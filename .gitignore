@@ -1,1 +1,5 @@
+#Config File w/ API Token
 config.json
+
+#JSON w/ Steam games and keys
+games.json
