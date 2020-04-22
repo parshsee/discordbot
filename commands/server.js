@@ -5,6 +5,7 @@ module.exports = {
     aliases: [],
     description: 'Displays server info!',
     args: false,
+    usage: ' ',                  //Space lets the usage show up when asking for it in commands
     execute(message, args) {
         //Send back message to channel the message was sent in
         message.channel.send('This servers\'s name is:' + message.guild.name + '\nTotal Members: ' + message.guild.memberCount);

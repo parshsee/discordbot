@@ -48,7 +48,13 @@ client.on('message', message => {
     //Checks args property of relevant command and to see if any args were passed
     //If command requires arguments and no arguments provided (just command)
     if(command.args && !args.length) {
-        return message.reply('you didn\'t provide any arguments!');
+        let reply = 'you didn\'t provide any arguments!';
+
+        if(command.usage) {
+            reply += `\nThe proper usage would be: \'${prefix}${command.name} ${command.usage}\'`;
+        }
+
+        return message.reply(reply);
     }
 
 
