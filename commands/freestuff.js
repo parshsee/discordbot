@@ -6,6 +6,7 @@ module.exports = {
     aliases: [],
     description: 'Shows all available free games',
     args: false,
+    usage: ' ',
     execute(message, args) {
         if(message.channel.name === 'freebies') {
             return message.channel.send('You are in the right channel');
