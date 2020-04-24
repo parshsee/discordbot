@@ -13,7 +13,7 @@ module.exports = {
         //Create generic Embedded Message with necessary fields
         const embed = new Discord.MessageEmbed()
             .setColor('#0099ff')
-            .setAuthor('Immature Allies', message.guild.iconURL())
+            .setAuthor(message.guild.name, message.guild.iconURL())
             .setThumbnail(message.guild.iconURL())
             .setTimestamp()
             .setFooter('Parshotan Seenanan');
@@ -46,9 +46,9 @@ module.exports = {
             return message.reply('that\'s not a valid command!');
         }
 
-        if(command.aliases) data.push(`Aliases: ${command.aliases.join(', ')}`);
-        if(command.description) data.push(`Description: ${command.description}`);
-        if(command.usage) data.push(`Usage: ${prefix}${command.name} ${command.usage}`);
+        if(command.aliases) data.push(`**Aliases:** ${command.aliases.join(', ')}`);
+        if(command.description) data.push(`**Description:** ${command.description}`);
+        if(command.usage) data.push(`**Usage:** ${prefix}${command.name} ${command.usage}`);
 
         //Create embedded message detailing the command 
         embed

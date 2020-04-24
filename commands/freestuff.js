@@ -1,9 +1,10 @@
 const jsonReader = require('../util/jsonReader');
 const Discord = require('discord.js');
 
-
 function chunkSubstr(str, size) {
+  //Gets the number of chunks (pretty much the amount of messages that will be sent)
   const numChunks = Math.ceil(str.length / size)
+  //Creats an array with that many positions
   const chunks = new Array(numChunks)
 
   for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
@@ -30,51 +31,66 @@ function chunkSubstr(str, size) {
 
 }
 
-async function sendEmbeds(text, channel) {
-    const testArr = chunkSubstr(text, 2048);
+/*
+  Take a string and channel and sends 'x'  amount of messages to the channel depending 
+  on the length of the text.
+  Async Function to allow for loop to create a message, send the message, then create another
+  if the text was long enough to be broken into multiple arrays and send that 
+  ([a]wait for embed to be made before sending it)
 
-    for (let chunk of testArr) { // Loop through every element
-      let embed = new Discord.MessageEmbed()
-        .setColor("00FFFF")
-        .setDescription(chunk);
-  
-      await channel.send({ embed }); // Wait for the embed to be sent
-    }
+*/
+async function sendEmbeds(text, message) {
+  const testArr = chunkSubstr(text, 2048);
+  let embed = new Discord.MessageEmbed()
+      .setColor("00FFFF")
+      .setAuthor(message.guild.name, message.guild.iconURL())
+      .setThumbnail(message.guild.iconURL())
+      .setTimestamp()
+      .setFooter('Parshotan Seenanan')
+      .setTitle('Available Games');
+  let count = 1;
+
+  for (let chunk of testArr) { // Loop through every element
+    //First Embedded Title this
+    //Else every other embedded gets 'Games Cont'
+    if(count === 1) {
+      embed
+        .setTitle('Available Games')
+        //.setThumbnail(message.guild.iconURL());
+    } else {
+      embed
+        .setTitle('Games Cont.')
+        //.setThumbnail();
+     }
+    embed
+      .setDescription(chunk);
+    count += 1;
+
+    await message.channel.send({ embed }); // Wait for the embed to be sent
   }
+}
 
 module.exports = {
     name: 'freestuff',
-    aliases: [],
-    description: 'Shows all available free games',
+    aliases: ['freegames', 'free'],
+    description: 'Shows all available games',
     args: false,
     usage: ' ',
     async execute(message, args) {
         if(message.channel.name === 'freebies') {
-            const embed = new Discord.MessageEmbed()
-                .setColor('#0099ff')
-                .setAuthor('Immature Allies', message.guild.iconURL())
-                .setThumbnail(message.guild.iconURL())
-                .setTimestamp()
-                .setFooter('Parshotan Seenanan')
-                .setTitle('Available Games');
-            
             let reply = '';
-            //Returns json array
+            //Returns json array, await so the program doesnt execute rest of lines 
+            //until it has fully read the file
             const gamesArray = await jsonReader('./games.json');
             
-            //Loops through array, gets all game names, adds to reply
+            //Loops through array, gets all game names, adds to reply 
+            //formatted with arrow emoji + two newlines at end
             gamesArray.forEach(function(game) {
-                //reply += `➡️ **${game.name}**\n\n`;
                 reply += `:arrow_right: **${game.name}** \n\n`
             });
-
-            return sendEmbeds(reply, message.channel);
-            // embed  
-            //     .setDescription(reply);
-
-            // return message.channel.send(embed);
+            return sendEmbeds(reply, message);
         }
-        
+
         message.channel.send('This command can only be used in \'freebies\' channel');
     }
 }
