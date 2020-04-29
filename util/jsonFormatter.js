@@ -1,8 +1,18 @@
 const fs = require('fs').promises;
 const jsonReader = require('./jsonReader');
+const jsonWriter = require('./jsonWriter');
 
-async function jsonFormatter(file) {
-    const jsonArray = await jsonReader(file);
+/** 
+ *  Takes the given filePath and reads it, getting a jsonArray
+ *  Sorts the array alphabetically based on name
+ *  Loops through the array and updates the ids for every object (couldn't find a way to do it in sort)
+ *  Turns the array into a jsonString ---- Needed to write to file (otherwise get [object Object])
+ *  Writes the jsonString back to the filePath, since it exists it overwrites the exisiting file
+    https://medium.com/@osiolabs/read-write-json-files-with-node-js-92d03cc82824
+    https://stackoverflow.com/questions/35576041/sort-json-by-value/35576179
+*/
+async function jsonFormatter(filePath) {
+    const jsonArray = await jsonReader(filePath);
 
     jsonArray.sort(function(a, b) {
         return a.name.localeCompare(b.name);
@@ -14,13 +24,7 @@ async function jsonFormatter(file) {
 
     const jsonString = JSON.stringify(jsonArray, null, 2);
 
-    try {
-        await fs.writeFile(file, jsonString);
-        return true;
-    } catch (err) {
-        console.log("Error Formatting/Overwritting File: " + err);
-        return false;
-    }
+    await jsonWriter(filePath, jsonString);
 }
 
 module.exports = jsonFormatter;
