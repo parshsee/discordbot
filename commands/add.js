@@ -17,13 +17,9 @@ function argsValidation(args) {
     //Example Key: LLJNN-IF2XT-6NGVY
     //Should follow specified format
     //Game Name, Key, Type
-    gameType = args[args.length - 1];
-    gameKey = args[args.length - 2].split('-');
-    gameName = ''
-
-    for(let i = 0; i <= args.length - 3; i++) {
-        gameName += args[i] + ' ';
-    }
+    const gameType = args[args.length - 1];
+    const gameKey = args[args.length - 2].split('-');
+    let gameName = args.slice(0, args.length - 2).join(' ');
 
     //If game type isn't game, dlc, or other 
     //Return error w/ message
@@ -74,15 +70,12 @@ function argsValidation(args) {
 module.exports = {
     name: 'add',
     aliases: [],
-    description: 'Adds the specified game and key to the database!',
+    description: 'Adds the specified game and key to the database! \nThis command can only be used as a DM to the bot',
     args: true,
     usage: '[game name] [key] [type: Game, DLC, Other]',
     async execute(message, args) {
         //Create a reply with sentence + their message 
-        let reply = 'This command can only be used as a DM: \nia!add ';
-        for(arg of args) {
-            reply += arg + " ";
-        }
+        let reply = `This command can only be used as a DM: \n${message.content}`;
 
         //If the message was sent in dm channel
         if(message.channel.type === 'dm') {
@@ -114,7 +107,8 @@ module.exports = {
         //Remember deleting other peopels messages is a permission
         //Wouldn't make sense to do this in a dm
         message.delete().catch();
-        //DM the user the reply
+        //DM the user the reply and send message to check dm
+        message.reply('check your dm\'s');
         return message.author.send(reply);
     }
 }
