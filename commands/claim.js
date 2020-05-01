@@ -6,7 +6,7 @@ const { gamesFile } = require('../config.json');
 module.exports = {
 	name: 'claim',
 	aliases: ['get'],
-	description: 'Claim a game and recieve the steam key for it!',
+	description: 'Claim a game and recieve the steam key for it!\nKey will be sent as a DM to the user',
 	args: true,
 	usage: '[game name]',
 	async execute(message, args) {
