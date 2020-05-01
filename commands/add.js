@@ -92,6 +92,11 @@ module.exports = {
 
 			// Get the jsonArray of the games file
 			const jsonArray = await jsonReader(gamesFile);
+
+			//	Check if the steam key is already in the file, return error message
+			if(jsonArray.find(game => game.key.toLowerCase() === errors.key.toLowerCase())) {
+				return message.channel.send('Steam key already in database.');
+			}
 			// Add the formatted object from user arguments into the end
 			// Turn the array into a JSON string
 			jsonArray.push(errors);
