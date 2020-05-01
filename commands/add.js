@@ -1,6 +1,7 @@
 const jsonReader = require('../util/jsonReader');
 const jsonWriter = require('../util/jsonWriter');
 const jsonFormatter = require('../util/jsonFormatter');
+const { gamesFile } = require('../config.json');
 
 function argsValidation(args) {
 	const errors = {
@@ -90,15 +91,15 @@ module.exports = {
 			}
 
 			// Get the jsonArray of the games file
-			const jsonArray = await jsonReader('./games.json');
+			const jsonArray = await jsonReader(gamesFile);
 			// Add the formatted object from user arguments into the end
 			// Turn the array into a JSON string
 			jsonArray.push(errors);
 			const jsonString = JSON.stringify(jsonArray);
 			// Write to the games file (overwriting it with added game)
-			await jsonWriter('./games.json', jsonString);
+			await jsonWriter(gamesFile, jsonString);
 			// Format the file so the added game get alphabetized & ids get updated
-			await jsonFormatter('./games.json');
+			await jsonFormatter(gamesFile);
 
 			// Reply to user the success
 			return message.channel.send('Game Added Successfully');

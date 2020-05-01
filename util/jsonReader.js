@@ -1,5 +1,5 @@
 const fs = require('fs').promises;
-// const gamesJSON = require('../games.json');
+// const gamesJSON = require(gamesFile);
 // Require reads file once, requiring it again reads from cache
 // Fine for reading static data, but not changes
 
