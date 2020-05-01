@@ -1,7 +1,7 @@
 const fs = require('fs').promises;
-//const gamesJSON = require('../games.json');
-//Require reads file once, requiring it again reads from cache
-//Fine for reading static data, but not changes
+// const gamesJSON = require('../games.json');
+// Require reads file once, requiring it again reads from cache
+// Fine for reading static data, but not changes
 
 /** fs.readFile reads asynchronolously so the next lines of code will execute
     regardless if it's done reading file or not
@@ -16,10 +16,10 @@ const fs = require('fs').promises;
 
     https://stackoverflow.com/questions/46867517/how-to-read-file-with-async-await-properly
     https://github.com/Keyang/node-csvtojson/issues/278
- */ 
+ */
 async function jsonReader(filePath) {
-    const data = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(data);
+	const data = await fs.readFile(filePath, 'utf8');
+	return JSON.parse(data);
 }
 
 module.exports = jsonReader;
