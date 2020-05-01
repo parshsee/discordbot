@@ -93,6 +93,12 @@ module.exports = {
 			gamesArray.forEach(function(game) {
 				reply += `:arrow_right: **${game.name}** \n\n`;
 			});
+
+			//	If no game in database, reply wouldn't have anything added to it, send modified reply
+			//	\n\n allows chunk method to work without changes
+			if(reply === '') {
+				reply += 'No games in database.\nTo add a game use ia!add [game name] [steam key] [type: Game, DLC, Other]\n\n';
+			}
 			return sendEmbeds(reply, message);
 		}
 
