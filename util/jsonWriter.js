@@ -8,13 +8,13 @@ const fs = require('fs').promises;
     (Log statements don't seem to work regardless of if condition)
  */
 async function jsonWriter(filePath, jsonString) {
-    await fs.writeFile(filePath, jsonString, err => {
-        if(err) {
-            console.log('Error Writing File: ', err);
-        } else {
-            console.log('Successfully wrote file!');
-        }
-    });
+	await fs.writeFile(filePath, jsonString, err => {
+		if(err) {
+			console.log('Error Writing File: ', err);
+		} else {
+			console.log('Successfully wrote file!');
+		}
+	});
 }
 
 module.exports = jsonWriter;
