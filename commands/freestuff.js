@@ -1,5 +1,6 @@
-const jsonReader = require('../util/jsonReader');
 const Discord = require('discord.js');
+const jsonReader = require('../util/jsonReader');
+const { gamesFile } = require('../config.json');
 
 function chunkSubstr(str, size) {
 	// Gets the number of chunks (pretty much the amount of messages that will be sent)
@@ -85,13 +86,19 @@ module.exports = {
 			let reply = '';
 			// Returns json array, await so the program doesnt execute rest of lines
 			// until it has fully read the file
-			const gamesArray = await jsonReader('./games.json');
+			const gamesArray = await jsonReader(gamesFile);
 
 			// Loops through array, gets all game names, adds to reply
 			// formatted with arrow emoji + two newlines at end
 			gamesArray.forEach(function(game) {
 				reply += `:arrow_right: **${game.name}** \n\n`;
 			});
+
+			//	If no game in database, reply wouldn't have anything added to it, send modified reply
+			//	\n\n allows chunk method to work without changes
+			if(reply === '') {
+				reply += 'No games in database.\nTo add a game use ia!add [game name] [steam key] [type: Game, DLC, Other]\n\n';
+			}
 			return sendEmbeds(reply, message);
 		}
 
