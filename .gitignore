@@ -3,3 +3,6 @@ config.json
 
 #JSON w/ Steam games and keys
 games.json
+
+#Node Modules
+node_modules
