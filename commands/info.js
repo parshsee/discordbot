@@ -118,6 +118,16 @@ module.exports = {
 			return message.channel.send(gameInformation.errorMessage);
 		}
 
+		let gameSummary = gameInformation.summary;
+
+		// If the summary is longer than 1024 characters
+		// Get a new length within 1024 characters that ends in a newline
+		// Set the summary to the shorten version
+		if(gameSummary.length > 1024) {
+			const newLength = gameSummary.substr(0, 1024).lastIndexOf('\n');
+			gameSummary = gameSummary.substr(0, newLength);
+		}
+
 		// Construct the embed with the game information
 		const embed = new discord.MessageEmbed()
 			.setColor('#0099ff')
@@ -127,7 +137,7 @@ module.exports = {
 			.setThumbnail(gameInformation.coverImage)
 			.setTitle(gameInformation.name)
 			.addFields(
-				{ name: 'Game Information', value: gameInformation.summary, inline: true },
+				{ name: 'Game Information', value: gameSummary, inline: true },
 				{ name: 'Game Modes', value: gameInformation.gameModes, inline: true },
 			);
 		// Return the embed
