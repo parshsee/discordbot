@@ -1,6 +1,6 @@
 const axios = require('axios');
 const discord = require('discord.js');
-const { gameAPI, coverAPI, gameModeAPI, APIKey } = require('../config.json');
+// const { gameAPI, coverAPI, gameModeAPI, APIKey } = require('../config.json');
 
 async function apiCalls(gameName) {
 	let gameInformation = {};
@@ -10,11 +10,11 @@ async function apiCalls(gameName) {
 	// API call to search for game
 	// based on user input
 	const searchResult = (await axios({
-		url: gameAPI,
+		url: process.env.gameAPI,
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
-			'user-key': APIKey,
+			'user-key': process.env.APIKey,
 		},
 		data: `search "${gameName}";`,
 	// Data without the [0] because it is an array of search ids
@@ -34,11 +34,11 @@ async function apiCalls(gameName) {
 	// API call to get game information
 	// based on first search result
 	const gameInfo = (await axios({
-		url: gameAPI,
+		url: process.env.gameAPI,
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
-			'user-key': APIKey,
+			'user-key': process.env.APIKey,
 		},
 		data: `fields cover, game_modes, name, summary; where id = ${firstGameID};`,
 	// Data with the [0] because it only has one object in the array
@@ -56,11 +56,11 @@ async function apiCalls(gameName) {
 	// API call to get the game cover info
 	// based on cover id
 	const gameCoverInfo = (await axios({
-		url: coverAPI,
+		url: process.env.coverAPI,
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
-			'user-key': APIKey,
+			'user-key': process.env.APIKey,
 		},
 		data: `fields url; where id = ${gameCover};`,
 	// Data with the [0] because it only has one object in the array
@@ -76,11 +76,11 @@ async function apiCalls(gameName) {
 		// API call to get the game modes info
 		// based on game mode ids
 		const gameModesInfo = (await axios({
-			url: gameModeAPI,
+			url: process.env.gameModeAPI,
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
-				'user-key': APIKey,
+				'user-key': process.env.APIKey,
 			},
 			data: `fields name; where id = ${gameMode};`,
 		// Data with the [0] because it only has one object in the array

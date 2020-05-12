@@ -3,7 +3,7 @@ const fs = require('fs');
 // Require the Discord.js module
 const Discord = require('discord.js');
 // Require the config file, gets the prefix and token from it
-const { prefix, token } = require('./config.json');
+// const { prefix, token } = require('./config.json');
 
 // Create a new Discord client (bot)
 const client = new Discord.Client();
@@ -30,10 +30,10 @@ client.once('ready', () => {
 
 client.on('message', message => {
 	// If the message doesn't start with the prefix || This bot sent the message, exit
-	if(!message.content.startsWith(prefix) || message.author.bot) return;
+	if(!message.content.startsWith(process.env.prefix) || message.author.bot) return;
 
 	// Slices off prefix (removes) and splits everything seperated by space into an array (regex accounts for multiple spaces)
-	const args = message.content.slice(prefix.length).split(/ +/);
+	const args = message.content.slice(process.env.prefix.length).split(/ +/);
 	// Gets the command, which should be the first in the array
 	// Shift stores the command and removes it from the array
 	// This is just the command name (i.e server, ping, user-info)
@@ -51,7 +51,7 @@ client.on('message', message => {
 		let reply = 'you didn\'t provide any arguments!';
 
 		if(command.usage) {
-			reply += `\nThe proper usage would be: '${prefix}${command.name} ${command.usage}'`;
+			reply += `\nThe proper usage would be: '${process.env.prefix}${command.name} ${command.usage}'`;
 		}
 
 		return message.reply(reply);
@@ -71,5 +71,5 @@ client.on('message', message => {
 
 
 // Login in server with app token should be last line of code
-client.login(token);
+client.login(process.env.token);
 
