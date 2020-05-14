@@ -1,7 +1,7 @@
+require('dotenv').config();
 const jsonReader = require('../util/jsonReader');
 const jsonWriter = require('../util/jsonWriter');
 const jsonFormatter = require('../util/jsonFormatter');
-const { gamesFile } = require('../config.json');
 
 function argsValidation(args) {
 	const errors = {
@@ -91,7 +91,7 @@ module.exports = {
 			}
 
 			// Get the jsonArray of the games file
-			const jsonArray = await jsonReader(gamesFile);
+			const jsonArray = await jsonReader(process.env.GAMES_FILE);
 
 			//	Check if the steam key is already in the file, return error message
 			if(jsonArray.find(game => game.key.toLowerCase() === errors.key.toLowerCase())) {
@@ -102,9 +102,9 @@ module.exports = {
 			jsonArray.push(errors);
 			const jsonString = JSON.stringify(jsonArray);
 			// Write to the games file (overwriting it with added game)
-			await jsonWriter(gamesFile, jsonString);
+			await jsonWriter(process.env.GAMES_FILE, jsonString);
 			// Format the file so the added game get alphabetized & ids get updated
-			await jsonFormatter(gamesFile);
+			await jsonFormatter(process.env.GAMES_FILE);
 
 			// Reply to user the success
 			return message.channel.send('Game Added Successfully');

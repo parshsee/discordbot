@@ -1,7 +1,7 @@
+require('dotenv').config();
 const jsonReader = require('../util/jsonReader');
 const jsonWriter = require('../util/jsonWriter');
 const jsonFormatter = require('../util/jsonFormatter');
-const { gamesFile } = require('../config.json');
 
 module.exports = {
 	name: 'claim',
@@ -10,7 +10,7 @@ module.exports = {
 	args: true,
 	usage: '[game name]',
 	async execute(message, args) {
-		const jsonArray = await jsonReader(gamesFile);
+		const jsonArray = await jsonReader(process.env.GAMES_FILE);
 		const gameName = args.join(' ');
 
 		if(message.channel.name !== 'freebies') {
@@ -25,9 +25,9 @@ module.exports = {
 
 			const jsonString = JSON.stringify(jsonArray);
 			// Write to the games file (overwriting it with added game)
-			await jsonWriter(gamesFile, jsonString);
+			await jsonWriter(process.env.GAMES_FILE, jsonString);
 			// Format the file so the added game get alphabetized & ids get updated
-			await jsonFormatter(gamesFile);
+			await jsonFormatter(process.env.GAMES_FILE);
 
 			message.channel.send(`A copy of ${name} has been claimed by ${message.author}`);
 			return message.author.send(`Game Claimed: ${name}\nKey: ${key}`);

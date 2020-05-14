@@ -1,5 +1,5 @@
+require('dotenv').config();
 const Discord = require('discord.js');
-const { prefix } = require('../config.json');
 
 module.exports = {
 	name: 'commands',
@@ -40,7 +40,7 @@ module.exports = {
 			// Add a blank field and an 'Additional Help' field
 			embed
 				.addField('\u200B', '\u200B')
-				.addField('Additional Help', `You can send '${prefix}help ${this.usage}' to get more detailed information on that command!`);
+				.addField('Additional Help', `You can send '${process.env.PREFIX}help ${this.usage}' to get more detailed information on that command!`);
 
 			return message.channel.send(embed);
 		}
@@ -57,7 +57,7 @@ module.exports = {
 
 		if(command.aliases) data.push(`**Aliases:** ${command.aliases.join(', ')}`);
 		if(command.description) data.push(`**Description:** ${command.description}`);
-		if(command.usage) data.push(`**Usage:** ${prefix}${command.name} ${command.usage}`);
+		if(command.usage) data.push(`**Usage:** ${process.env.PREFIX}${command.name} ${command.usage}`);
 
 		// Create embedded message detailing the command
 		embed
