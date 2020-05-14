@@ -72,4 +72,3 @@ client.on('message', message => {
 
 // Login in server with app token should be last line of code
 client.login(process.env.TOKEN);
-
