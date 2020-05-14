@@ -1,6 +1,6 @@
+require('dotenv').config();
 const Discord = require('discord.js');
 const jsonReader = require('../util/jsonReader');
-// const { gamesFile } = require('../config.json');
 
 function chunkSubstr(str, size) {
 	// Gets the number of chunks (pretty much the amount of messages that will be sent)
@@ -86,7 +86,7 @@ module.exports = {
 			let reply = '';
 			// Returns json array, await so the program doesnt execute rest of lines
 			// until it has fully read the file
-			const gamesArray = await jsonReader(process.env.gamesFile);
+			const gamesArray = await jsonReader(process.env.GAMES_FILE);
 
 			// Loops through array, gets all game names, adds to reply
 			// formatted with arrow emoji + two newlines at end

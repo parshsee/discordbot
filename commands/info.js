@@ -1,6 +1,6 @@
+require('dotenv').config();
 const axios = require('axios');
 const discord = require('discord.js');
-// const { gameAPI, coverAPI, gameModeAPI, APIKey } = require('../config.json');
 
 async function apiCalls(gameName) {
 	let gameInformation = {};
@@ -10,11 +10,11 @@ async function apiCalls(gameName) {
 	// API call to search for game
 	// based on user input
 	const searchResult = (await axios({
-		url: process.env.gameAPI,
+		url: process.env.GAME_API,
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
-			'user-key': process.env.APIKey,
+			'user-key': process.env.API_KEY,
 		},
 		data: `search "${gameName}";`,
 	// Data without the [0] because it is an array of search ids
@@ -34,11 +34,11 @@ async function apiCalls(gameName) {
 	// API call to get game information
 	// based on first search result
 	const gameInfo = (await axios({
-		url: process.env.gameAPI,
+		url: process.env.GAME_API,
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
-			'user-key': process.env.APIKey,
+			'user-key': process.env.API_KEY,
 		},
 		data: `fields cover, game_modes, name, summary; where id = ${firstGameID};`,
 	// Data with the [0] because it only has one object in the array
@@ -56,11 +56,11 @@ async function apiCalls(gameName) {
 	// API call to get the game cover info
 	// based on cover id
 	const gameCoverInfo = (await axios({
-		url: process.env.coverAPI,
+		url: process.env.GAME_COVER_API,
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
-			'user-key': process.env.APIKey,
+			'user-key': process.env.API_KEY,
 		},
 		data: `fields url; where id = ${gameCover};`,
 	// Data with the [0] because it only has one object in the array
@@ -76,11 +76,11 @@ async function apiCalls(gameName) {
 		// API call to get the game modes info
 		// based on game mode ids
 		const gameModesInfo = (await axios({
-			url: process.env.gameModeAPI,
+			url: process.env.GAME_MODE_API,
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
-				'user-key': process.env.APIKey,
+				'user-key': process.env.API_KEY,
 			},
 			data: `fields name; where id = ${gameMode};`,
 		// Data with the [0] because it only has one object in the array
