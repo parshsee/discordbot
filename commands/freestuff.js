@@ -91,7 +91,7 @@ module.exports = {
 			// Loops through array, gets all game names, adds to reply
 			// formatted with arrow emoji + two newlines at end
 			gamesArray.forEach(function(game) {
-				reply += `:arrow_right: **${game.name}** \n\n`;
+				reply += `:arrow_right: **${game.name}** \n Type: ${game.key} \n\n`;
 			});
 
 			//	If no game in database, reply wouldn't have anything added to it, send modified reply
