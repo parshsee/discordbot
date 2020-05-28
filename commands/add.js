@@ -2,6 +2,8 @@ require('dotenv').config();
 const jsonReader = require('../util/jsonReader');
 const jsonWriter = require('../util/jsonWriter');
 const jsonFormatter = require('../util/jsonFormatter');
+// Get the Games schema
+const Game = require('../database/models/games');
 
 function argsValidation(args) {
 	const errors = {
@@ -89,6 +91,24 @@ module.exports = {
 			} else {
 				delete errors.found;
 			}
+
+			// Construct a new Games model from the model
+			const games = new Game({
+				gameName: errors.name,
+				gameKey: errors.key,
+				gameType: errors.type,
+			});
+
+			// Save the game to the database
+			(async () => {
+				try {
+					await games.save();
+					console.log('Game added to Database');
+				} catch (err) {
+					console.log('error: ' + err);
+				}
+			})();
+
 
 			// Get the jsonArray of the games file
 			const jsonArray = await jsonReader(process.env.GAMES_FILE);
