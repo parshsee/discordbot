@@ -35,7 +35,7 @@ module.exports = {
 				.setDescription('Here\'s a list of all my commands!');
 			// Add a field in the message for every command, and their description
 			for(const command of commands) {
-				embed.addField(`**${command[1].name}**`, command[1].description);
+				embed.addField(`__**${command[1].name}**__`, command[1].description);
 			}
 			// Add a blank field and an 'Additional Help' field
 			embed
