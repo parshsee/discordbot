@@ -1,6 +1,7 @@
 require('dotenv').config();
 const Discord = require('discord.js');
-const jsonReader = require('../util/jsonReader');
+// const jsonReader = require('../util/jsonReader');
+const Games = require('../database/models/games');
 
 function chunkSubstr(str, size) {
 	// Gets the number of chunks (pretty much the amount of messages that will be sent)
@@ -86,12 +87,17 @@ module.exports = {
 			let reply = '';
 			// Returns json array, await so the program doesnt execute rest of lines
 			// until it has fully read the file
-			const gamesArray = await jsonReader(process.env.GAMES_FILE);
+			// const gamesArray = await jsonReader(process.env.GAMES_FILE);
+
+			// Query the database, finding all documents in Games collection and sorting by name (1 is ascending, -1 is decending)
+			// Await the query to get the json array of all documents
+			const query = Games.find().sort({ gameName: 1 });
+			const docs = await query;
 
 			// Loops through array, gets all game names, adds to reply
 			// formatted with arrow emoji + two newlines at end
-			gamesArray.forEach(function(game) {
-				reply += `:arrow_right: **${game.name}** \n Type: ${game.key} \n\n`;
+			docs.forEach(function(game) {
+				reply += `:free: **${game.gameName}** \n Type: ${game.gameType} \n\n`;
 			});
 
 			//	If no game in database, reply wouldn't have anything added to it, send modified reply
