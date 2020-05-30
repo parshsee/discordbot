@@ -1,7 +1,7 @@
 require('dotenv').config();
-const jsonReader = require('../util/jsonReader');
-const jsonWriter = require('../util/jsonWriter');
-const jsonFormatter = require('../util/jsonFormatter');
+// const jsonReader = require('../util/jsonReader');
+// const jsonWriter = require('../util/jsonWriter');
+// const jsonFormatter = require('../util/jsonFormatter');
 // Get the Games schema
 const Game = require('../database/models/games');
 
@@ -35,7 +35,7 @@ function argsValidation(args) {
 	// Return error w/ messaage
 	if(gameKey.length < 3 || gameKey.length > 3) {
 		errors.found = true;
-		errors.message = 'Steam key not recognized. Make sure it is in the correct format';
+		errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
 		return errors;
 	} else {
 		// For every section of the key
@@ -45,7 +45,7 @@ function argsValidation(args) {
 		for(const keyPart of gameKey) {
 			if(keyPart.length < 5 || keyPart.length > 5) {
 				errors.found = true;
-				errors.message = 'Steam key not recognized. Make sure it is in the correct format';
+				errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
 				return errors;
 			}
 			// if(!isNaN(keyPart)) {
@@ -54,7 +54,7 @@ function argsValidation(args) {
 			// }
 			if(!(keyPart === keyPart.toUpperCase())) {
 				errors.found = true;
-				errors.message = 'Steam key not recognized. Make sure it is in the correct format';
+				errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
 				return errors;
 			}
 		}
@@ -73,7 +73,7 @@ function argsValidation(args) {
 module.exports = {
 	name: 'add',
 	aliases: [],
-	description: 'Adds the specified game and key to the database! \nThis command can only be used as a DM to the bot',
+	description: 'Adds the specified game and key to the database! \n__*This command can only be used as a DM to the bot*__',
 	args: true,
 	usage: '[game name] [key] [type: Game, DLC, Other]',
 	async execute(message, args) {
@@ -104,37 +104,40 @@ module.exports = {
 				try {
 					await games.save();
 					console.log('Game added to Database');
+					return message.channel.send('Game Added Successfully');
 				} catch (err) {
 					console.log('error: ' + err);
+					return message.channel.send('Steam key already in database.');
 				}
 			})();
 
+			return;
 
 			// Get the jsonArray of the games file
-			const jsonArray = await jsonReader(process.env.GAMES_FILE);
+			// const jsonArray = await jsonReader(process.env.GAMES_FILE);
 
-			//	Check if the steam key is already in the file, return error message
-			if(jsonArray.find(game => game.key.toLowerCase() === errors.key.toLowerCase())) {
-				return message.channel.send('Steam key already in database.');
-			}
-			// Add the formatted object from user arguments into the end
-			// Turn the array into a JSON string
-			jsonArray.push(errors);
-			const jsonString = JSON.stringify(jsonArray);
-			// Write to the games file (overwriting it with added game)
-			await jsonWriter(process.env.GAMES_FILE, jsonString);
-			// Format the file so the added game get alphabetized & ids get updated
-			await jsonFormatter(process.env.GAMES_FILE);
+			// //	Check if the steam key is already in the file, return error message
+			// if(jsonArray.find(game => game.key.toLowerCase() === errors.key.toLowerCase())) {
+			// 	return message.channel.send('Steam key already in database.');
+			// }
+			// // Add the formatted object from user arguments into the end
+			// // Turn the array into a JSON string
+			// jsonArray.push(errors);
+			// const jsonString = JSON.stringify(jsonArray);
+			// // Write to the games file (overwriting it with added game)
+			// await jsonWriter(process.env.GAMES_FILE, jsonString);
+			// // Format the file so the added game get alphabetized & ids get updated
+			// await jsonFormatter(process.env.GAMES_FILE);
 
-			// Reply to user the success
-			return message.channel.send('Game Added Successfully');
+			// // Reply to user the success
+			// return message.channel.send('Game Added Successfully');
 		}
 		// Delete can only work on server, not in dm's
 		// Remember deleting other peopels messages is a permission
 		// Wouldn't make sense to do this in a dm
 		message.delete().catch();
 		// DM the user the reply and send message to check dm
-		message.reply('check your dm\'s');
+		message.reply('lets keep that between us. Check your dm\'s <3');
 		return message.author.send(reply);
 	},
 };
