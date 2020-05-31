@@ -4,6 +4,8 @@ require('dotenv').config();
 const fs = require('fs');
 // Require the Discord.js module
 const Discord = require('discord.js');
+// Require the database connection to MongoDB
+const database = require('./database/database.js');
 
 // Create a new Discord client (bot)
 const client = new Discord.Client();
@@ -22,9 +24,22 @@ for(const file of commandFiles) {
 // When the client is ready, run this code
 // This event only triggers once, at the very beginning when logging in (hence the 'once')
 client.once('ready', () => {
-	console.log('Ready!');
 	client.user.setUsername('Immature Bot');
 	client.user.setActivity('you | ia!commands', { type: 'WATCHING' });
+	console.log('Ready!');
+
+	// Make the connection to MongoDB
+	// Async/Await instead of Then/Catch
+	// https://stackoverflow.com/questions/54890608/how-to-use-async-await-with-mongoose/54892088
+	(async () => {
+		try {
+			await database;
+			console.log('Connected to MongoDB!');
+		} catch (err) {
+			console.log('error: ' + err);
+		}
+	})();
+
 });
 
 
