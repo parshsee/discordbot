@@ -6,7 +6,8 @@ const fs = require('fs');
 const Discord = require('discord.js');
 // Require the database connection to MongoDB
 const database = require('./database/database.js');
-
+// Require the birthday collection from MongoDB
+const Birthday = require('./database/models/birthdays');
 // Create a new Discord client (bot)
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -30,6 +31,7 @@ client.once('ready', () => {
 
 	// Make the connection to MongoDB
 	// Async/Await instead of Then/Catch
+	// Try/Catch to get any errors from await
 	// https://stackoverflow.com/questions/54890608/how-to-use-async-await-with-mongoose/54892088
 	(async () => {
 		try {
@@ -40,6 +42,14 @@ client.once('ready', () => {
 		}
 	})();
 
+	// https://stackoverflow.com/questions/45120618/send-a-message-with-discord-js
+	// Freebies Channel: 	In .env file
+	// Gen Channel: 		In .env file
+	// 1000 = 1 sec, 10000 = 10 sec, 86400000 = 24 hours
+	const genChannel = client.channels.cache.get(`${process.env.GEN_CHANNEL_ID}`);
+
+	// Sets an interval of milliseconds, to run the birthdayChecker code
+	setInterval(() => birthdayChecker(genChannel), 86400000);
 });
 
 
@@ -87,3 +97,31 @@ client.on('message', message => {
 
 // Login in server with app token should be last line of code
 client.login(process.env.TOKEN);
+
+async function birthdayChecker(genChannel) {
+	// Create a query getting all documents from Birthday collection
+	// Await query to get array of document objects
+	const query = Birthday.find();
+	const doc = await query;
+
+	// Get the current date
+	// Get the current month & day in mm/dd format
+	// Get the current year
+	const currentDate = new Date();
+	const currentMonthDay = `${currentDate.getMonth() + 1}/${currentDate.getDate()}`;
+	const currentYear = currentDate.getFullYear();
+
+	// For every birthday object get the date in mm/dd format and year
+	doc.forEach((birthday) => {
+		const birthdayDate = `${birthday.birthday.getMonth() + 1}/${birthday.birthday.getDate()}`;
+		const birthdayYear = birthday.birthday.getFullYear();
+
+		// If the birthday month and date are the same as the current month and day
+		// Send a message to the general channel
+		if (birthdayDate === currentMonthDay) {
+			genChannel.send(`@everyone, ${birthday.firstName} ${birthday.lastName} turns ${currentYear - birthdayYear} today!`);
+			console.log('There is a birthday today');
+		}
+	});
+
+}
