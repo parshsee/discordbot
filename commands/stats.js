@@ -18,31 +18,34 @@ module.exports = {
 			const member = message.mentions.members.size === 1 ? message.mentions.members.first() : message.guild.members.cache.get(args[0]);
 
 			if(member) {
-				// Send embed with info
+				// Create and send embed with info on user
 				const embed = new Discord.MessageEmbed()
 					.setColor('#0099ff')
 					.setTimestamp()
 					.setFooter('Parshotan Seenanan')
-					.setAuthor(`${member.user.usename} (${member.id})`, member.user.displayAvatarURL())
+					.setAuthor(`${member.user.username}`, member.user.displayAvatarURL())
 					.setThumbnail(member.user.displayAvatarURL())
 					.addField('Created On', member.user.createdAt.toLocaleString(), true)
 					.addField('Joined On', member.joinedAt.toLocaleString(), true)
 					.addField('Tag', member.user.tag)
 					.addField('ID', member.id)
 					.addField('Nickname', member.nickname ? member.nickname : 'None')
-					.addField('Presence', member.presence.status)
+					.addField('Presence', member.presence.status === 'online' ? `:green_circle: ${member.presence.status}` : `:red_circle: ${member.presence.status}`)
 					.setDescription(`${member.roles.cache.map(role => role.toString()).join(' ')}`);
 
 				return message.channel.send(embed);
 			} else {
 				// Send error message, couldn't find user
 				// Error can be caused because id couldnt be
-				return message.channel.send('Could not find that id or user in the server');
+				return message.channel.send('Could not find that ID or User in the server');
 			}
 
 		} else {
-			const { guild } = message;
 			// If command is just !stats
+
+			// Get guild object from message object
+			const { guild } = message;
+			// Create and send embed with info on server
 			const embed = new Discord.MessageEmbed()
 				.setColor('#0099ff')
 				.setTimestamp()
