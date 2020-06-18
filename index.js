@@ -26,7 +26,7 @@ for(const file of commandFiles) {
 // This event only triggers once, at the very beginning when logging in (hence the 'once')
 client.once('ready', () => {
 	client.user.setUsername('Immature Bot');
-	client.user.setActivity('you | ia!commands', { type: 'WATCHING' });
+	client.user.setActivity('you | ia!help', { type: 'WATCHING' });
 	console.log('Ready!');
 
 	// Make the connection to MongoDB
@@ -55,7 +55,8 @@ client.once('ready', () => {
 
 client.on('message', message => {
 	// If the message doesn't start with the prefix || This bot sent the message, exit
-	if(!message.content.startsWith(process.env.PREFIX) || message.author.bot) return;
+	// Updated to check for Ia and IA command
+	if(!message.content.toLowerCase().startsWith(process.env.PREFIX) || message.author.bot) return;
 
 	// Slices off prefix (removes) and splits everything seperated by space into an array (regex accounts for multiple spaces)
 	const args = message.content.slice(process.env.PREFIX.length).split(/ +/);
@@ -94,6 +95,33 @@ client.on('message', message => {
 
 });
 
+// Client detects when a person joins (is added) to the guild
+// Passes a member object
+client.on('guildMemberAdd', member => {
+	// Get the member log channel
+	const memberLogChannel = client.channels.cache.get(`${process.env.MEMBER_LOG_CHANNEL_ID}`);
+	// Create and send an embed that the user has joined
+	const embed = new Discord.MessageEmbed()
+		.setFooter(`${member.user.tag} has joined.`, member.user.displayAvatarURL());
+
+	// Log the joined user
+	console.log(`${member.user.tag} has joined.`);
+	memberLogChannel.send(embed);
+});
+
+// Client detects when a person leaves (is removed) from the guild
+// Passes a member object
+client.on('guildMemberRemove', member => {
+	// Get the member log channel
+	const memberLogChannel = client.channels.cache.get(`${process.env.MEMBER_LOG_CHANNEL_ID}`);
+	// Create and send an embed that the user has left
+	const embed = new Discord.MessageEmbed()
+		.setFooter(`${member.user.tag} has left.`, member.user.displayAvatarURL());
+
+	// Log the person that left
+	console.log(`${member.user.tag} has left.`);
+	memberLogChannel.send(embed);
+});
 
 // Login in server with app token should be last line of code
 client.login(process.env.TOKEN);
