@@ -1,7 +1,7 @@
 module.exports = {
 	name: 'delete',
 	aliases: ['prune'],
-	description: 'Deletes the last message or a given number of messages (up to 100) in the channel\n__*Only available to Mods*__',
+	description: 'Deletes the last message or a given number of messages (up to 100) in the channel from the last two weeks\n__*Only available to Mods*__',
 	args: false,
 	usage: ' **OR** \nia!delete [# of messages]',
 	execute(message, args) {
