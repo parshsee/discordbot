@@ -7,7 +7,7 @@ const quotesSchema = mongoose.Schema({
 	firstName: { type: String, require: true },
 	lastName: { type: String, require: true },
 	quote: { type: String, require: true },
-	timestamp: { type: Date, require: true },
+	timestamp: { type: Date, require: true, default: Date.now },
 });
 
 // Export the model as 'Games' to be used when adding
