@@ -1,13 +1,44 @@
 const Quote = require('../database/models/quotes');
-// const idNumber = db call || 1;
 
 async function addQuote(message, args) {
+	// Check if first and last name are strings
+	if(!isNaN(args[0]) || !isNaN(args[1])) {
+		return message.channel.send('Please enter a valid name');
+	}
+
 	// Gets the first & last names (capitalizing the first letter in each)
 	// The rest of the args should be the quote
+	// Replace any occurence of quotes special char (")
 	const userFirstName = args[0].charAt(0).toUpperCase() + args[0].slice(1);
 	const userLastName = args[1].charAt(0).toUpperCase() + args[1].slice(1);
-	const userQuote = args.slice(2).join(' ');
+	const userQuote = args.slice(2).join(' ').replace(/["]+/g, '');
 
+	const query = Quote.find().sort({ id: 1 });
+	const doc = await query;
+
+	const idNumber = doc.length ? doc[doc.length - 1].id + 1 : 1;
+
+	console.log(idNumber);
+
+	// Construct a new quote document from the model
+	const quote = new Quote({
+		id: idNumber,
+		firstName: userFirstName,
+		lastName: userLastName,
+		quote: userQuote,
+	});
+
+	// Save the Quote to the database
+	(async () => {
+		try {
+			await quote.save();
+			console.log('Quote added to Database');
+			return message.channel.send('Quote Added Successfully');
+		} catch (err) {
+			console.log('error: ' + err);
+			return message.channel.send('Error saving quote.');
+		}
+	})();
 
 
 }
