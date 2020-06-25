@@ -13,12 +13,15 @@ async function addQuote(message, args) {
 	const userLastName = args[1].charAt(0).toUpperCase() + args[1].slice(1);
 	const userQuote = args.slice(2).join(' ').replace(/["]+/g, '');
 
+	// Create a query getting all documents, sorting by id
+	// Await the query to the array of document objects
 	const query = Quote.find().sort({ id: 1 });
 	const doc = await query;
 
+	// Check if the array is empty (meaning nothing in db)
+	// True = Get the id of the last entry and add 1
+	// False = Set the id to 1
 	const idNumber = doc.length ? doc[doc.length - 1].id + 1 : 1;
-
-	console.log(idNumber);
 
 	// Construct a new quote document from the model
 	const quote = new Quote({
