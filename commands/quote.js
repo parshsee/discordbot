@@ -47,6 +47,25 @@ async function addQuote(message, args) {
 }
 
 async function removeQuote(message, args) {
+	// Check if id is a number
+	if(isNaN(args[0])) return message.channel.send('Please enter a valid ID number');
+
+	// Get the id number from the args
+	const idNumber = args[0];
+
+	// Create a query finding and deleting the doc with the id number
+	// Await the query to get the document that was deleted
+	const query = Quote.findOneAndDelete({ id: idNumber });
+	const doc = await query;
+
+	// If document is null (search result failed) return error message
+	if(!doc) return message.channel.send('Quote could not be found. Please make sure the quote is in ia!quotes and that it is typed correctly ');
+
+	// Destructure the first and last name from the doc object
+	const { firstName, lastName } = doc;
+
+	// Return a message saying deletion was successful
+	return message.channel.send(`${firstName} ${lastName}'s quote has been removed from database.`);
 
 }
 
@@ -57,7 +76,6 @@ module.exports = {
 	description: 'Adds or Removes a quote from the bot',
 	args: true,
 	usage: '\n[add] [first name] [last name] [quote] **OR** \n[remove] [ID]',
-	// eslint-disable-next-line no-unused-vars
 	execute(message, args) {
 		// Get the first argument and remove it from array
 		const firstArg = args.shift().toLowerCase();
