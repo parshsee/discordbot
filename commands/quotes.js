@@ -40,35 +40,34 @@ module.exports = {
 			// 8 * 3 = 24, Only 8 quotes can be in an embed at a time
 			let limit = 8;
 
-			// Loop through the array of docs
-			// Can't use forEach because need index for checks
-			for (let j = 0; j < doc.length; j++) {
+			// Loop through the array of docs getting the quote object and index
+			doc.forEach((quote, index) => {
 				// If the index = the limit
-				if (j === limit) {
+				if (index === limit) {
 					// Ternary Operator, set initial title for first embed and the titles for the others
-					embed.setTitle(j === 8 ? 'All Quotes' : 'All Quotes Cont.');
+					embed.setTitle(index === 8 ? 'All Quotes' : 'All Quotes Cont.');
 					// Increase the limit
 					limit += 8;
 					// Wait for the embed to be send
-					await message.channel.send({ embed });
+					// forEach function doesn't need it to be await for some reason
+					message.channel.send({ embed });
 					// Clear all fields from the embed
 					// Allows me to add another 25 fields
 					embed.fields = [];
 				}
 
 				// If the remainder is 0, indicates that this will be the first row in embed, set titles
-				if (j % 8 === 0) {
-					embed.addField('ID', `${doc[j].id}`, true);
-					embed.addField('Quote', `"${doc[j].quote}"`, true);
-					embed.addField('Person', `${doc[j].firstName} ${doc[j].lastName}`, true);
-				// Else its not the first row, titles can be blank
+				if (index % 8 === 0) {
+					embed.addField('ID', `${quote.id}`, true);
+					embed.addField('Quote', `"${quote.quote}"`, true);
+					embed.addField('Person', `${quote.firstName} ${quote.lastName}`, true);
+					// Else its not the first row, titles can be blank
 				} else {
-					embed.addField('\u200b', `${doc[j].id}`, true);
-					embed.addField('\u200b', `"${doc[j].quote}"`, true);
-					embed.addField('\u200b', `${doc[j].firstName} ${doc[j].lastName}`, true);
+					embed.addField('\u200b', `${quote.id}`, true);
+					embed.addField('\u200b', `"${quote.quote}"`, true);
+					embed.addField('\u200b', `${quote.firstName} ${quote.lastName}`, true);
 				}
-
-			}
+			});
 			// Return the remaining embed after it exits for loop
 			// Ensures that the last quotes are sent
 			// I.e if 28 quotes in db, 24 will get sent with code above, last 4 will get sent with this
