@@ -26,6 +26,8 @@ module.exports = {
 				.setAuthor('Immature Bot');
 		}
 
+		const argInt = parseInt(args[0]);
+
 		// If no args given (i.e just ia!quotes)
 		if(!args.length) {
 			// Create a query getting all docs sorting by id
@@ -73,6 +75,30 @@ module.exports = {
 			// I.e if 28 quotes in db, 24 will get sent with code above, last 4 will get sent with this
 			return message.channel.send(embed);
 
+		} else if(args[0].toLowerCase() === 'list') {
+			// Get a number of all the documents in the collection
+			const numberOfDocs = await Quote.countDocuments();
+
+			// Get a random number from 0 to the number of docs 
+			const randomDoc = Math.floor(Math.random() * numberOfDocs);
+
+			// Create a query finding one document and skipping straight to the index number
+			// https://stackoverflow.com/questions/39277670/how-to-find-random-record-in-mongoose
+			// Await the query to get the doc object
+			const query = Quote.findOne().skip(randomDoc);
+			const doc = await query;
+
+			// If there are no quotes in database, send error message
+			if(!doc) return message.channel.send('No quotes in database.\nTo add a quote use ia!quote [first name] [last name] [quote]');
+
+			// Convert the timestamp to mm/yyyy
+			const date = `${doc.timestamp.getMonth() + 1}/${doc.timestamp.getFullYear()}`;
+			// Set the title of the embed to the quote, with users name and date
+			embed
+				.setTitle(`"${doc.quote}" --- ${doc.firstName}, ${date}`);
+
+			// Send the embeded
+			return message.channel.send(embed);
 		}
 
 		return message.channel.send(embed);
