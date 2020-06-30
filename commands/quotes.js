@@ -26,8 +26,6 @@ module.exports = {
 				.setAuthor('Immature Bot');
 		}
 
-		const argInt = parseInt(args[0]);
-
 		// If no args given (i.e just ia!quotes)
 		if(!args.length) {
 			// Create a query getting all docs sorting by id
@@ -74,7 +72,7 @@ module.exports = {
 			// Ensures that the last quotes are sent
 			// I.e if 28 quotes in db, 24 will get sent with code above, last 4 will get sent with this
 			return message.channel.send(embed);
-
+		// If the first arg is 'list'
 		} else if(args[0].toLowerCase() === 'list') {
 			// Get a number of all the documents in the collection
 			const numberOfDocs = await Quote.countDocuments();
@@ -97,8 +95,37 @@ module.exports = {
 			embed
 				.setTitle(`"${doc.quote}" --- ${doc.firstName}, ${date}`);
 
-			// Send the embeded
+			// Send the embedded
 			return message.channel.send(embed);
+		// If the first arg is a number (integer)
+		} else if(Number(args[0])) {
+			// Store the number in a variable
+			const idNumber = Number(args[0]);
+
+			// Create a query gettingthe id that equals the user given id
+			// Await the query to get an array of docs (even though it will only have one entry)
+			const query = Quote.find({ id: idNumber });
+			const doc = await query;
+
+			// If there are no quotes in database, send error message
+			if(!doc) return message.channel.send('No quotes in database.\nTo add a quote use ia!quote [first name] [last name] [quote]');
+
+			// Get the fields from the document (first instance since it's an array)
+			const { firstName, lastName, id, quote } = doc[0];
+
+			// Add fields and title to embedded
+			embed
+				.setTitle('Quote')
+				.addField('ID', `${id}`, true)
+				.addField('Quote', `"${quote}"`, true)
+				.addField('Person', `${firstName} ${lastName}`, true);
+
+			// Send the embedded
+			return message.channel.send(embed);
+		// If there are two args (should only be first name and last name)
+		} else if(args.length === 2) {
+			const userFirstName = args[0];
+			const userLastName = args[1];
 		}
 
 		return message.channel.send(embed);
