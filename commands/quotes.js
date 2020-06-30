@@ -108,14 +108,13 @@ module.exports = {
 			const doc = await query;
 
 			// If there are no quotes in database, send error message
-			if(!doc) return message.channel.send('No quotes in database.\nTo add a quote use ia!quote [first name] [last name] [quote]');
+			if(!doc) return message.channel.send('Could not find ID in database.\nUse ia!quotes [list] to see all quotes');
 
 			// Get the fields from the document (first instance since it's an array)
 			const { firstName, lastName, id, quote } = doc[0];
 
 			// Add fields and title to embedded
 			embed
-				.setTitle('Quote')
 				.addField('ID', `${id}`, true)
 				.addField('Quote', `"${quote}"`, true)
 				.addField('Person', `${firstName} ${lastName}`, true);
@@ -124,10 +123,58 @@ module.exports = {
 			return message.channel.send(embed);
 		// If there are two args (should only be first name and last name)
 		} else if(args.length === 2) {
+			// Get the first and last name
 			const userFirstName = args[0];
 			const userLastName = args[1];
-		}
 
-		return message.channel.send(embed);
+			// Create a query getting the document that matches the first and last name
+			// Returns an array of all documents matching it 
+			const query = Quote.find({ firstName: userFirstName, lastName: userLastName });
+			const doc = await query;
+
+			// If there are no quotes in database, send error message
+			if(!doc) return message.channel.send('Could not find name in database.\nUse ia!quotes [list] to see all quotes');
+
+			// The limit of how many quotes can be in an embed
+			// Only have 25 fields
+			// Need to set the ID, Quote, and Name each column is a different field (so 3)
+			// 8 * 3 = 24, Only 8 quotes can be in an embed at a time
+			let limit = 8;
+
+			// Loop through the array of docs getting the quote object and index
+			doc.forEach((quote, index) => {
+				// If the index = the limit
+				if (index === limit) {
+					// Ternary Operator, set initial title for first embed and the titles for the others
+					embed.setTitle(index === 8 ? 'All Quotes' : 'All Quotes Cont.');
+					// Increase the limit
+					limit += 8;
+					// Wait for the embed to be send
+					// forEach function doesn't need it to be await for some reason
+					message.channel.send({ embed });
+					// Clear all fields from the embed
+					// Allows me to add another 25 fields
+					embed.fields = [];
+				}
+
+				// If the remainder is 0, indicates that this will be the first row in embed, set titles
+				if (index % 8 === 0) {
+					embed.addField('ID', `${quote.id}`, true);
+					embed.addField('Quote', `"${quote.quote}"`, true);
+					embed.addField('Person', `${quote.firstName} ${quote.lastName}`, true);
+					// Else its not the first row, titles can be blank
+				} else {
+					embed.addField('\u200b', `${quote.id}`, true);
+					embed.addField('\u200b', `"${quote.quote}"`, true);
+					embed.addField('\u200b', `${quote.firstName} ${quote.lastName}`, true);
+				}
+			});
+			// Return the remaining embed after it exits for loop
+			// Ensures that the last quotes are sent
+			// I.e if 28 quotes in db, 24 will get sent with code above, last 4 will get sent with this
+			return message.channel.send(embed);
+		} else {
+			return message.channel.send('Incorrect command usage. For proper usage use ia!help quotes');
+		}
 	},
 };
