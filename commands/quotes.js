@@ -1,6 +1,50 @@
 const Quote = require('../database/models/quotes');
 const Discord = require('discord.js');
 
+// Creates a embedded with 3 columns: ID, Quote, Name
+// Uses information from array of documents
+// Sends embedded back to channel
+function createEmbeddedColumns(message, doc, embed) {
+	// The limit of how many quotes can be in an embed
+	// Only have 25 fields
+	// Need to set the ID, Quote, and Name each column is a different field (so 3)
+	// 8 * 3 = 24, Only 8 quotes can be in an embed at a time
+	let limit = 8;
+
+	// Loop through the array of docs getting the quote object and index
+	doc.forEach((quote, index) => {
+		// If the index = the limit
+		if (index === limit) {
+			// Ternary Operator, set initial title for first embed and the titles for the others
+			embed.setTitle(index === 8 ? 'All Quotes' : 'All Quotes Cont.');
+			// Increase the limit
+			limit += 8;
+			// Wait for the embed to be send
+			// forEach function doesn't need it to be await for some reason
+			message.channel.send({ embed });
+			// Clear all fields from the embed
+			// Allows me to add another 25 fields
+			embed.fields = [];
+		}
+
+		// If the remainder is 0, indicates that this will be the first row in embed, set titles
+		if (index % 8 === 0) {
+			embed.addField('ID', `${quote.id}`, true);
+			embed.addField('Quote', `"${quote.quote}"`, true);
+			embed.addField('Person', `${quote.firstName} ${quote.lastName}`, true);
+			// Else its not the first row, titles can be blank
+		} else {
+			embed.addField('\u200b', `${quote.id}`, true);
+			embed.addField('\u200b', `"${quote.quote}"`, true);
+			embed.addField('\u200b', `${quote.firstName} ${quote.lastName}`, true);
+		}
+	});
+	// Return the remaining embed after it exits for loop
+	// Ensures that the last quotes are sent
+	// I.e if 28 quotes in db, 24 will get sent with code above, last 4 will get sent with this
+	return message.channel.send(embed);
+}
+
 module.exports = {
 	name: 'quotes',
 	aliases: [],
@@ -34,50 +78,16 @@ module.exports = {
 			const doc = await query;
 			// If there are no quotes in database, send error message
 			if(!doc) return message.channel.send('No quotes in database.\nTo add a quote use ia!quote [first name] [last name] [quote]');
-			// The limit of how many quotes can be in an embed
-			// Only have 25 fields
-			// Need to set the ID, Quote, and Name each column is a different field (so 3)
-			// 8 * 3 = 24, Only 8 quotes can be in an embed at a time
-			let limit = 8;
 
-			// Loop through the array of docs getting the quote object and index
-			doc.forEach((quote, index) => {
-				// If the index = the limit
-				if (index === limit) {
-					// Ternary Operator, set initial title for first embed and the titles for the others
-					embed.setTitle(index === 8 ? 'All Quotes' : 'All Quotes Cont.');
-					// Increase the limit
-					limit += 8;
-					// Wait for the embed to be send
-					// forEach function doesn't need it to be await for some reason
-					message.channel.send({ embed });
-					// Clear all fields from the embed
-					// Allows me to add another 25 fields
-					embed.fields = [];
-				}
+			// Call function to create and send 3 column embedded
+			createEmbeddedColumns(message, doc, embed);
 
-				// If the remainder is 0, indicates that this will be the first row in embed, set titles
-				if (index % 8 === 0) {
-					embed.addField('ID', `${quote.id}`, true);
-					embed.addField('Quote', `"${quote.quote}"`, true);
-					embed.addField('Person', `${quote.firstName} ${quote.lastName}`, true);
-					// Else its not the first row, titles can be blank
-				} else {
-					embed.addField('\u200b', `${quote.id}`, true);
-					embed.addField('\u200b', `"${quote.quote}"`, true);
-					embed.addField('\u200b', `${quote.firstName} ${quote.lastName}`, true);
-				}
-			});
-			// Return the remaining embed after it exits for loop
-			// Ensures that the last quotes are sent
-			// I.e if 28 quotes in db, 24 will get sent with code above, last 4 will get sent with this
-			return message.channel.send(embed);
 		// If the first arg is 'list'
-		} else if(args[0].toLowerCase() === 'list') {
+		} else if(args[0].toLowerCase() === 'random') {
 			// Get a number of all the documents in the collection
 			const numberOfDocs = await Quote.countDocuments();
 
-			// Get a random number from 0 to the number of docs 
+			// Get a random number from 0 to the number of docs
 			const randomDoc = Math.floor(Math.random() * numberOfDocs);
 
 			// Create a query finding one document and skipping straight to the index number
@@ -128,51 +138,15 @@ module.exports = {
 			const userLastName = args[1];
 
 			// Create a query getting the document that matches the first and last name
-			// Returns an array of all documents matching it 
+			// Returns an array of all documents matching it
 			const query = Quote.find({ firstName: userFirstName, lastName: userLastName });
 			const doc = await query;
 
 			// If there are no quotes in database, send error message
 			if(!doc) return message.channel.send('Could not find name in database.\nUse ia!quotes [list] to see all quotes');
 
-			// The limit of how many quotes can be in an embed
-			// Only have 25 fields
-			// Need to set the ID, Quote, and Name each column is a different field (so 3)
-			// 8 * 3 = 24, Only 8 quotes can be in an embed at a time
-			let limit = 8;
-
-			// Loop through the array of docs getting the quote object and index
-			doc.forEach((quote, index) => {
-				// If the index = the limit
-				if (index === limit) {
-					// Ternary Operator, set initial title for first embed and the titles for the others
-					embed.setTitle(index === 8 ? 'All Quotes' : 'All Quotes Cont.');
-					// Increase the limit
-					limit += 8;
-					// Wait for the embed to be send
-					// forEach function doesn't need it to be await for some reason
-					message.channel.send({ embed });
-					// Clear all fields from the embed
-					// Allows me to add another 25 fields
-					embed.fields = [];
-				}
-
-				// If the remainder is 0, indicates that this will be the first row in embed, set titles
-				if (index % 8 === 0) {
-					embed.addField('ID', `${quote.id}`, true);
-					embed.addField('Quote', `"${quote.quote}"`, true);
-					embed.addField('Person', `${quote.firstName} ${quote.lastName}`, true);
-					// Else its not the first row, titles can be blank
-				} else {
-					embed.addField('\u200b', `${quote.id}`, true);
-					embed.addField('\u200b', `"${quote.quote}"`, true);
-					embed.addField('\u200b', `${quote.firstName} ${quote.lastName}`, true);
-				}
-			});
-			// Return the remaining embed after it exits for loop
-			// Ensures that the last quotes are sent
-			// I.e if 28 quotes in db, 24 will get sent with code above, last 4 will get sent with this
-			return message.channel.send(embed);
+			// Call function to create and send 3 column embedded
+			createEmbeddedColumns(message, doc, embed);
 		} else {
 			return message.channel.send('Incorrect command usage. For proper usage use ia!help quotes');
 		}
