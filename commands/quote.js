@@ -64,11 +64,35 @@ async function removeQuote(message, args) {
 	// Destructure the first and last name from the doc object
 	const { firstName, lastName } = doc;
 
+	// Call to update the ids for the remaining docs
+	updateCollectionIDs();
+
 	// Return a message saying deletion was successful
 	return message.channel.send(`${firstName} ${lastName}'s quote has been removed from database.`);
 
 }
 
+// After removing a quote, go through the collection
+// Update all ids to be in order
+// Solves issue of having ids [1, 2, 3, 4] deleting id 3, and now ids show as [1, 2, 4]
+async function updateCollectionIDs() {
+	// Get number of documents in collection
+	const numberOfDocs = await Quote.countDocuments();
+
+	for(let i = 0; i < numberOfDocs; i++) {
+		// Find all documents matching the condition (id > i)
+		// Update the first documents id to be i + 1
+		// Function takes a filter, an update, and a callback
+		Quote.updateOne(
+			{ id: { $gt:i } },
+			{ id: i + 1 },
+			(err) => {
+				if (err) console.log(err);
+			});
+	}
+
+
+}
 
 module.exports = {
 	name: 'quote',
