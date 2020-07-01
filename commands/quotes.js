@@ -118,7 +118,7 @@ module.exports = {
 			const doc = await query;
 
 			// If there are no quotes in database, send error message
-			if(!doc) return message.channel.send('Could not find ID in database.\nUse ia!quotes [list] to see all quotes');
+			if(!doc) return message.channel.send('Could not find ID in database.\nUse ia!quotes to see all quotes');
 
 			// Get the fields from the document (first instance since it's an array)
 			const { firstName, lastName, id, quote } = doc[0];
@@ -143,7 +143,7 @@ module.exports = {
 			const doc = await query;
 
 			// If there are no quotes in database, send error message
-			if(!doc) return message.channel.send('Could not find name in database.\nUse ia!quotes [list] to see all quotes');
+			if(!doc) return message.channel.send('Could not find name in database.\nUse ia!quotes to see all quotes');
 
 			// Call function to create and send 3 column embedded
 			createEmbeddedColumns(message, doc, embed);
