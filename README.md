@@ -9,8 +9,6 @@ This is my first Discord bot which serves to help me learn JavaScript and MongoD
 - Mongoose
 - MongoDB
 
----
-
 ## Bot Commands
 - [add](#add)
 - [bday](#bday)
@@ -26,7 +24,6 @@ This is my first Discord bot which serves to help me learn JavaScript and MongoD
 - [quotes](#quotes)
 - [stats](#stats)
 
----
 ## Command Descriptions
 ### Add
 Adds a specified game and key to the database
@@ -57,7 +54,6 @@ Show information on the server or on a specific user from their user id or menti
 
 [Back To The Top](#Immature-Bot)
 
----
 ## References
 ### APIs Used
 Dailycute API: 	https://some-random-api.ml/
@@ -68,7 +64,6 @@ Meme API: https://github.com/R3l3ntl3ss/Meme_Api
 
 [Back To The Top](#Immature-Bot)
 
----
 ## Author Info
 
 [Back To The Top](#Immature-Bot)
