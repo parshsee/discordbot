@@ -126,6 +126,10 @@ client.on('guildMemberRemove', member => {
 // Login in server with app token should be last line of code
 client.login(process.env.TOKEN);
 
+process.on('unhandledRejection', error => {
+	console.error('Unhandled Promise Rejection: ', error);
+});
+
 async function birthdayChecker(genChannel) {
 	// Create a query getting all documents from Birthday collection
 	// Await query to get array of document objects
