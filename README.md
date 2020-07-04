@@ -64,7 +64,4 @@ Meme API: https://github.com/R3l3ntl3ss/Meme_Api
 
 [Back To The Top](#Immature-Bot)
 
-## Author Info
-
-[Back To The Top](#Immature-Bot)
 
