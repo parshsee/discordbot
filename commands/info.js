@@ -50,6 +50,14 @@ async function apiCalls(gameName) {
 	gameInformation = { name, summary };
 	gameInformation.gameModes = [];
 
+	// If the game doesn't have any results
+	// Return error and errorMessage
+	if(!gameInfo.cover) {
+		gameInformation.error = true;
+		gameInformation.errorMessage = 'Search Result Failed';
+		return gameInformation;
+	}
+
 	// Get game cover id, used to make api call for cover url
 	const gameCover = gameInfo.cover;
 
