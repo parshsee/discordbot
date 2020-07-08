@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-// Create a schema (template) for the games document (table)
-// Unique ensures that the Steam Key is always unique
+// Create a schema (template) for the quotes document (table)
+// Default ensures that if blank, inserts a value automatically
 const quotesSchema = mongoose.Schema({
 	id: { type: Number, require: true },
 	firstName: { type: String, require: true },
@@ -10,5 +10,5 @@ const quotesSchema = mongoose.Schema({
 	timestamp: { type: Date, require: true, default: Date.now },
 });
 
-// Export the model as 'Games' to be used when adding
+// Export the model as 'Quotes' to be used when adding
 module.exports = mongoose.model('Quotes', quotesSchema);
