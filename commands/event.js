@@ -1,7 +1,45 @@
 const Event = require('../database/models/events');
 
 async function addEvent(message, args) {
+	// MessageCollector w/ awaitMessages
+	const userEventName = args.join(' ');
+	console.log(userEventName);
 
+	message.channel.send('What day is the event? Please enter in mm/dd/yyyy format');
+	message.channel.send('What time is the event? Please enter in hh:mm AM/PM format');
+
+	const filter = m => m.author.id === message.author.id;
+	try {
+		const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
+		validateDate(msg);
+	} catch (err) {
+		console.log(err);
+		if(err instanceof Error) console.log('Haha Poopy Pancakes');
+		retryCommand(message, args);
+	}
+}
+
+function validateDate(msg) {
+	console.log(msg);
+	throw new Error('Poop Pancakes');
+}
+
+async function retryCommand(message, args) {
+	const filter = m => m.author.id === message.author.id;
+
+	try {
+		message.channel.send('You did not send a message on time. Retry? (Y/N)');
+		const msg2 = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
+
+		console.log(msg2.first().content);
+
+		if(msg2.first().content.toLowerCase() === 'y') addEvent(message, args);
+		else if(msg2.first().content.toLowerCase() === 'n') message.channel.send('Command cancelled.');
+		else message.channel.send('Incorrect Response. Command Cancelled');
+	} catch (error) {
+		message.channel.send('No response given. Command timed out.');
+		console.log(error);
+	}
 }
 
 async function removeEvent(message, args) {
