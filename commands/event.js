@@ -7,6 +7,8 @@ async function addEvent(message, args) {
 
 	message.channel.send('What day is the event? Please enter in mm/dd/yyyy format');
 	message.channel.send('What time is the event? Please enter in hh:mm AM/PM format');
+	message.channel.send('Do you want to be reminded the day before, hour before, or both? Please enter \'Day\', \'Hour\', or \'Both\'');
+	// After getting all info, save information in db and  create an embedded with info showing user
 
 	const filter = m => m.author.id === message.author.id;
 	try {
@@ -14,14 +16,32 @@ async function addEvent(message, args) {
 		validateDate(msg);
 	} catch (err) {
 		console.log(err);
-		if(err instanceof Error) console.log('Haha Poopy Pancakes');
+		if(err instanceof UserException) console.log('Haha Poopy Pancakes');
 		retryCommand(message, args);
 	}
 }
 
 function validateDate(msg) {
 	console.log(msg);
-	throw new Error('Poop Pancakes');
+	throw new UserException('Poop Pancakes');
+}
+
+async function questionOne(message, args, userInfo) {
+	// User Info is an array of what the user has entered correctly
+}
+
+async function questionTwo(){
+
+}
+
+async function questionThree() {
+
+}
+
+function UserException(errMsg, position) {
+	this.message = errMsg;
+	this.position = position;
+	this.name = 'UserException';
 }
 
 async function retryCommand(message, args) {
