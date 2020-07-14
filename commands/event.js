@@ -5,37 +5,79 @@ async function addEvent(message, args) {
 	const userEventName = args.join(' ');
 	console.log(userEventName);
 
-	message.channel.send('What day is the event? Please enter in mm/dd/yyyy format');
-	message.channel.send('What time is the event? Please enter in hh:mm AM/PM format');
-	message.channel.send('Do you want to be reminded the day before, hour before, or both? Please enter \'Day\', \'Hour\', or \'Both\'');
+	const userInfo = args;
+	console.log(userInfo);
+
+	userInfo.push(await questionOne(message));
+	console.log(userInfo);
+	userInfo.push(await questionTwo(message));
+	console.log(userInfo);
+	userInfo.push(await questionThree(message));
+	console.log(userInfo);
+
+
 	// After getting all info, save information in db and  create an embedded with info showing user
+
+}
+
+async function questionOne(message) {
+	// User Info is an array of what the user has entered correctly
+	message.channel.send('What day is the event? Please enter in mm/dd/yyyy format');
 
 	const filter = m => m.author.id === message.author.id;
 	try {
 		const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
 		validateDate(msg);
+		return msg;
 	} catch (err) {
 		console.log(err);
-		if(err instanceof UserException) console.log('Haha Poopy Pancakes');
-		retryCommand(message, args);
+		if(err instanceof UserException) await retryCommand(message, err.message, err.position);
+	}
+}
+
+async function questionTwo(message) {
+	message.channel.send('What time is the event? Please enter in hh:mm AM/PM format');
+
+	const filter = m => m.author.id === message.author.id;
+	try {
+		const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
+		validateTime(msg);
+		return msg;
+	} catch (err) {
+		console.log(err);
+		if(err instanceof UserException) await retryCommand(message, err.message, err.position);
+	}
+
+}
+
+async function questionThree(message) {
+	message.channel.send('Do you want to be reminded the day before, hour before, or both? Please enter \'Day\', \'Hour\', or \'Both\'');
+
+	const filter = m => m.author.id === message.author.id;
+	try {
+		const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
+		validateReminderType(msg);
+		return msg;
+	} catch (err) {
+		console.log(err);
+		if(err instanceof UserException) await retryCommand(message, err.message, err.position);
 	}
 }
 
 function validateDate(msg) {
 	console.log(msg);
-	throw new UserException('Poop Pancakes');
+	if(msg === 'hello') console.log('world');
+	else throw new UserException('Date has passed or invalid format', 1);
 }
 
-async function questionOne(message, args, userInfo) {
-	// User Info is an array of what the user has entered correctly
+function validateTime(msg) {
+	console.log(msg);
+	throw new UserException('Time invalid', 2);
 }
 
-async function questionTwo(){
-
-}
-
-async function questionThree() {
-
+function validateReminderType(msg) {
+	console.log(msg);
+	throw new UserException('Not proper response', 3);
 }
 
 function UserException(errMsg, position) {
@@ -44,18 +86,24 @@ function UserException(errMsg, position) {
 	this.name = 'UserException';
 }
 
-async function retryCommand(message, args) {
+async function retryCommand(message, errMsg, position) {
 	const filter = m => m.author.id === message.author.id;
 
 	try {
-		message.channel.send('You did not send a message on time. Retry? (Y/N)');
+		message.channel.send(errMsg);
 		const msg2 = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
 
 		console.log(msg2.first().content);
 
-		if(msg2.first().content.toLowerCase() === 'y') addEvent(message, args);
-		else if(msg2.first().content.toLowerCase() === 'n') message.channel.send('Command cancelled.');
-		else message.channel.send('Incorrect Response. Command Cancelled');
+		if(msg2.first().content.toLowerCase() === 'y') {
+			if(position === 1) questionOne(message);
+			if(position === 2) questionTwo(message);
+			if(position === 3) questionThree(message);
+		} else if(msg2.first().content.toLowerCase() === 'n') {
+			message.channel.send('Command cancelled.');
+		} else {
+			message.channel.send('Incorrect Response. Command Cancelled');
+		}
 	} catch (error) {
 		message.channel.send('No response given. Command timed out.');
 		console.log(error);
