@@ -9,8 +9,8 @@ async function addEvent(message, args) {
 	console.log(userInfo);
 
 	try {
-		userInfo.push(await questionOne(message));
-		console.log(userInfo);
+		//userInfo.push(await questionOne(message));
+		//console.log(userInfo);
 		userInfo.push(await questionTwo(message));
 		console.log(userInfo);
 		userInfo.push(await questionThree(message));
@@ -64,13 +64,12 @@ async function questionThree(message) {
 // Checks if date is correct
 // Checks if date is after current date
 async function validateDate(msg) {
-	console.log(msg);
 	const userDate = msg.first().content;
 	const dateArr = userDate.split('/');
 	// Check if date is an actual date  || If there are only three elements in array
 	// Only checks 01/01/1970 to future || (month, day, year)
 	if(!Date.parse(userDate) || dateArr.length !== 3) {
-		throw new UserException('Birthday not recognized. Make sure it is a valid date in the correct format (mm/dd/yyyy)', 1);
+		throw new UserException('Date not recognized. Make sure it is a valid date in the correct format (mm/dd/yyyy)', 1);
 	}
 
 	// Convert the users date to the correct format
@@ -87,7 +86,7 @@ async function validateDate(msg) {
 	// Check if the users date is ahead of the current date
 	// i.e Person not born yet
 	if(date < currentDate) {
-		throw new UserException('Date already passed. Please enter a valid date.');
+		throw new UserException('Date already passed. Please enter a valid date.', 1);
 	}
 
 	return msg.first().content;
@@ -95,8 +94,26 @@ async function validateDate(msg) {
 }
 
 async function validateTime(msg) {
-	console.log(msg);
-	throw new UserException('Time invalid', 2);
+	// Get first entry from message and replace any whitespaces
+	const userTime = msg.first().content.replace(/\s+/g, '');
+	// Regex for checking correct time format (##:##am/pm)
+	const re = /^\d{1,2}:\d{2}([ap]m)?$/i;
+
+	// Check if time is in correct format
+	if(!userTime.match(re)) {
+		throw new UserException('Invalid time format', 2);
+	}
+
+	// Check if time is realistic (0-12 : 0 - 5, 0 - 9)
+	const merideim = userTime.slice(userTime.length - 2);
+	const onlyTime = userTime.substring(0, userTime.length - 2).split(':');
+
+	if(onlyTime[0] < 0 || onlyTime[0] > 12 || onlyTime[1] < 0 || onlyTime[1] > 59) {
+		throw new UserException('Time out of bounds', 2);
+	}
+
+	return msg.first().content;
+
 }
 
 async function validateReminderType(msg) {
