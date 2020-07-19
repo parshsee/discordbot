@@ -52,6 +52,15 @@ async function questionTwo(message) {
 }
 
 async function questionThree(message) {
+	message.channel.send('Add the IDs of any participants seperated by a space. If no other participants enter \'none\'');
+
+	const filter = m => m.author.id === message.author.id;
+	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
+	return await validateTime(msg);
+
+}
+
+async function questionFour(message) {
 	message.channel.send('Do you want to be reminded the day before, hour before, or both? Please enter \'Day\', \'Hour\', or \'Both\'');
 
 	const filter = m => m.author.id === message.author.id;
