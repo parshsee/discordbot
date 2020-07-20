@@ -1,7 +1,6 @@
 const Event = require('../database/models/events');
 
 async function addEvent(message, args) {
-	// MessageCollector w/ awaitMessages
 	const userEventName = args.join(' ');
 	console.log(userEventName);
 
@@ -13,7 +12,9 @@ async function addEvent(message, args) {
 		//console.log(userInfo);
 		//userInfo.push(await questionTwo(message));
 		//console.log(userInfo);
-		userInfo.push(await questionThree(message));
+		//userInfo.push(await questionThree(message));
+		//console.log(userInfo);
+		userInfo.push(await questionFour(message));
 		console.log(userInfo);
 	} catch (err) {
 		if (err instanceof UserException) {
@@ -22,18 +23,19 @@ async function addEvent(message, args) {
 		} else {
 			console.log('This is a timeout error');
 			message.channel.send('This is a timeout error');
-			console.log(err);
 		}
 	}
 
-
-
 	// After getting all info, save information in db and  create an embedded with info showing user
+	// userInfo[0] = mm/dd/yyyy
+	// userInfo[1] = hh:mm am/pm
+	// userInfo[2] = [ID1, ID2, ID3, ...]
+	// userInfo[3] = day/hour/both
+	// Use 0 and 1 to get Date (convert am/pm to Date?)
 
 }
 
 async function questionOne(message) {
-	// User Info is an array of what the user has entered correctly
 	message.channel.send('What day is the event? Please enter in mm/dd/yyyy format');
 
 	const filter = m => m.author.id === message.author.id;
@@ -99,7 +101,7 @@ async function validateDate(msg) {
 		throw new UserException('Date already passed. Please enter a valid date.', 1);
 	}
 
-	return msg.first().content;
+	return userDate;
 
 }
 
@@ -122,12 +124,13 @@ async function validateTime(msg) {
 		throw new UserException('Time out of bounds', 2);
 	}
 
-	return msg.first().content;
+	return userTime;
 
 }
 
 async function validateParticipants(msg) {
-	console.log(msg.first().content);
+	if(msg.first().content.toLowerCase() === 'none') return msg.first().content;
+
 	const userMentionArr = msg.first().content.split(' ');
 
 	const mentionsArr = userMentionArr.map(mention => {
@@ -149,8 +152,13 @@ async function validateParticipants(msg) {
 }
 
 async function validateReminderType(msg) {
-	console.log(msg);
-	throw new UserException('Not proper response', 3);
+	const userType = msg.first().content.toLowerCase();
+
+	if(userType !== 'hour' || userType !== 'day' || userType !== 'both') {
+		throw new UserException('Not proper response', 4);
+	}
+
+	return userType;
 }
 
 function UserException(errMsg, position) {
@@ -172,6 +180,7 @@ async function retryCommand(message, errMsg, position) {
 			if (position === 1) questionOne(message);
 			if (position === 2) questionTwo(message);
 			if (position === 3) questionThree(message);
+			if (position === 4) questionFour(message);
 		} else if (msg2.first().content.toLowerCase() === 'n') {
 			message.channel.send('Command cancelled.');
 		} else {
