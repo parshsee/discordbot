@@ -11,8 +11,8 @@ async function addEvent(message, args) {
 	try {
 		//userInfo.push(await questionOne(message));
 		//console.log(userInfo);
-		userInfo.push(await questionTwo(message));
-		console.log(userInfo);
+		//userInfo.push(await questionTwo(message));
+		//console.log(userInfo);
 		userInfo.push(await questionThree(message));
 		console.log(userInfo);
 	} catch (err) {
@@ -22,6 +22,7 @@ async function addEvent(message, args) {
 		} else {
 			console.log('This is a timeout error');
 			message.channel.send('This is a timeout error');
+			console.log(err);
 		}
 	}
 
@@ -52,11 +53,11 @@ async function questionTwo(message) {
 }
 
 async function questionThree(message) {
-	message.channel.send('Add the IDs of any participants seperated by a space. If no other participants enter \'none\'');
+	message.channel.send('Add the IDs or mention any participants included in the event. If no other participants enter \'none\'');
 
 	const filter = m => m.author.id === message.author.id;
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
-	return await validateTime(msg);
+	return await validateParticipants(msg);
 
 }
 
@@ -122,6 +123,28 @@ async function validateTime(msg) {
 	}
 
 	return msg.first().content;
+
+}
+
+async function validateParticipants(msg) {
+	console.log(msg.first().content);
+	const userMentionArr = msg.first().content.split(' ');
+
+	const mentionsArr = userMentionArr.map(mention => {
+		if(mention.startsWith('<@') && mention.endsWith('>')) {
+			mention = mention.slice(2, -1);
+
+			if(mention.startsWith('!')) {
+				mention = mention.slice(1);
+			}
+		} else {
+			throw new UserException('Not valid user ID', 3);
+		}
+
+		return mention;
+	});
+
+	return mentionsArr;
 
 }
 
