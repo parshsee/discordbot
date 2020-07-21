@@ -1,30 +1,35 @@
 const Event = require('../database/models/events');
 
+let userInfo = [];
+
 async function addEvent(message, args) {
 	const userEventName = args.join(' ');
-	console.log(userEventName);
 
-	const userInfo = args;
+	userInfo.push(userEventName);
 	console.log(userInfo);
 
 	try {
-		//userInfo.push(await questionOne(message));
-		//console.log(userInfo);
-		//userInfo.push(await questionTwo(message));
-		//console.log(userInfo);
-		//userInfo.push(await questionThree(message));
-		//console.log(userInfo);
-		userInfo.push(await questionFour(message));
+		await questionOne(message);
+		console.log(userInfo);
+		await questionTwo(message);
+		console.log(userInfo);
+		await questionThree(message);
+		console.log(userInfo);
+		await questionFour(message);
 		console.log(userInfo);
 	} catch (err) {
 		if (err instanceof UserException) {
-			message.channel.send(err.message);
-			// await retryCommand(message, err.message, err.position);
+			// message.channel.send(err.message);
+			await retryCommand(message, err.message, err.position);
 		} else {
 			console.log('This is a timeout error');
 			message.channel.send('This is a timeout error');
+			userInfo = [];
 		}
 	}
+
+	console.log('--------------End of addEvent Try/Catch-----------------');
+	console.log(userInfo);
 
 	// After getting all info, save information in db and  create an embedded with info showing user
 	// userInfo[0] = mm/dd/yyyy
@@ -41,8 +46,13 @@ async function questionOne(message) {
 	const filter = m => m.author.id === message.author.id;
 
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] });
-	return await validateDate(msg);
+	console.log(msg.first().content);
+	const userDate = validateDate(msg);
+	console.log('Date validated');
+	userInfo.push(userDate);
 
+	console.log('-------questionOne Done-------');
+	console.log(userInfo);
 }
 
 async function questionTwo(message) {
@@ -50,8 +60,12 @@ async function questionTwo(message) {
 
 	const filter = m => m.author.id === message.author.id;
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
-	return await validateTime(msg);
+	const userTime = validateTime(msg);
+	console.log('Time validated');
+	userInfo.push(userTime);
 
+	console.log('-------questionTwo Done-------');
+	console.log(userInfo);
 }
 
 async function questionThree(message) {
@@ -59,8 +73,12 @@ async function questionThree(message) {
 
 	const filter = m => m.author.id === message.author.id;
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
-	return await validateParticipants(msg);
+	const userMentions = await validateParticipants(msg);
+	console.log('Participants validated');
+	userInfo.push(userMentions);
 
+	console.log('-------questionThree Done-------');
+	console.log(userInfo);
 }
 
 async function questionFour(message) {
@@ -68,14 +86,18 @@ async function questionFour(message) {
 
 	const filter = m => m.author.id === message.author.id;
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
-	await validateReminderType(msg);
-	return msg;
+	const userType = await validateReminderType(msg);
+	console.log('Reminder validated');
 
+	userInfo.push(userType);
+	console.log('-------questionFour Done-------');
+	console.log(userInfo);
 }
 
 // Checks if date is correct
 // Checks if date is after current date
-async function validateDate(msg) {
+function validateDate(msg) {
+	console.log('In valdateDate');
 	const userDate = msg.first().content;
 	const dateArr = userDate.split('/');
 	// Check if date is an actual date  || If there are only three elements in array
@@ -105,11 +127,12 @@ async function validateDate(msg) {
 
 }
 
-async function validateTime(msg) {
+function validateTime(msg) {
+	console.log('In validateTime');
 	// Get first entry from message and replace any whitespaces
 	const userTime = msg.first().content.replace(/\s+/g, '');
 	// Regex for checking correct time format (##:##am/pm)
-	const re = /^\d{1,2}:\d{2}([ap]m)?$/i;
+	const re = /^\d{1,2}:\d{2}([ap]m)$/i;
 
 	// Check if time is in correct format
 	if(!userTime.match(re)) {
@@ -129,6 +152,7 @@ async function validateTime(msg) {
 }
 
 async function validateParticipants(msg) {
+	console.log('In validateParticipants');
 	if(msg.first().content.toLowerCase() === 'none') return msg.first().content;
 
 	const userMentionArr = msg.first().content.split(' ');
@@ -152,9 +176,10 @@ async function validateParticipants(msg) {
 }
 
 async function validateReminderType(msg) {
+	console.log('In validateReminderType');
 	const userType = msg.first().content.toLowerCase();
 
-	if(userType !== 'hour' || userType !== 'day' || userType !== 'both') {
+	if(userType !== 'hour' && userType !== 'day' && userType !== 'both') {
 		throw new UserException('Not proper response', 4);
 	}
 
@@ -171,24 +196,41 @@ async function retryCommand(message, errMsg, position) {
 	const filter = m => m.author.id === message.author.id;
 
 	try {
-		message.channel.send(errMsg);
+		message.channel.send(errMsg + ' Retry? (Y/N)');
 		const msg2 = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
 
 		console.log(msg2.first().content);
 
 		if (msg2.first().content.toLowerCase() === 'y') {
-			if (position === 1) questionOne(message);
-			if (position === 2) questionTwo(message);
-			if (position === 3) questionThree(message);
-			if (position === 4) questionFour(message);
+			if(position === 1) {
+				await questionOne(message);
+				await questionTwo(message);
+				await questionThree(message);
+				await questionFour(message);
+			} else if(position === 2) {
+				await questionTwo(message);
+				await questionThree(message);
+				await questionFour(message);
+			} else if(position === 3) {
+				await questionThree(message);
+				await questionFour(message);
+			} else if(position === 4) {
+				await questionFour(message);
+			}
 		} else if (msg2.first().content.toLowerCase() === 'n') {
 			message.channel.send('Command cancelled.');
 		} else {
 			message.channel.send('Incorrect Response. Command Cancelled');
 		}
-	} catch (error) {
-		message.channel.send('No response given. Command timed out.');
-		console.log(error);
+	} catch (err) {
+		console.log(err);
+		if (err instanceof UserException) {
+			await retryCommand(message, err.message, err.position);
+		} else {
+			message.channel.send('No response given. Command timed out.');
+			userInfo = [];
+			console.log(err);
+		}
 	}
 }
 
