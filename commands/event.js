@@ -31,6 +31,7 @@ async function addEvent(message, args) {
 	console.log('--------------End of addEvent Try/Catch-----------------');
 	console.log(userInfo);
 
+	message.channel.send('You are done');
 	// After getting all info, save information in db and  create an embedded with info showing user
 	// userInfo[0] = mm/dd/yyyy
 	// userInfo[1] = hh:mm am/pm
@@ -59,7 +60,7 @@ async function questionTwo(message) {
 	message.channel.send('What time is the event? Please enter in hh:mm AM/PM format');
 
 	const filter = m => m.author.id === message.author.id;
-	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
+	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] });
 	const userTime = validateTime(msg);
 	console.log('Time validated');
 	userInfo.push(userTime);
@@ -69,11 +70,11 @@ async function questionTwo(message) {
 }
 
 async function questionThree(message) {
-	message.channel.send('Add the IDs or mention any participants included in the event. If no other participants enter \'none\'');
+	message.channel.send('Add the IDs or mention all participants included in the event. If no other participants enter \'none\'');
 
 	const filter = m => m.author.id === message.author.id;
-	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
-	const userMentions = await validateParticipants(msg);
+	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] });
+	const userMentions = validateParticipants(msg);
 	console.log('Participants validated');
 	userInfo.push(userMentions);
 
@@ -85,8 +86,8 @@ async function questionFour(message) {
 	message.channel.send('Do you want to be reminded the day before, hour before, or both? Please enter \'Day\', \'Hour\', or \'Both\'');
 
 	const filter = m => m.author.id === message.author.id;
-	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
-	const userType = await validateReminderType(msg);
+	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] });
+	const userType = validateReminderType(msg);
 	console.log('Reminder validated');
 
 	userInfo.push(userType);
@@ -151,7 +152,7 @@ function validateTime(msg) {
 
 }
 
-async function validateParticipants(msg) {
+function validateParticipants(msg) {
 	console.log('In validateParticipants');
 	if(msg.first().content.toLowerCase() === 'none') return msg.first().content;
 
@@ -175,7 +176,7 @@ async function validateParticipants(msg) {
 
 }
 
-async function validateReminderType(msg) {
+function validateReminderType(msg) {
 	console.log('In validateReminderType');
 	const userType = msg.first().content.toLowerCase();
 
@@ -197,7 +198,7 @@ async function retryCommand(message, errMsg, position) {
 
 	try {
 		message.channel.send(errMsg + ' Retry? (Y/N)');
-		const msg2 = await message.channel.awaitMessages(filter, { max: 1, time: 15000, errors: ['time'] });
+		const msg2 = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] });
 
 		console.log(msg2.first().content);
 
@@ -219,17 +220,18 @@ async function retryCommand(message, errMsg, position) {
 			}
 		} else if (msg2.first().content.toLowerCase() === 'n') {
 			message.channel.send('Command cancelled.');
+			userInfo = [];
 		} else {
 			message.channel.send('Incorrect Response. Command Cancelled');
+			userInfo = [];
 		}
 	} catch (err) {
-		console.log(err);
 		if (err instanceof UserException) {
 			await retryCommand(message, err.message, err.position);
+		// If timeout after retry is called, the else gets called. No way to ask them to retry here.
 		} else {
 			message.channel.send('No response given. Command timed out.');
 			userInfo = [];
-			console.log(err);
 		}
 	}
 }
