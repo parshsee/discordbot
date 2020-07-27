@@ -22,8 +22,7 @@ async function addEvent(message, args) {
 			// message.channel.send(err.message);
 			await retryCommand(message, err.message, err.position);
 		} else {
-			console.log('This is a timeout error');
-			message.channel.send('This is a timeout error');
+			message.channel.send('No response given. Command timed out.');
 			userInfo = [];
 		}
 	}
@@ -46,7 +45,7 @@ async function questionOne(message) {
 
 	const filter = m => m.author.id === message.author.id;
 
-	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] });
+	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 	console.log(msg.first().content);
 	const userDate = validateDate(msg);
 	console.log('Date validated');
@@ -60,7 +59,7 @@ async function questionTwo(message) {
 	message.channel.send('What time is the event? Please enter in hh:mm AM/PM format');
 
 	const filter = m => m.author.id === message.author.id;
-	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] });
+	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 	const userTime = validateTime(msg);
 	console.log('Time validated');
 	userInfo.push(userTime);
@@ -73,7 +72,7 @@ async function questionThree(message) {
 	message.channel.send('Add the IDs or mention all participants included in the event. If no other participants enter \'none\'');
 
 	const filter = m => m.author.id === message.author.id;
-	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] });
+	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 	const userMentions = validateParticipants(msg);
 	console.log('Participants validated');
 	userInfo.push(userMentions);
@@ -86,7 +85,7 @@ async function questionFour(message) {
 	message.channel.send('Do you want to be reminded the day before, hour before, or both? Please enter \'Day\', \'Hour\', or \'Both\'');
 
 	const filter = m => m.author.id === message.author.id;
-	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] });
+	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 	const userType = validateReminderType(msg);
 	console.log('Reminder validated');
 
@@ -198,7 +197,7 @@ async function retryCommand(message, errMsg, position) {
 
 	try {
 		message.channel.send(errMsg + ' Retry? (Y/N)');
-		const msg2 = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] });
+		const msg2 = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 
 		console.log(msg2.first().content);
 
