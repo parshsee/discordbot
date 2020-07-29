@@ -5,7 +5,7 @@ let userInfo = [];
 async function addEvent(message, args) {
 	const userEventName = args.join(' ');
 
-	userInfo.push(userEventName);
+	// userInfo.push(userEventName);
 	console.log(userInfo);
 
 	try {
@@ -37,6 +37,50 @@ async function addEvent(message, args) {
 	// userInfo[2] = [ID1, ID2, ID3, ...]
 	// userInfo[3] = day/hour/both
 	// Use 0 and 1 to get Date (convert am/pm to Date?)
+
+	// If the array is empty (timeout), return
+	if(!userInfo.length) return;
+
+	const convertTime12to24 = (time12h) => {
+		const merideim = time12h.slice(time12h.length - 2);
+		let [hours, minutes] = time12h.substring(0, time12h.length - 2).split(':');
+
+		if (hours === '12') {
+			hours = '00';
+		}
+
+		if (merideim.toLowerCase() === 'pm') {
+			hours = parseInt(hours, 10) + 12;
+		}
+
+		return `${hours}:${minutes}`;
+	};
+	const userDate = userInfo[0];
+	let userTime = convertTime12to24(userInfo[1]);
+	const userMentionArr = userInfo[2];
+	const userReminderType = userInfo[3];
+	console.log(userTime);
+
+	// Create a query getting all documents, sorting by id
+	// Await the query to the array of document objects
+	const query = Event.find().sort({ id: 1 });
+	const doc = await query;
+
+	// Check if the array is empty (meaning nothing in db)
+	// True = Get the id of the last entry and add 1
+	// False = Set the id to 1
+	const idNumber = doc.length ? doc[doc.length - 1].id + 1 : 1;
+
+	const event = new Event({
+		eventId: idNumber,
+		eventName: userEventName,
+		eventDate: ,
+		eventAuthor: ,
+		eventPeople: userMentionArr,
+		reminderType: userReminderType,
+	});
+
+	
 
 }
 
