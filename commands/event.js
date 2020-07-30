@@ -61,6 +61,19 @@ async function addEvent(message, args) {
 	const userReminderType = userInfo[3];
 	console.log(userTime);
 
+	console.log(userDate);
+
+	const userDateArr = userDate.split('/');
+	const date = new Date(userDateArr[2], userDateArr[0] - 1, userDateArr[1]);
+	
+	console.log(date);
+
+	const userTimeArr = userTime.split(':');
+	date.setHours(userTimeArr[0], userTimeArr[1]);
+
+	console.log(date);
+	// 	------------- May need to subtract 4 hours from date, UTC is 4 hours ahead of EST. Test Beforehand though --- date.setHours(date.getHours() - 2);
+
 	// Create a query getting all documents, sorting by id
 	// Await the query to the array of document objects
 	const query = Event.find().sort({ id: 1 });
@@ -71,16 +84,27 @@ async function addEvent(message, args) {
 	// False = Set the id to 1
 	const idNumber = doc.length ? doc[doc.length - 1].id + 1 : 1;
 
+	// Construct a new event document from the model
 	const event = new Event({
 		eventId: idNumber,
 		eventName: userEventName,
-		eventDate: ,
-		eventAuthor: ,
+		eventDate: date,
+		eventAuthor: message.author.id,
 		eventPeople: userMentionArr,
 		reminderType: userReminderType,
 	});
 
-	
+	// Save the Event to the database
+	(async () => {
+		try {
+			await event.save();
+			console.log('Event added to Database');
+			return message.channel.send('Event Added Successfully');
+		} catch (err) {
+			console.log('error: ' + err);
+			return message.channel.send('Error saving event.');
+		}
+	})();
 
 }
 
