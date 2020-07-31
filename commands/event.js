@@ -56,7 +56,7 @@ async function addEvent(message, args) {
 		return `${hours}:${minutes}`;
 	};
 	const userDate = userInfo[0];
-	let userTime = convertTime12to24(userInfo[1]);
+	const userTime = convertTime12to24(userInfo[1]);
 	const userMentionArr = userInfo[2];
 	const userReminderType = userInfo[3];
 	console.log(userTime);
@@ -65,7 +65,7 @@ async function addEvent(message, args) {
 
 	const userDateArr = userDate.split('/');
 	const date = new Date(userDateArr[2], userDateArr[0] - 1, userDateArr[1]);
-	
+
 	console.log(date);
 
 	const userTimeArr = userTime.split(':');
@@ -82,7 +82,7 @@ async function addEvent(message, args) {
 	// Check if the array is empty (meaning nothing in db)
 	// True = Get the id of the last entry and add 1
 	// False = Set the id to 1
-	const idNumber = doc.length ? doc[doc.length - 1].id + 1 : 1;
+	const idNumber = doc.length ? doc[doc.length - 1].eventId + 1 : 1;
 
 	// Construct a new event document from the model
 	const event = new Event({
@@ -105,6 +105,8 @@ async function addEvent(message, args) {
 			return message.channel.send('Error saving event.');
 		}
 	})();
+
+	userInfo = [];
 
 }
 
@@ -208,7 +210,6 @@ function validateTime(msg) {
 	}
 
 	// Check if time is realistic (0-12 : 0 - 5, 0 - 9)
-	const merideim = userTime.slice(userTime.length - 2);
 	const onlyTime = userTime.substring(0, userTime.length - 2).split(':');
 
 	if(onlyTime[0] < 0 || onlyTime[0] > 12 || onlyTime[1] < 0 || onlyTime[1] > 59) {
@@ -264,7 +265,7 @@ async function retryCommand(message, errMsg, position) {
 	const filter = m => m.author.id === message.author.id;
 
 	try {
-		message.channel.send(errMsg + ' Retry? (Y/N)');
+		message.channel.send(errMsg + ' __Retry? (Y/N)__');
 		const msg2 = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 
 		console.log(msg2.first().content);
@@ -304,7 +305,49 @@ async function retryCommand(message, errMsg, position) {
 }
 
 async function removeEvent(message, args) {
+	// Check if id is a number
+	if (isNaN(args[0])) return message.channel.send('Please enter a valid ID number');
 
+	// Get the id number from the args
+	const idNumber = args[0];
+
+	// Create a query finding and deleting the doc with the id number
+	// Await the query to get the document that was deleted
+	const query = Event.findOneAndDelete({ eventId: idNumber });
+	const doc = await query;
+
+	// If document is null (search result failed) return error message
+	if (!doc) return message.channel.send('Event could not be found. Please make sure the event is in ia!events and that it is typed correctly ');
+
+	// Destructure the first and last name from the doc object
+	const eventName = doc.eventName;
+
+	// Call to update the ids for the remaining docs
+	updateCollectionIDs();
+
+	// Return a message saying deletion was successful
+	return message.channel.send(`${eventName} has been removed from database.`);
+
+}
+
+// After removing an event, go through the collection
+// Update all ids to be in order
+// Solves issue of having ids [1, 2, 3, 4] deleting id 3, and now ids show as [1, 2, 4]
+async function updateCollectionIDs() {
+	// Get number of documents in collection
+	const numberOfDocs = await Event.countDocuments();
+
+	for(let i = 0; i < numberOfDocs; i++) {
+		// Find all documents matching the condition (id > i)
+		// Update the first documents id to be i + 1
+		// Function takes a filter, an update, and a callback
+		Event.updateOne(
+			{ eventId: { $gt:i } },
+			{ eventId: i + 1 },
+			(err) => {
+				if (err) console.log(err);
+			});
+	}
 }
 
 module.exports = {
