@@ -5,9 +5,6 @@ let userInfo = [];
 async function addEvent(message, args) {
 	const userEventName = args.join(' ');
 
-	// userInfo.push(userEventName);
-	console.log(userInfo);
-
 	try {
 		await questionOne(message);
 		console.log(userInfo);
@@ -29,8 +26,6 @@ async function addEvent(message, args) {
 
 	console.log('--------------End of addEvent Try/Catch-----------------');
 	console.log(userInfo);
-
-	message.channel.send('You are done');
 	// After getting all info, save information in db and  create an embedded with info showing user
 	// userInfo[0] = mm/dd/yyyy
 	// userInfo[1] = hh:mm am/pm
@@ -43,6 +38,7 @@ async function addEvent(message, args) {
 
 	const convertTime12to24 = (time12h) => {
 		const merideim = time12h.slice(time12h.length - 2);
+		// eslint-disable-next-line prefer-const
 		let [hours, minutes] = time12h.substring(0, time12h.length - 2).split(':');
 
 		if (hours === '12') {
@@ -59,19 +55,13 @@ async function addEvent(message, args) {
 	const userTime = convertTime12to24(userInfo[1]);
 	const userMentionArr = userInfo[2];
 	const userReminderType = userInfo[3];
-	console.log(userTime);
-
-	console.log(userDate);
 
 	const userDateArr = userDate.split('/');
 	const date = new Date(userDateArr[2], userDateArr[0] - 1, userDateArr[1]);
 
-	console.log(date);
-
 	const userTimeArr = userTime.split(':');
 	date.setHours(userTimeArr[0], userTimeArr[1]);
 
-	console.log(date);
 	// 	------------- May need to subtract 4 hours from date, UTC is 4 hours ahead of EST. Test Beforehand though --- date.setHours(date.getHours() - 2);
 
 	// Create a query getting all documents, sorting by id
@@ -106,6 +96,7 @@ async function addEvent(message, args) {
 		}
 	})();
 
+	// Reset the array
 	userInfo = [];
 
 }
@@ -116,13 +107,9 @@ async function questionOne(message) {
 	const filter = m => m.author.id === message.author.id;
 
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
-	console.log(msg.first().content);
 	const userDate = validateDate(msg);
 	console.log('Date validated');
 	userInfo.push(userDate);
-
-	console.log('-------questionOne Done-------');
-	console.log(userInfo);
 }
 
 async function questionTwo(message) {
@@ -133,22 +120,16 @@ async function questionTwo(message) {
 	const userTime = validateTime(msg);
 	console.log('Time validated');
 	userInfo.push(userTime);
-
-	console.log('-------questionTwo Done-------');
-	console.log(userInfo);
 }
 
 async function questionThree(message) {
-	message.channel.send('Add the IDs or mention all participants included in the event. If no other participants enter \'none\'');
+	message.channel.send('Mention (@) all participants included in the event. If no other participants enter \'none\'');
 
 	const filter = m => m.author.id === message.author.id;
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 	const userMentions = validateParticipants(msg);
 	console.log('Participants validated');
 	userInfo.push(userMentions);
-
-	console.log('-------questionThree Done-------');
-	console.log(userInfo);
 }
 
 async function questionFour(message) {
@@ -158,10 +139,7 @@ async function questionFour(message) {
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 	const userType = validateReminderType(msg);
 	console.log('Reminder validated');
-
 	userInfo.push(userType);
-	console.log('-------questionFour Done-------');
-	console.log(userInfo);
 }
 
 // Checks if date is correct
@@ -267,8 +245,6 @@ async function retryCommand(message, errMsg, position) {
 	try {
 		message.channel.send(errMsg + ' __Retry? (Y/N)__');
 		const msg2 = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
-
-		console.log(msg2.first().content);
 
 		if (msg2.first().content.toLowerCase() === 'y') {
 			if(position === 1) {
