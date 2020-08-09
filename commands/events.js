@@ -72,7 +72,7 @@ module.exports = {
 		if(!args.length) {
 			// Create a query getting all docs sorting by id
 			// Await the query to get the array of docs
-			const query = Event.find().sort({ id: 1 });
+			const query = Event.find().sort({ eventId: 1 });
 			const doc = await query;
 			// If there are no events in database, send error message
 			if(!doc) return message.channel.send('No events in database.\nTo add an event use ia!event add [event name]');

@@ -66,7 +66,7 @@ async function addEvent(message, args) {
 
 	// Create a query getting all documents, sorting by id
 	// Await the query to the array of document objects
-	const query = Event.find().sort({ id: 1 });
+	const query = Event.find().sort({ eventId: 1 });
 	const doc = await query;
 
 	// Check if the array is empty (meaning nothing in db)
