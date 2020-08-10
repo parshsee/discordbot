@@ -8,6 +8,8 @@ const Discord = require('discord.js');
 const database = require('./database/database.js');
 // Require the birthday collection from MongoDB
 const Birthday = require('./database/models/birthdays');
+// Require the event collection from MongoDB
+const Event = require('./database/models/events');
 // Create a new Discord client (bot)
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -45,11 +47,13 @@ client.once('ready', () => {
 	// https://stackoverflow.com/questions/45120618/send-a-message-with-discord-js
 	// Freebies Channel: 	In .env file
 	// Gen Channel: 		In .env file
-	// 1000 = 1 sec, 10000 = 10 sec, 86400000 = 24 hours
+	// 1000 = 1 sec, 10000 = 10 sec, 3600000 = 1 hour, 86400000 = 24 hours
 	const genChannel = client.channels.cache.get(`${process.env.GEN_CHANNEL_ID}`);
 
 	// Sets an interval of milliseconds, to run the birthdayChecker code
 	setInterval(() => birthdayChecker(genChannel), 86400000);
+
+	setInterval(() => scheduleChecker(), 10000);
 });
 
 
@@ -155,5 +159,39 @@ async function birthdayChecker(genChannel) {
 			console.log('There is a birthday today');
 		}
 	});
+
+}
+
+async function scheduleChecker() {
+	// Create a query getting all documents from Event collection sorting by id
+	// Await query to get array of document objects
+	const query = Event.find().sort({ eventId: 1 });
+	const doc = await query;
+
+	const currentDate = new Date().toLocaleString();
+	const currDate2 = new Date().toLocaleDateString();
+
+	const date = doc[0].eventDate.toLocaleString();
+	const date2 = doc[0].eventDate.toLocaleDateString();
+
+	// console.log(currentDate);
+	// console.log(date);
+	// console.log('--------------------------------------------');
+	// console.log(currDate2);
+	// console.log(date2);
+
+
+	doc.forEach(event => {
+		const eventDate = event.eventDate.toLocaleString(); // ex. 8/10/2020, 2:15:03 PM
+
+		if(event.reminderType === 'day') {
+			
+		} else if(event.reminderType === 'hour') {
+
+		} else if(event.reminderType === 'both') {
+
+		}
+	});
+
 
 }
