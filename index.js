@@ -47,13 +47,15 @@ client.once('ready', () => {
 	// https://stackoverflow.com/questions/45120618/send-a-message-with-discord-js
 	// Freebies Channel: 	In .env file
 	// Gen Channel: 		In .env file
-	// 1000 = 1 sec, 10000 = 10 sec, 3600000 = 1 hour, 86400000 = 24 hours
+	// Test Server Gen Channel: 569279064255496227
+	// 1000 = 1 sec, 10000 = 10 sec, 60000 = 1 minute, 3600000 = 1 hour, 86400000 = 24 hours
 	const genChannel = client.channels.cache.get(`${process.env.GEN_CHANNEL_ID}`);
+	const testServerGenChannel = client.channels.cache.get(`569279064255496227`);
 
 	// Sets an interval of milliseconds, to run the birthdayChecker code
 	setInterval(() => birthdayChecker(genChannel), 86400000);
 
-	setInterval(() => scheduleChecker(), 10000);
+	setInterval(() => scheduleChecker(testServerGenChannel), 60000);
 });
 
 
@@ -162,34 +164,49 @@ async function birthdayChecker(genChannel) {
 
 }
 
-async function scheduleChecker() {
+async function scheduleChecker(testServerGenChannel) {
 	// Create a query getting all documents from Event collection sorting by id
 	// Await query to get array of document objects
 	const query = Event.find().sort({ eventId: 1 });
 	const doc = await query;
 
-	const currentDate = new Date().toLocaleString();
-	const currDate2 = new Date().toLocaleDateString();
 
-	const date = doc[0].eventDate.toLocaleString();
-	const date2 = doc[0].eventDate.toLocaleDateString();
+	const tomorrow = new Date();
+	tomorrow.setDate(new Date().getDate() + 1);
+	// tomorrow.setMinutes(0, 0, 0);
+	tomorrow.setSeconds(0, 0);
 
-	// console.log(currentDate);
-	// console.log(date);
-	// console.log('--------------------------------------------');
-	// console.log(currDate2);
-	// console.log(date2);
+	const hourAhead = new Date();
+	hourAhead.setHours(new Date().getHours() + 1);
+	hourAhead.setSeconds(0, 0);
 
+	console.log(hourAhead.toLocaleString());
 
 	doc.forEach(event => {
-		const eventDate = event.eventDate.toLocaleString(); // ex. 8/10/2020, 2:15:03 PM
+		const eventDate = event.eventDate;
+		// Rounds time up or down to the nearest hour (if checking every hour)
+		// if(eventDate.getMinutes() >= 30) {
+		// 	eventDate.setHours(eventDate.getHours() + 1, 0, 0, 0);
+		// } else {
+		// 	eventDate.setMinutes(0, 0, 0);
+		// }
+
+		// console.log(eventDate.toLocaleString()); // ex. 8/10/2020, 2:15:03 PMssss
 
 		if(event.reminderType === 'day') {
-			
+			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
+				return testServerGenChannel.send(event.eventName);
+			}
 		} else if(event.reminderType === 'hour') {
-
+			if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
+				return testServerGenChannel.send(event.eventName);
+			}
 		} else if(event.reminderType === 'both') {
-
+			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
+				return testServerGenChannel.send(event.eventName);
+			} else if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
+				return testServerGenChannel.send(event.eventName);
+			}
 		}
 	});
 
