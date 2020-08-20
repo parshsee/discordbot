@@ -170,43 +170,55 @@ async function scheduleChecker(testServerGenChannel) {
 	const query = Event.find().sort({ eventId: 1 });
 	const doc = await query;
 
+	const today = new Date();
+	today.setSeconds(0, 0);
 
 	const tomorrow = new Date();
-	tomorrow.setDate(new Date().getDate() + 1);
-	// tomorrow.setMinutes(0, 0, 0);
+	tomorrow.setDate(today.getDate() + 1);
 	tomorrow.setSeconds(0, 0);
 
 	const hourAhead = new Date();
-	hourAhead.setHours(new Date().getHours() + 1);
+	hourAhead.setHours(today.getHours() + 1);
 	hourAhead.setSeconds(0, 0);
 
+	console.log(today.toLocaleString());
+	console.log(tomorrow.toLocaleString());
 	console.log(hourAhead.toLocaleString());
 
-	doc.forEach(event => {
-		const eventDate = event.eventDate;
-		// Rounds time up or down to the nearest hour (if checking every hour)
-		// if(eventDate.getMinutes() >= 30) {
-		// 	eventDate.setHours(eventDate.getHours() + 1, 0, 0, 0);
-		// } else {
-		// 	eventDate.setMinutes(0, 0, 0);
-		// }
+	doc.forEach(async event => {
+		const { eventName, eventDate, reminderType, eventAuthor } = event;
+		let eventPeople = event.eventPeople;
 
-		// console.log(eventDate.toLocaleString()); // ex. 8/10/2020, 2:15:03 PMssss
+		// If there's only 1 element in the array and it's 'none', remove it
+		if(eventPeople.length === 1 && eventPeople[0] === 'none') eventPeople.pop();
+		// Add the author ID to the beginning of the array
+		eventPeople.unshift(eventAuthor);
+		// Mutate (modify) the array, changing each ID (person) to allow Discord to @ them
+		eventPeople = eventPeople.map((person) => {
+			person = `<@${person}>`;
+			return person;
+		});
 
-		if(event.reminderType === 'day') {
+		if(reminderType === 'day') {
 			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
-				return testServerGenChannel.send(event.eventName);
+				return testServerGenChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
 			}
-		} else if(event.reminderType === 'hour') {
+		} else if(reminderType === 'hour') {
 			if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
-				return testServerGenChannel.send(event.eventName);
+				return testServerGenChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
 			}
-		} else if(event.reminderType === 'both') {
+		} else if(reminderType === 'both') {
 			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
-				return testServerGenChannel.send(event.eventName);
+				return testServerGenChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
 			} else if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
-				return testServerGenChannel.send(event.eventName);
+				return testServerGenChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
 			}
+		}
+
+		if(today.toLocaleString() === eventDate.toLocaleString()) {
+			await Event.findOneAndDelete({ eventId: event.eventId });
+
+			return testServerGenChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} starts now! :alarm_clock:`);
 		}
 	});
 
