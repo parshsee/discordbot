@@ -206,29 +206,29 @@ async function scheduleChecker(remindersChannel) {
 		// Check the reminder type
 		if(reminderType === 'day') {
 			// If reminder type is a day and tomorrows time equals the event time
-			if(tomorrow.getTime() === eventDate.getTime()) {
+			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
 				// Send message to channel reminding participants of event in 24 hours
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
 			}
 		} else if(reminderType === 'hour') {
 			// If reminder type is an hour and hourAhead time equals the event time
-			if(hourAhead.getTime() === eventDate.getTime()) {
+			if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
 				// Send message to channel reminding participants of event in 1 hour
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
 			}
 		} else if(reminderType === 'both') {
 			// If reminder type is a day and tomorrows time equals the event time
-			if(tomorrow.getTime() === eventDate.getTime()) {
+			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
 				// Send message to channel reminding participants of event in 24 hours
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
 			// Send message to channel reminding participants of event in 24 hours
-			} else if(hourAhead.getTime() === eventDate.getTime()) {
+			} else if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
 				// Send message to channel reminding participants of event in 1 hour
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
 			}
 		}
 		// If current time equals event time
-		if(today.getTime() === eventDate.getTime()) {
+		if(today.toLocaleString() === eventDate.toLocaleString()) {
 			// Delete event from database
 			await Event.findOneAndDelete({ eventId: event.eventId });
 			// Send message to channel letting participants of event
