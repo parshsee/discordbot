@@ -47,15 +47,15 @@ client.once('ready', () => {
 	// https://stackoverflow.com/questions/45120618/send-a-message-with-discord-js
 	// Freebies Channel: 	In .env file
 	// Gen Channel: 		In .env file
-	// Test Server Gen Channel: 569279064255496227
 	// 1000 = 1 sec, 10000 = 10 sec, 60000 = 1 minute, 3600000 = 1 hour, 86400000 = 24 hours
 	const genChannel = client.channels.cache.get(`${process.env.GEN_CHANNEL_ID}`);
-	const testServerGenChannel = client.channels.cache.get(`569279064255496227`);
+	const remindersChannel = client.channels.cache.get(`${process.env.REMINDERS_CHANNEL_ID}`);
 
 	// Sets an interval of milliseconds, to run the birthdayChecker code
 	setInterval(() => birthdayChecker(genChannel), 86400000);
 
-	setInterval(() => scheduleChecker(testServerGenChannel), 60000);
+	// Sets an interval of milliseconds, to run the scheduleChecker code
+	setInterval(() => scheduleChecker(remindersChannel), 60000);
 });
 
 
@@ -164,28 +164,32 @@ async function birthdayChecker(genChannel) {
 
 }
 
-async function scheduleChecker(testServerGenChannel) {
+async function scheduleChecker(remindersChannel) {
 	// Create a query getting all documents from Event collection sorting by id
 	// Await query to get array of document objects
 	const query = Event.find().sort({ eventId: 1 });
 	const doc = await query;
 
+	// Get todays date
+	// Set the seconds/milliseconds to 0
 	const today = new Date();
 	today.setSeconds(0, 0);
 
+	// Get tomorrows date (todays date + 1)
+	// Set the seconds/milliseconds to 0
 	const tomorrow = new Date();
 	tomorrow.setDate(today.getDate() + 1);
 	tomorrow.setSeconds(0, 0);
 
+	// Get date for an hour ahead (todays hour + 1)
+	// Set the seconds/milliseconds to 0
 	const hourAhead = new Date();
 	hourAhead.setHours(today.getHours() + 1);
 	hourAhead.setSeconds(0, 0);
 
-	console.log(today.toLocaleString());
-	console.log(tomorrow.toLocaleString());
-	console.log(hourAhead.toLocaleString());
-
+	// Loop through each event
 	doc.forEach(async event => {
+		// Get all the fields
 		const { eventName, eventDate, reminderType, eventAuthor } = event;
 		let eventPeople = event.eventPeople;
 
@@ -199,28 +203,36 @@ async function scheduleChecker(testServerGenChannel) {
 			return person;
 		});
 
+		// Check the reminder type
 		if(reminderType === 'day') {
-			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
-				return testServerGenChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
+			// If reminder type is a day and tomorrows time equals the event time
+			if(tomorrow.getTime() === eventDate.getTime()) {
+				// Send message to channel reminding participants of event in 24 hours
+				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
 			}
 		} else if(reminderType === 'hour') {
-			if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
-				return testServerGenChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
+			// If reminder type is an hour and hourAhead time equals the event time
+			if(hourAhead.getTime() === eventDate.getTime()) {
+				// Send message to channel reminding participants of event in 1 hour
+				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
 			}
 		} else if(reminderType === 'both') {
-			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
-				return testServerGenChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
-			} else if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
-				return testServerGenChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
+			// If reminder type is a day and tomorrows time equals the event time
+			if(tomorrow.getTime() === eventDate.getTime()) {
+				// Send message to channel reminding participants of event in 24 hours
+				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
+			// Send message to channel reminding participants of event in 24 hours
+			} else if(hourAhead.getTime() === eventDate.getTime()) {
+				// Send message to channel reminding participants of event in 1 hour
+				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
 			}
 		}
-
-		if(today.toLocaleString() === eventDate.toLocaleString()) {
+		// If current time equals event time
+		if(today.getTime() === eventDate.getTime()) {
+			// Delete event from database
 			await Event.findOneAndDelete({ eventId: event.eventId });
-
-			return testServerGenChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} starts now! :alarm_clock:`);
+			// Send message to channel letting participants of event
+			return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} starts now! :alarm_clock:`);
 		}
 	});
-
-
 }
