@@ -17,6 +17,8 @@ This is my first Discord bot which serves to help me learn JavaScript and MongoD
 - [commands](#commands)
 - [dailycute](#dailycute)
 - [delete](#delete)
+- [event](#event)
+- [events](#events)
 - [freestuff](#freestuff)
 - [info](#info)
 - [meme](#meme)
@@ -39,6 +41,10 @@ View all available commands from bot
 Call API and retrieve random cute animal image and animal fact
 ### Delete
 Deletes the last message or a given number of messages (up to 100) in the channel from the last two weeks
+### Event
+Adds or Removes an event from the database
+### Events
+Shows all events in database or a specific one
 ### Freestuff
 Shows all available games in database
 ### Info
