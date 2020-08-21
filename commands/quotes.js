@@ -51,7 +51,6 @@ module.exports = {
 	description: 'Gets a random quote, specific quote, or lists all quotes',
 	args: false,
 	usage: ' **OR** \nia!quotes [first name] [last name] **OR** \nia!quotes [ID] **OR** \nia!quotes list',
-	// eslint-disable-next-line no-unused-vars
 	async execute(message, args) {
 
 		// Create the MessageEmbed
