@@ -358,9 +358,9 @@ async function updateCollectionIDs() {
 module.exports = {
 	name: 'event',
 	aliases: ['schedule', 'remind'],
-	description: 'Adds or Removes an event from the bot',
+	description: 'Adds or Removes an event from the bot\n__*Can not be used as DM*__',
 	args: true,
-	usage: '\n[add] [event name] **OR** \n[remove] [ID]\n__*Can not be used as DM*__',
+	usage: '\n[add] [event name] **OR** \n[remove] [ID]',
 	execute(message, args) {
 		if(message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
 
