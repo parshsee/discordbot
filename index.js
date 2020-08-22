@@ -193,10 +193,6 @@ async function scheduleChecker(remindersChannel) {
 	hourAhead.setHours(today.getHours() + 1);
 	hourAhead.setSeconds(0, 0);
 
-	console.log(today.toLocaleString());
-	console.log(tomorrow.toLocaleString());
-	console.log(hourAhead.toLocaleString());
-
 	// Loop through each event
 	doc.forEach(async event => {
 		// Get all the fields
