@@ -173,6 +173,8 @@ async function scheduleChecker(remindersChannel) {
 	// Get todays date
 	// Set the seconds/milliseconds to 0
 	const today = new Date();
+	// Set hours back 4 -- Server's time 4 hours ahead of local time
+	today.setHours(today.getHours() - 4);
 	today.setSeconds(0, 0);
 
 	// Get tomorrows date (todays date + 1)
@@ -186,6 +188,10 @@ async function scheduleChecker(remindersChannel) {
 	const hourAhead = new Date();
 	hourAhead.setHours(today.getHours() + 1);
 	hourAhead.setSeconds(0, 0);
+
+	console.log(today.toLocaleString());
+	console.log(tomorrow.toLocaleString());
+	console.log(hourAhead.toLocaleString());
 
 	// Loop through each event
 	doc.forEach(async event => {
