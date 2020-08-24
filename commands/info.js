@@ -23,7 +23,7 @@ async function apiCalls(gameName) {
 
 	console.log(searchResult);
 
-	// Go through each object of games 
+	// Go through each object of games
 	// Check if the search result game name is the same as the user game name
 	// If true, add to gameInformation object
 	searchResult.forEach(result => {
@@ -40,6 +40,33 @@ async function apiCalls(gameName) {
 		gameInformation.errorMessage = 'Search Result Failed: Game not in Database';
 		return gameInformation;
 	}
+
+	console.log(gameInformation.game_modes);
+
+	// API call to get the game modes info
+	// based on game mode ids
+	const gameModesInfo = (await axios({
+		url: process.env.GAME_MODE_API,
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json',
+			'user-key': process.env.API_KEY,
+		},
+		// Return the name of any game mode where the ID is any of the given ids in the array
+		// Returns an array of objects with gamemode names
+		data: `fields name; where id = (${gameInformation.game_modes});`,
+	})).data;
+
+	console.log(gameModesInfo);
+
+	// Go through each object (mode) in array with the index
+	// Add that mode to the array of game_modes in gameInfomration
+	// Essentially updates the arrays from the IDs to the actual modes
+	gameModesInfo.forEach((mode, index) => {
+		gameInformation.game_modes[index] = mode.name;
+	});
+
+	console.log(gameInformation);
 
 	// // API call to get game information
 	// // based on first search result
