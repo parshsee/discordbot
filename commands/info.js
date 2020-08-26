@@ -20,7 +20,7 @@ async function apiCalls(gameName) {
 			// Cover.url removes call to game cover endpoint to retrieve url
 			// Game_modes.name removes call to game modes endpoint to retrieve each game mode
 			// Make sure the cover isn't null (usually indicates game infomration is missing)
-			data: `search "${gameName}"; fields cover.url, game_modes.name, name, summary, release_dates; where cover != null;`,
+			data: `search "${gameName}"; fields cover.url, game_modes.name, name, summary; where cover != null;`,
 			// Data without the [0] because it is an array of search ids
 		})).data;
 
