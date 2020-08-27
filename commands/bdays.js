@@ -177,7 +177,7 @@ module.exports = {
 			// For each object in the array, format the date and add to reply
 			sortedAfterDates.forEach(birthday => {
 				// Format the date to mm/dd/yyyy
-				const date = `${birthday.bday.getMonth() + 1}/${birthday.bday.getDate()}/${birthday.bday.getFullYear()}`;
+				const date = `${birthday.bday.toLocaleDateString()}`;
 				// Add to the reply
 				reply += `:birthday: **${birthday.fullName}** \n Birthday: ${date} \n\n`;
 			});
@@ -187,7 +187,7 @@ module.exports = {
 			// For each object in the array, format the date and add to reply
 			sortedBeforeDates.forEach(birthday => {
 				// Format the date to mm/dd/yyyy
-				const date = `${birthday.bday.getMonth() + 1}/${birthday.bday.getDate()}/${birthday.bday.getFullYear()}`;
+				const date = `${birthday.bday.toLocaleDateString()}`;
 				// Add to the reply
 				reply += `:birthday: **${birthday.fullName}** \n Birthday: ${date} \n\n`;
 			});
@@ -219,7 +219,7 @@ module.exports = {
 		// Get the fields from the document (first instance since it's an array)
 		const { firstName, lastName, birthday } = doc[0];
 		// Format the date to be mm/dd/yyyy
-		const date = `${birthday.getMonth() + 1}/${birthday.getDate()}/${birthday.getFullYear()}`;
+		const date = `${birthday.toLocaleDateString()}`;
 
 		// Add to the reply
 		reply += `:birthday: **${firstName} ${lastName}** \n Birthday: ${date} \n\n`;
