@@ -81,7 +81,6 @@ module.exports = {
 	description: 'Shows all available games',
 	args: false,
 	usage: ' **OR** \nia!freestuff [game name]',
-	// eslint-disable-next-line no-unused-vars
 	async execute(message, args) {
 		if(message.channel.name === 'freebies') {
 			if (!args.length) {
