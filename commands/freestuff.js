@@ -84,28 +84,53 @@ module.exports = {
 	// eslint-disable-next-line no-unused-vars
 	async execute(message, args) {
 		if(message.channel.name === 'freebies') {
-			let reply = '';
-			// Returns json array, await so the program doesnt execute rest of lines
-			// until it has fully read the file
-			// const gamesArray = await jsonReader(process.env.GAMES_FILE);
+			if (!args.length) {
+				let reply = '';
+				// Returns json array, await so the program doesnt execute rest of lines
+				// until it has fully read the file
+				// const gamesArray = await jsonReader(process.env.GAMES_FILE);
 
-			// Query the database, finding all documents in Games collection and sorting by name (1 is ascending, -1 is decending)
-			// Await the query to get the json array of all documents
-			const query = Games.find().sort({ gameName: 1 });
-			const docs = await query;
+				// Query the database, finding all documents in Games collection and sorting by name (1 is ascending, -1 is decending)
+				// Await the query to get the json array of all documents
+				const query = Games.find().sort({ gameName: 1 });
+				const docs = await query;
 
-			// Loops through array, gets all game names, adds to reply
-			// formatted with arrow emoji + two newlines at end
-			docs.forEach(function(game) {
-				reply += `:free: **${game.gameName}** \n Type: ${game.gameType} \n\n`;
-			});
+				// Loops through array, gets all game names, adds to reply
+				// formatted with arrow emoji + two newlines at end
+				docs.forEach(game => {
+					reply += `:free: **${game.gameName}** \n Type: ${game.gameType} \n\n`;
+				});
 
-			//	If no game in database, reply wouldn't have anything added to it, send modified reply
-			//	\n\n allows chunk method to work without changes
-			if(reply === '') {
-				reply += 'No games in database.\nTo add a game use ia!add [game name] [steam key] [type: Game, DLC, Other]\n\n';
+				//	If no game in database, reply wouldn't have anything added to it, send modified reply
+				//	\n\n allows chunk method to work without changes
+				if (reply === '') {
+					reply += 'No games in database.\nTo add a game use ia!add [game name] [steam key] [type: Game, DLC, Other]\n\n';
+				}
+				return sendEmbeds(reply, message);
+			} else {
+				// Get all args in array and join with spaces to create String
+				const searchTerm = args.join(' ');
+				let reply = '';
+
+				// Query the database, finding all documents in Games collection where the game name is equal to the regex
+				// Regex: Finds all documents with the search term, case insensitive
+				// Await the query to get the json array of all documents
+				const query = Games.find({ gameName: { $regex: '.*' + searchTerm + '.*', $options: 'i' } });
+				const docs = await query;
+
+				// Loops through array, gets all game names, adds to reply
+				// formatted with arrow emoji + two newlines at end
+				docs.forEach(game => {
+					reply += `:free: **${game.gameName}** \n Type: ${game.gameType} \n\n`;
+				});
+
+				//	If no game in database, reply wouldn't have anything added to it, send modified reply
+				//	\n\n allows chunk method to work without changes
+				if (reply === '') {
+					reply += 'No games in database.\nTo add a game use ia!add [game name] [steam key] [type: Game, DLC, Other]\n\n';
+				}
+				return sendEmbeds(reply, message);
 			}
-			return sendEmbeds(reply, message);
 		}
 
 		message.channel.send('This command can only be used in \'freebies\' channel');
