@@ -80,7 +80,7 @@ module.exports = {
 	aliases: ['freegames', 'free'],
 	description: 'Shows all available games',
 	args: false,
-	usage: ' ',
+	usage: ' **OR** \nia!freestuff [game name]',
 	// eslint-disable-next-line no-unused-vars
 	async execute(message, args) {
 		if(message.channel.name === 'freebies') {

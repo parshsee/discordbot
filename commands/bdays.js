@@ -158,7 +158,7 @@ module.exports = {
 	aliases: [],
 	description: 'Shows all birthdays or a specific one',
 	args: false,
-	usage: '[first name] [last name]',
+	usage: ' **OR**\nia!bdays [first name] [last name]',
 	async execute(message, args) {
 
 		let reply = '';
