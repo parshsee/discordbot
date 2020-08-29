@@ -3,33 +3,44 @@ const axios = require('axios');
 
 async function apiCalls(animal, aFact) {
 
-	// Make API call to get image of the random animal
-	// .data to only return the data (response)
-	const animalImage = (await axios({
-		url: process.env.ANIMAL_IMAGE_API + animal,
-		method: 'GET',
-		headers: {
-			'Accept': 'application/json',
-		},
-	})).data;
+	try {
+		// Make API call to get image of the random animal
+		// .data to only return the data (response)
+		const animalImage = (await axios({
+			url: process.env.ANIMAL_IMAGE_API + animal,
+			method: 'GET',
+			headers: {
+				'Accept': 'application/json',
+			},
+		})).data;
 
-	// Make API call to get fact of the random animal
-	// .data to only return the data (response)
-	const animalFact = (await axios({
-		url: process.env.ANIMAL_FACT_API + aFact,
-		method: 'GET',
-		headers: {
-			'Accept': 'application/json',
-		},
-	})).data;
+		// Make API call to get fact of the random animal
+		// .data to only return the data (response)
+		const animalFact = (await axios({
+			url: process.env.ANIMAL_FACT_API + aFact,
+			method: 'GET',
+			headers: {
+				'Accept': 'application/json',
+			},
+		})).data;
 
-	// Construct an object response
-	const response = {
-		fact: animalFact.fact,
-		link: animalImage.link,
-	};
+		// Construct an object response
+		const response = {
+			fact: animalFact.fact,
+			link: animalImage.link,
+		};
 
-	return response;
+		console.log('Call to Some-Random-API: Successful');
+		return response;
+	} catch (error) {
+		console.log('Call to Some-Random-API: Failure', error);
+		const response = {
+			error: true,
+			errorMessage: 'Command Failed: Error connecting to Databasee',
+		};
+
+		return response;
+	}
 }
 
 module.exports = {
@@ -64,6 +75,9 @@ module.exports = {
 
 		// Make API calls with random animals
 		const response = await apiCalls(animal, aFact);
+
+		// Check if there was an error during API call
+		if(response.error) return message.channel.send(response.errorMessage);
 
 		// Return fact and animal image
 		return message.channel.send(`${response.fact}`, { files: [`${response.link}`] });

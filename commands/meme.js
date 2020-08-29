@@ -14,8 +14,10 @@ async function apiCalls(subreddit = '') {
 			},
 		}));
 
+		console.log('Call to Meme API: Successful');
 		return memeLink.data;
 	} catch (error) {
+		console.log('Call to Meme API: Failure');
 		// Log the API error and return the data
 		console.log(error.response);
 		return error.response.data;

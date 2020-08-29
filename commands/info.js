@@ -38,6 +38,7 @@ async function apiCalls(gameName) {
 		if (!searchResult.length || !Object.keys(gameInformation).length) {
 			gameInformation.error = true;
 			gameInformation.errorMessage = 'Search Result Failed: Game not in Database';
+			console.log('Call to IGDB API: Successful');
 			return gameInformation;
 		}
 
@@ -51,9 +52,10 @@ async function apiCalls(gameName) {
 		// Format game cover to proper URL
 		gameInformation.cover = `https:${gameInformation.cover.url}`;
 
+		console.log('Call to IGDB API: Successful');
 		return gameInformation;
 	} catch (error) {
-		console.log(error);
+		console.log('Call to IGDB API: Failure', error);
 		gameInformation.error = true;
 		gameInformation.errorMessage = 'Search Result Failed: Error connecting to Database';
 		return gameInformation;
