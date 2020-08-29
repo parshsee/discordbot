@@ -75,7 +75,7 @@ module.exports = {
 			const query = Event.find().sort({ eventId: 1 });
 			const doc = await query;
 			// If there are no events in database, send error message
-			if(!doc) return message.channel.send('No events in database.\nTo add an event use ia!event add [event name]');
+			if(!doc.length) return message.channel.send('No events in database.\nTo add an event use ia!event add [event name]');
 
 			// Call function to create and send 3 column embedded
 			createEmbeddedColumns(message, doc, embed);

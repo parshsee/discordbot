@@ -157,7 +157,7 @@ async function birthdayChecker(genChannel) {
 		// If the birthday month and date are the same as the current month and day
 		// Send a message to the general channel
 		if (birthdayDate === currentMonthDay) {
-			genChannel.send(`@everyone, ${birthday.firstName} ${birthday.lastName} turns ${currentYear - birthdayYear} today!`);
+			genChannel.send(`@everyone, ${birthday.firstName} turns ${currentYear - birthdayYear} today!`);
 			console.log('There is a birthday today');
 		}
 	});
