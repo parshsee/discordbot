@@ -75,6 +75,7 @@ module.exports = {
 			// Await the query to get the array of docs
 			const query = Quote.find().sort({ id: 1 });
 			const doc = await query;
+			console.log('Quote DB Called');
 			// If there are no quotes in database, send error message
 			if(!doc) return message.channel.send('No quotes in database.\nTo add a quote use ia!quote [first name] [last name] [quote]');
 
@@ -94,6 +95,7 @@ module.exports = {
 			// Await the query to get the doc object
 			const query = Quote.findOne().skip(randomDoc);
 			const doc = await query;
+			console.log('Quote DB Called');
 
 			// If there are no quotes in database, send error message
 			if(!doc) return message.channel.send('No quotes in database.\nTo add a quote use ia!quote [first name] [last name] [quote]');
@@ -115,6 +117,7 @@ module.exports = {
 			// Await the query to get an array of docs (even though it will only have one entry)
 			const query = Quote.find({ id: idNumber });
 			const doc = await query;
+			console.log('Quote DB Called');
 
 			// If there are no quotes in database, send error message
 			if(!doc) return message.channel.send('Could not find ID in database.\nUse ia!quotes to see all quotes');
@@ -140,6 +143,7 @@ module.exports = {
 			// Returns an array of all documents matching it
 			const query = Quote.find({ firstName: userFirstName, lastName: userLastName });
 			const doc = await query;
+			console.log('Quote DB Called');
 
 			// If there are no quotes in database, send error message
 			if(!doc) return message.channel.send('Could not find name in database.\nUse ia!quotes to see all quotes');

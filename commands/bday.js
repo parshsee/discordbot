@@ -69,6 +69,7 @@ async function removeBirthday(message, args) {
 	// Get the first and last names from the document
 	const { firstName, lastName } = doc;
 
+	console.log('Birthday removed from Database');
 	// Return a message saying deletion was successful
 	return message.channel.send(`${firstName} ${lastName}'s birthday has been removed from database.`);
 }

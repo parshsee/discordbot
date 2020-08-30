@@ -93,6 +93,7 @@ module.exports = {
 				// Await the query to get the json array of all documents
 				const query = Games.find().sort({ gameName: 1 });
 				const docs = await query;
+				console.log('Game DB Called');
 
 				// Loops through array, gets all game names, adds to reply
 				// formatted with arrow emoji + two newlines at end
@@ -116,6 +117,7 @@ module.exports = {
 				// Await the query to get the json array of all documents
 				const query = Games.find({ gameName: { $regex: '.*' + searchTerm + '.*', $options: 'i' } });
 				const docs = await query;
+				console.log('Game DB Called');
 
 				// Loops through array, gets all game names, adds to reply
 				// formatted with arrow emoji + two newlines at end

@@ -67,6 +67,7 @@ async function removeQuote(message, args) {
 	// Call to update the ids for the remaining docs
 	updateCollectionIDs();
 
+	console.log('Quote removed from Database');
 	// Return a message saying deletion was successful
 	return message.channel.send(`${firstName} ${lastName}'s quote has been removed from database.`);
 
