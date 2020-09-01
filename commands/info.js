@@ -2,8 +2,22 @@ require('dotenv').config();
 const axios = require('axios');
 const discord = require('discord.js');
 
-async function apiCalls(gameName) {
+async function apiCalls(gameName, gameYear) {
+	// Create game information object
 	let gameInformation = {};
+	// Create inital search query
+	// Search for the game name, return info on cover (specifically url), game_modes (specifically name), summary, name of EACH game,
+	// Cover.url removes call to game cover endpoint to retrieve url
+	// Game_modes.name removes call to game modes endpoint to retrieve each game mode
+	// Make sure the cover isn't null (usually indicates game infomration is missing)
+	let searchQuery = `search "${gameName}"; fields cover.url, game_modes.name, name, summary; where cover != null`;
+	// If given a game year add that to the search query
+	// Else close the query
+	if(gameYear) {
+		searchQuery = searchQuery + ` & release_dates.y = ${gameYear};`;
+	} else {
+		searchQuery = searchQuery + ';';
+	}
 
 	try {
 		// API call to search for game
@@ -16,11 +30,8 @@ async function apiCalls(gameName) {
 				'Accept': 'application/json',
 				'user-key': process.env.API_KEY,
 			},
-			// Search for the game name, return info on cover (specifically url), game_modes (specifically name), summary, name of EACH game,
-			// Cover.url removes call to game cover endpoint to retrieve url
-			// Game_modes.name removes call to game modes endpoint to retrieve each game mode
-			// Make sure the cover isn't null (usually indicates game infomration is missing)
-			data: `search "${gameName}"; fields cover.url, game_modes.name, name, summary; where cover != null;`,
+			// In the body (data), use the search query provided
+			data: searchQuery,
 			// Data without the [0] because it is an array of search ids
 		})).data;
 
@@ -45,9 +56,13 @@ async function apiCalls(gameName) {
 		// Go through each object (mode) in array with the index
 		// Add that mode to the array of game_modes in gameInfomration
 		// Essentially updates the arrays from the IDs to the actual modes
-		gameInformation.game_modes.forEach((mode, index) => {
-			gameInformation.game_modes[index] = mode.name;
-		});
+		if(gameInformation.game_modes) {
+			gameInformation.game_modes.forEach((mode, index) => {
+				gameInformation.game_modes[index] = mode.name;
+			});
+		} else {
+			gameInformation.game_modes = 'Unknown';
+		}
 
 		// Format game cover to proper URL
 		gameInformation.cover = `https:${gameInformation.cover.url}`;
@@ -77,8 +92,17 @@ module.exports = {
 
 		// Get the game name from the args
 		// Make all relevant api calls from game name
-		const gameName = args.join(' ').toLowerCase();
-		const gameInformation = await apiCalls(gameName);
+		let gameArr = args.join(' ').toLowerCase().split('---');
+		// Go through array and remove whitespaces from each element
+		gameArr = gameArr.map(value => {
+			return value.trim();
+		});
+		// Check if there is a second element in array (which should be the year)
+		// And check if the second element is a number
+		// Return error message if not
+		if(gameArr[1] && isNaN(gameArr[1])) return message.channel.send('Optional second parameter isn\'t a valid year');
+
+		const gameInformation = await apiCalls(gameArr[0], gameArr[1]);
 
 		// If error during API call
 		// Return the error message
