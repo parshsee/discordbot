@@ -46,9 +46,9 @@ Adds or Removes an event from the database
 ### Events
 Shows all events in database or a specific one
 ### Freestuff
-Shows all available games in database
+Shows all available games in database or searches for a specific game. Multiple copies of the same game will appear as [game name] x[# of copies]
 ### Info
-Call API to retrieve information about a specified game
+Call API to retrieve information about a specified game with optional searching for specific year
 ### Meme
 Call API to retrieve a meme from a random subreddit (dankmemes, memes, me_irl) or a specified one
 ### Quote
