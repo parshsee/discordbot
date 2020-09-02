@@ -81,9 +81,9 @@ async function apiCalls(gameName, gameYear) {
 module.exports = {
 	name: 'info',
 	aliases: ['gameinfo'],
-	description: 'Retrieves information about the specified game',
+	description: 'Retrieves information about the specified game with optional searching for specific year',
 	args: true,
-	usage: '[game name]',
+	usage: '[game name] **OR** \nia!info [game name] --- [year]',
 	async execute(message, args) {
 
 		// If used as a DM
