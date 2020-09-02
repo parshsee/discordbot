@@ -78,7 +78,7 @@ async function sendEmbeds(text, message) {
 module.exports = {
 	name: 'freestuff',
 	aliases: ['freegames', 'free'],
-	description: 'Shows all available games',
+	description: 'Shows all available games or searches for a specific game \n __Multiple copies of the same game will appear as [game name] x[# of copies]__',
 	args: false,
 	usage: ' **OR** \nia!freestuff [game name]',
 	async execute(message, args) {
@@ -95,11 +95,24 @@ module.exports = {
 				const docs = await query;
 				console.log('Game DB Called');
 
-				// Loops through array, gets all game names, adds to reply
-				// formatted with arrow emoji + two newlines at end
-				docs.forEach(game => {
-					reply += `:free: **${game.gameName}** \n Type: ${game.gameType} \n\n`;
-				});
+				// Loop through the array of Games
+				// The copies functionality requires the array to be sorted
+				for(let i = 0, n = docs.length; i < n; i++) {
+					// Query the database, finding all documents in Games collection where the name is the same as the current one and returning the count
+					// Await the query to get the number
+					const query2 = Games.find({ gameName: docs[i].gameName }).countDocuments();
+					const docs2 = await query2;
+					// If more than one instance of game name
+					if(docs2 > 1) {
+						// Add to reply the number of copies
+						reply += `:free: **${docs[i].gameName} x${docs2}** \n Type: ${docs[i].gameType} \n\n`;
+						// Increase the index by that amount - 1 (due to current game)
+						i = i + docs2 - 1;
+					} else {
+						// Reply normally
+						reply += `:free: **${docs[i].gameName}** \n Type: ${docs[i].gameType} \n\n`;
+					}
+				}
 
 				//	If no game in database, reply wouldn't have anything added to it, send modified reply
 				//	\n\n allows chunk method to work without changes
@@ -115,15 +128,28 @@ module.exports = {
 				// Query the database, finding all documents in Games collection where the game name is equal to the regex
 				// Regex: Finds all documents with the search term, case insensitive
 				// Await the query to get the json array of all documents
-				const query = Games.find({ gameName: { $regex: '.*' + searchTerm + '.*', $options: 'i' } });
+				const query = Games.find({ gameName: { $regex: '.*' + searchTerm + '.*', $options: 'i' } }).sort({ gameName: 1 });
 				const docs = await query;
 				console.log('Game DB Called');
 
-				// Loops through array, gets all game names, adds to reply
-				// formatted with arrow emoji + two newlines at end
-				docs.forEach(game => {
-					reply += `:free: **${game.gameName}** \n Type: ${game.gameType} \n\n`;
-				});
+				// Loop through the array of Games
+				// The copies functionality requires the array to be sorted
+				for(let i = 0, n = docs.length; i < n; i++) {
+					// Query the database, finding all documents in Games collection where the name is the same as the current one and returning the count
+					// Await the query to get the number
+					const query2 = Games.find({ gameName: docs[i].gameName }).count();
+					const docs2 = await query2;
+					// If more than one instance of game name
+					if(docs2 > 1) {
+						// Add to reply the number of copies
+						reply += `:free: **${docs[i].gameName} x${docs2}** \n Type: ${docs[i].gameType} \n\n`;
+						// Increase the index by that amount - 1 (due to current game)
+						i = i + docs2 - 1;
+					} else {
+						// Reply normally
+						reply += `:free: **${docs[i].gameName}** \n Type: ${docs[i].gameType} \n\n`;
+					}
+				}
 
 				//	If no game in database, reply wouldn't have anything added to it, send modified reply
 				//	\n\n allows chunk method to work without changes
