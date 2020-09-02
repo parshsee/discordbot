@@ -141,6 +141,7 @@ async function birthdayChecker(genChannel) {
 	// Await query to get array of document objects
 	const query = Birthday.find();
 	const doc = await query;
+	console.log('Birthday DB Called');
 
 	// Get the current date
 	// Get the current month & day in mm/dd format
@@ -213,22 +214,26 @@ async function scheduleChecker(remindersChannel) {
 		if(reminderType === 'day') {
 			// If reminder type is a day and tomorrows time equals the event time
 			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
+				console.log('Event DB Called');
 				// Send message to channel reminding participants of event in 24 hours
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
 			}
 		} else if(reminderType === 'hour') {
 			// If reminder type is an hour and hourAhead time equals the event time
 			if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
+				console.log('Event DB Called');
 				// Send message to channel reminding participants of event in 1 hour
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
 			}
 		} else if(reminderType === 'both') {
 			// If reminder type is a day and tomorrows time equals the event time
 			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
+				console.log('Event DB Called');
 				// Send message to channel reminding participants of event in 24 hours
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
 			// Send message to channel reminding participants of event in 24 hours
 			} else if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
+				console.log('Event DB Called');
 				// Send message to channel reminding participants of event in 1 hour
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
 			}
@@ -237,6 +242,7 @@ async function scheduleChecker(remindersChannel) {
 		if(today.toLocaleString() === eventDate.toLocaleString()) {
 			// Delete event from database
 			await Event.findOneAndDelete({ eventId: event.eventId });
+			console.log('Event DB Called');
 			// Send message to channel letting participants of event
 			return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} starts now! :alarm_clock:`);
 		}
