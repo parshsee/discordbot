@@ -137,7 +137,7 @@ module.exports = {
 				for(let i = 0, n = docs.length; i < n; i++) {
 					// Query the database, finding all documents in Games collection where the name is the same as the current one and returning the count
 					// Await the query to get the number
-					const query2 = Games.find({ gameName: docs[i].gameName }).count();
+					const query2 = Games.find({ gameName: docs[i].gameName }).countDocuments();
 					const docs2 = await query2;
 					// If more than one instance of game name
 					if(docs2 > 1) {
