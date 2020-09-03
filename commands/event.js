@@ -331,6 +331,7 @@ async function removeEvent(message, args) {
 	updateCollectionIDs();
 
 	// Return a message saying deletion was successful
+	console.log('Event removed from Database');
 	return message.channel.send(`${eventName} has been removed from database.`);
 
 }

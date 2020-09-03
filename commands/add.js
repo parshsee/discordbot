@@ -111,6 +111,7 @@ module.exports = {
 				}
 			})();
 
+			console.log('Game added to Database');
 			return;
 
 			// Get the jsonArray of the games file

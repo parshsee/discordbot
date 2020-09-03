@@ -29,6 +29,7 @@ module.exports = {
 		// Get gameName and gameKey from object
 		const { gameName, gameKey } = doc;
 
+		console.log('Game removed from Database');
 		// Reply to the channel that user claimed and DM user the key
 		message.channel.send(`A copy of ${gameName} has been claimed by ${message.author}`);
 		return message.author.send(`Game Claimed: ${gameName}\nKey: ${gameKey}`);

@@ -7,6 +7,7 @@ async function birthdayDBCall() {
 	// Await the query to the array of document objects
 	const query = Birthday.find().sort({ firstName: 1, lastName: 1 });
 	const doc = await query;
+	console.log('Birthday DB Called');
 
 	// Get current date
 	const currentDate = new Date();
@@ -212,7 +213,7 @@ module.exports = {
 		const query = Birthday.find({ firstName: userFirstName, lastName: userLastName });
 		// Doc is an array of objects in this case
 		const doc = await query;
-
+		console.log('Birthday DB Called');
 		// If the array is empty (no documents) send error message
 		if(!doc.length) return message.channel.send('Person could not be found. Please use ia!bdays to view the full list of birthdays');
 
