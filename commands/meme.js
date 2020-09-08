@@ -33,11 +33,28 @@ async function memeCreation(message, args) {
 
 	try {
 		await questionImage(message, filter);
-		//await questionTop(message, filter);
-		//await questionBottom(message, filter);
+		await questionTop(message, filter);
+		await questionBottom(message, filter);
 	} catch (error) {
-		console.log(error.message);
+		// If error is UserException, ask them to retry
+		if (error instanceof UserException) {
+			console.log(error.message);
+			// await retryCommand(message, err.message, err.position);
+		// Else it's timeout error, can't ask to retry here
+		} else {
+			console.log(error);
+			message.channel.send('No response given. Command timed out.');
+			// Since global variable, reset it at the end
+			memeCreationInfo = {};
+		}
 	}
+
+	if(!Object.keys(memeCreationInfo).length) return;
+
+	console.log(memeCreationInfo);
+
+	return `https://api.memegen.link/images/custom/${memeCreationInfo.topText}/${memeCreationInfo.bottomText}.png?background=${memeCreationInfo.url}`;
+
 }
 
 async function questionImage(message, filter) {
@@ -60,6 +77,8 @@ async function questionTop(message, filter) {
 	// Create await message, waiting 2 minutes for 1 message from the author
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 
+	const filteredText = filterText(msg.first().content);
+	memeCreationInfo.topText = filteredText;
 }
 
 async function questionBottom(message, filter) {
@@ -68,7 +87,21 @@ async function questionBottom(message, filter) {
 	// Create await message, waiting 2 minutes for 1 message from the author
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 
+	const filteredText = filterText(msg.first().content);
+	memeCreationInfo.bottomText = filteredText;
+}
 
+function filterText(text) {
+	let filteredText = text.split('_').join('__');
+	filteredText = filteredText.split(' ').join('_');
+	filteredText = filteredText.split('?').join('~q');
+	filteredText = filteredText.split('%').join('~p');
+	filteredText = filteredText.split('#').join('~h');
+	filteredText = filteredText.split('/').join('~s');
+	filteredText = filteredText.split('"').join('\'\'');
+	filteredText = filteredText.split('-').join('--');
+
+	return filteredText;
 }
 
 // Exception function takes message and position
@@ -88,7 +121,14 @@ module.exports = {
 	usage: ' **OR** \nia!meme [subreddit name]',
 	async execute(message, args) {
 		if(args.length === 1 && args[0].toLowerCase() === 'create') {
-			await memeCreation(message, args);
+			const url = await memeCreation(message, args);
+
+			return message.channel.send('test', {
+				files: [{
+					attachment: url,
+					name: 'REG_IMG.jpg',
+				}],
+			});
 		}
 
 		// If channel isn't memes channel return error message
