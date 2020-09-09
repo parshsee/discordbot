@@ -68,23 +68,35 @@ async function questionImage(message, filter) {
 }
 
 async function questionTop(message, filter) {
-	message.channel.send('What is the top text?');
+	message.channel.send('What is the top text? For no top text type \'N/A\'. To cancel type \'C\'');
 
 	// Create await message, waiting 2 minutes for 1 message from the author
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 
-	const filteredText = filterText(msg.first().content);
-	memeCreationInfo.topText = filteredText;
+	if(msg.first().content.toLowerCase() === 'n/a') {
+		memeCreationInfo.topText = '_';
+	} else if(msg.first().content.toLowerCase() === 'c') {
+		throw new UserException('Command cancelled', 1);
+	} else {
+		const filteredText = filterText(msg.first().content);
+		memeCreationInfo.topText = filteredText;
+	}
 }
 
 async function questionBottom(message, filter) {
-	message.channel.send('What is the bottom text?');
+	message.channel.send('What is the bottom text? For no bottom text type \'N/A\'. To cancel type \'C\'');
 
 	// Create await message, waiting 2 minutes for 1 message from the author
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 
-	const filteredText = filterText(msg.first().content);
-	memeCreationInfo.bottomText = filteredText;
+	if(msg.first().content.toLowerCase() === 'n/a') {
+		memeCreationInfo.bottomText = '_';
+	} else if(msg.first().content.toLowerCase() === 'c') {
+		throw new UserException('Command cancelled', 1);
+	} else {
+		const filteredText = filterText(msg.first().content);
+		memeCreationInfo.bottomText = filteredText;
+	}
 }
 
 function filterText(text) {
