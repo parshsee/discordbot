@@ -27,10 +27,11 @@ async function apiCalls(subreddit = '') {
 
 }
 
-async function memeCreation(message, args) {
+async function memeCreation(message) {
 	// Create a filter where the responses author has to be the same as the once who started the command
 	const filter = m => m.author.id === message.author.id;
 
+	// Go through each question, catch an error (thrown or timeout)
 	try {
 		await questionImage(message, filter);
 		await questionTop(message, filter);
@@ -41,6 +42,7 @@ async function memeCreation(message, args) {
 			await retryCommand(message, error.message, error.position);
 		// Else it's timeout error, can't ask to retry here
 		} else {
+			console.log('Call to Meme Creator API: Failure');
 			console.log(error);
 			message.channel.send('No response given. Command timed out.');
 			// Since global variable, reset it at the end
@@ -48,58 +50,84 @@ async function memeCreation(message, args) {
 		}
 	}
 
+	// If not keys in memeCreationInfo object, exit command
 	if(!Object.keys(memeCreationInfo).length) return;
 
+	console.log('Call to Meme Creator API: Successful');
+	// Return the formatted url (API is stateless, this is how the call is done)
 	return `https://api.memegen.link/images/custom/${memeCreationInfo.topText}/${memeCreationInfo.bottomText}.png?background=${memeCreationInfo.url}`;
 
 }
 
 async function questionImage(message, filter) {
+	// Send message asking for image template
 	message.channel.send('Upload the image template');
 
 	// Create await message, waiting 2 minutes for 1 message from the author
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 
+	// Check the msg collection to see if there is an attachment in the attachment collection
 	if(msg.first().attachments.first()) {
+		// Set the url in object to the attachment url
 		memeCreationInfo.url = msg.first().attachments.first().attachment;
 	} else {
+		// Throw exception if not found
 		throw new UserException('No attachment found', 1);
 	}
 }
 
 async function questionTop(message, filter) {
+	// Send message asking for top text, options to have none or to cancel
 	message.channel.send('What is the top text? For no top text type \'N/A\'. To cancel type \'C\'');
 
 	// Create await message, waiting 2 minutes for 1 message from the author
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 
+	// Check if the message is n/a, so the user wants it blank
 	if(msg.first().content.toLowerCase() === 'n/a') {
+		// Set top text to be blank
 		memeCreationInfo.topText = '_';
+	// Check if the message is c, so the user wants to cancel
 	} else if(msg.first().content.toLowerCase() === 'c') {
+		// Throw exception saying command cancelled
 		throw new UserException('Command cancelled', 1);
+	// Else what remains would be the top text
 	} else {
+		// Filter the text so the API reads it properly
 		const filteredText = filterText(msg.first().content);
+		// Set top text to the filteredText
 		memeCreationInfo.topText = filteredText;
 	}
 }
 
 async function questionBottom(message, filter) {
+	// Send message asking for top text, options to have none or to cancel
 	message.channel.send('What is the bottom text? For no bottom text type \'N/A\'. To cancel type \'C\'');
 
 	// Create await message, waiting 2 minutes for 1 message from the author
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 
+	// Check if the message is n/a, so the user wants it blank
 	if(msg.first().content.toLowerCase() === 'n/a') {
+		// Set bottom text to be blank
 		memeCreationInfo.bottomText = '_';
+	// Check if the message is c, so the user wants to cancel
 	} else if(msg.first().content.toLowerCase() === 'c') {
+		// Throw exception saying command cancelled
 		throw new UserException('Command cancelled', 1);
+	// Else what remains would be the top text
 	} else {
+		// Filter the text so the API reads it properly
 		const filteredText = filterText(msg.first().content);
+		// Set top text to the filteredText
 		memeCreationInfo.bottomText = filteredText;
 	}
 }
 
 function filterText(text) {
+	// Given a text, split it into an array using the seperator
+	// Then join it back into a string with the join item inbetween each element
+	// This is a crude way to replacAll(thing to replace, thing to replace with)
 	let filteredText = text.split('_').join('__');
 	filteredText = filteredText.split(' ').join('_');
 	filteredText = filteredText.split('?').join('~q');
@@ -128,12 +156,14 @@ async function retryCommand(message, errMsg, position) {
 		if (msg2.first().content.toLowerCase() === 'y') {
 			if(position === 1) {
 				await questionImage(message, filter);
+				await questionTop(message, filter);
+				await questionBottom(message, filter);
 			}
-		// If they don't want to continue, cancel command & clear/reset userInfo
+		// If they don't want to continue, cancel command & clear/reset memeCreationInfo
 		} else if (msg2.first().content.toLowerCase() === 'n') {
 			message.channel.send('Command cancelled.');
 			memeCreationInfo = {};
-		// If they give any other response, cancle command & clear/reset userInfo
+		// If they give any other response, cancel command & clear/reset memeCreationInfo
 		// Can't ask them to retry here
 		} else {
 			message.channel.send('Incorrect Response. Command Cancelled');
@@ -167,12 +197,16 @@ module.exports = {
 	args: false,
 	usage: ' **OR** \nia!meme [subreddit name]',
 	async execute(message, args) {
+		// If only 1 args that is 'create'
 		if(args.length === 1 && args[0].toLowerCase() === 'create') {
-			const url = await memeCreation(message, args);
-
+			// Call memeCreation function, which would return a url (blank if error/cancel)
+			const url = await memeCreation(message);
+			// If the url is undefined, end command
 			if(!url) return;
 
+			// Send message 'Creating', call with url takes a bit (1-2 seconds) to send
 			message.channel.send('Creating...');
+			// Send message with title and file, the url created
 			return message.channel.send('Here\'s your meme!', {
 				files: [{
 					attachment: url,
@@ -185,6 +219,8 @@ module.exports = {
 		// Remove to allow memes in any channel
 		if(message.channel.name !== 'memes') return message.channel.send('This command can only be used in memes channel');
 
+		// Check if there are arguments and the first arg isn't 'create' || There are no arguments
+		// Both indicators that user wants to use Reddit Meme API
 		if((args.length && args[0].toLowerCase() !== 'create') || !args.length) {
 			// Get the subreddit name from the args
 			// Get response from meme api call
