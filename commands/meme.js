@@ -193,9 +193,9 @@ function UserException(errMsg, position) {
 module.exports = {
 	name: 'meme',
 	aliases: ['memes'],
-	description: 'Sends a meme from a random subreddit (dankmemes, memes, me_irl) or a specified one!',
+	description: 'Sends a meme from a random subreddit (dankmemes, memes, me_irl) or a specified one! \n You can also now create your memes using ia!meme create',
 	args: false,
-	usage: ' **OR** \nia!meme [subreddit name]',
+	usage: ' **OR** \nia!meme [subreddit name]  **OR** \nia!meme create',
 	async execute(message, args) {
 		// If only 1 args that is 'create'
 		if(args.length === 1 && args[0].toLowerCase() === 'create') {
