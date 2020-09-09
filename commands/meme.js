@@ -38,8 +38,7 @@ async function memeCreation(message, args) {
 	} catch (error) {
 		// If error is UserException, ask them to retry
 		if (error instanceof UserException) {
-			console.log(error.message);
-			// await retryCommand(message, err.message, err.position);
+			await retryCommand(message, error.message, error.position);
 		// Else it's timeout error, can't ask to retry here
 		} else {
 			console.log(error);
@@ -50,8 +49,6 @@ async function memeCreation(message, args) {
 	}
 
 	if(!Object.keys(memeCreationInfo).length) return;
-
-	console.log(memeCreationInfo);
 
 	return `https://api.memegen.link/images/custom/${memeCreationInfo.topText}/${memeCreationInfo.bottomText}.png?background=${memeCreationInfo.url}`;
 
@@ -64,7 +61,6 @@ async function questionImage(message, filter) {
 	const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 
 	if(msg.first().attachments.first()) {
-		console.log(msg.first().attachments.first().attachment);
 		memeCreationInfo.url = msg.first().attachments.first().attachment;
 	} else {
 		throw new UserException('No attachment found', 1);
@@ -104,6 +100,45 @@ function filterText(text) {
 	return filteredText;
 }
 
+// Function to let user retry if there was a validation error
+async function retryCommand(message, errMsg, position) {
+	// Create a filter where the responses author has to be the same as the once who started the command
+	const filter = m => m.author.id === message.author.id;
+
+	try {
+		// Send the error message along with asking them to retry
+		message.channel.send(errMsg + ' __Retry? (Y/N)__');
+		// Create await message, waiting 2 minutes for 1 message from the author
+		const msg2 = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
+
+		// This was the best way I found to do it :(
+		// If they want to retry use position to put in correct question
+		if (msg2.first().content.toLowerCase() === 'y') {
+			if(position === 1) {
+				await questionImage(message, filter);
+			}
+		// If they don't want to continue, cancel command & clear/reset userInfo
+		} else if (msg2.first().content.toLowerCase() === 'n') {
+			message.channel.send('Command cancelled.');
+			memeCreationInfo = {};
+		// If they give any other response, cancle command & clear/reset userInfo
+		// Can't ask them to retry here
+		} else {
+			message.channel.send('Incorrect Response. Command Cancelled');
+			memeCreationInfo = {};
+		}
+	} catch (err) {
+		// If error is UserException go back to retry message
+		if (err instanceof UserException) {
+			await retryCommand(message, err.message, err.position);
+		// If timeout after retry is called, the else gets called. No way to ask them to retry here.
+		} else {
+			message.channel.send('No response given. Command timed out.');
+			memeCreationInfo = {};
+		}
+	}
+}
+
 // Exception function takes message and position
 // Message = Error message to display
 // Position = Which question it happened in
@@ -123,7 +158,10 @@ module.exports = {
 		if(args.length === 1 && args[0].toLowerCase() === 'create') {
 			const url = await memeCreation(message, args);
 
-			return message.channel.send('test', {
+			if(!url) return;
+
+			message.channel.send('Creating...');
+			return message.channel.send('Here\'s your meme!', {
 				files: [{
 					attachment: url,
 					name: 'REG_IMG.jpg',
