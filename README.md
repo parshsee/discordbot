@@ -50,7 +50,7 @@ Shows all available games in database or searches for a specific game. Multiple 
 ### Info
 Call API to retrieve information about a specified game with optional searching for specific year
 ### Meme
-Call API to retrieve a meme from a random subreddit (dankmemes, memes, me_irl) or a specified one
+Call API to retrieve a meme from a random subreddit (dankmemes, memes, me_irl) or a specified one. You can also now create your memes using ia!meme create
 ### Quote
 Adds or Removes a quote from the bot
 ### Quotes
@@ -67,6 +67,8 @@ Dailycute API: 	https://some-random-api.ml/
 Info API: https://api-v3.igdb.com/
 
 Meme API: https://github.com/R3l3ntl3ss/Meme_Api
+
+Meme Creation API: https://github.com/jacebrowning/memegen
 
 [Back To The Top](#Immature-Bot)
 
