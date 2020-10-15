@@ -28,7 +28,8 @@ async function apiCalls(gameName, gameYear) {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
-				'user-key': process.env.API_KEY,
+				'Client-ID': process.env.TWITCH_CLIENT_ID,
+				'Authorization': `Bearer ${process.env.TWITCH_TOKEN}`,
 			},
 			// In the body (data), use the search query provided
 			data: searchQuery,
@@ -72,7 +73,7 @@ async function apiCalls(gameName, gameYear) {
 	} catch (error) {
 		console.log('Call to IGDB API: Failure', error);
 		gameInformation.error = true;
-		gameInformation.errorMessage = 'Search Result Failed: Error connecting to Database';
+		gameInformation.errorMessage = 'Search Result Failed: Error connecting to Database. Please try again in a minute';
 		return gameInformation;
 	}
 
@@ -85,6 +86,8 @@ module.exports = {
 	args: true,
 	usage: '[game name] **OR** \nia!info [game name] --- [year]',
 	async execute(message, args) {
+
+		console.log(process.env.TWITCH_TOKEN);
 
 		// If used as a DM
 		// Return error message
