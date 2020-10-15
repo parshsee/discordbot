@@ -136,13 +136,6 @@ client.on('guildMemberRemove', member => {
 	memberLogChannel.send(embed);
 });
 
-client.on('shardDisconnect', (event, shardID) => {
-	console.log('-----------------Disconnecting-----------------');
-	console.log(event);
-	console.log(shardID);
-	console.log(process.env.TWITCH_TOKEN);
-});
-
 // Login in server with app token should be last line of code
 client.login(process.env.TOKEN);
 
@@ -150,12 +143,18 @@ process.on('unhandledRejection', error => {
 	console.error('Unhandled Promise Rejection: ', error);
 });
 
-process.on('beforeExit', (code) => {
-	console.log('Process beforeExit event with code: ', code);
+// When received SIGNAL TERMINATION (sent when Heroku closes app, for update or other)
+// Log the Twitch Token and continue to close app
+process.on('SIGTERM', () => {
+	console.log(`Twitch Token: ${process.env.TWITCH_TOKEN}`);
+	process.exit();
 });
 
-process.on('exit', (code) => {
-	console.log('Process exit event with code: ', code);
+// When recieved SIGNAL INTERUPPTED (sent when CTRL + C is used)
+// Log the Twitch Token and continue to close app
+process.on('SIGINT', () => {
+	console.log(`Twitch Token: ${process.env.TWITCH_TOKEN}`);
+	process.exit();
 });
 
 async function twitchTokenValidator() {
@@ -170,13 +169,11 @@ async function twitchTokenValidator() {
 			},
 		})).data;
 
-		console.log(twitchValidator);
-
 		if(twitchValidator.expires_in > 0) {
 			console.log(`Time Remaining: ${twitchValidator.expires_in}`);
 		} else {
 			console.log('Token Expired, Retrieving New Token');
-			getTwitchToken();
+			await getTwitchToken();
 		}
 
 	} catch(error) {
