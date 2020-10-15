@@ -150,6 +150,14 @@ process.on('unhandledRejection', error => {
 	console.error('Unhandled Promise Rejection: ', error);
 });
 
+process.on('beforeExit', (code) => {
+	console.log('Process beforeExit event with code: ', code);
+});
+
+process.on('exit', (code) => {
+	console.log('Process exit event with code: ', code);
+});
+
 async function twitchTokenValidator() {
 	// Given a token in header
 	// Returns the client id, scopes, and expire time in seconds (remaining)
