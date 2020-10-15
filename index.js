@@ -4,6 +4,8 @@ require('dotenv').config();
 const fs = require('fs');
 // Require the Discord.js module
 const Discord = require('discord.js');
+// Require the Axios module
+const axios = require('axios');
 // Require the database connection to MongoDB
 const database = require('./database/database.js');
 // Require the birthday collection from MongoDB
@@ -52,10 +54,15 @@ client.once('ready', () => {
 	const remindersChannel = client.channels.cache.get(`${process.env.REMINDERS_CHANNEL_ID}`);
 
 	// Sets an interval of milliseconds, to run the birthdayChecker code
-	setInterval(() => birthdayChecker(genChannel), 86400000);
+	setInterval(async () => await birthdayChecker(genChannel), 86400000);
+	console.log('Birthday Checker: Created');
 
 	// Sets an interval of milliseconds, to run the scheduleChecker code
-	setInterval(() => scheduleChecker(remindersChannel), 60000);
+	setInterval(async () => await scheduleChecker(remindersChannel), 60000);
+	console.log('Schedule Checker: Created');
+
+	setInterval(() => twitchTokenValidator(), 60000);
+	console.log('Twitch Token Checker: Created');
 });
 
 
@@ -129,12 +136,67 @@ client.on('guildMemberRemove', member => {
 	memberLogChannel.send(embed);
 });
 
+client.on('shardDisconnect', (event, shardID) => {
+	console.log('-----------------Disconnecting-----------------');
+	console.log(event);
+	console.log(shardID);
+	console.log(process.env.TWITCH_TOKEN);
+});
+
 // Login in server with app token should be last line of code
 client.login(process.env.TOKEN);
 
 process.on('unhandledRejection', error => {
 	console.error('Unhandled Promise Rejection: ', error);
 });
+
+async function twitchTokenValidator() {
+	// Given a token in header
+	// Returns the client id, scopes, and expire time in seconds (remaining)
+	try {
+		const twitchValidator = (await axios({
+			url: `${process.env.TWITCH_VALIDATION_API}`,
+			method: 'GET',
+			headers: {
+				'Authorization': `OAuth ${process.env.TWITCH_TOKEN}`,
+			},
+		})).data;
+
+		console.log(twitchValidator);
+
+		if(twitchValidator.expires_in > 0) {
+			console.log(`Time Remaining: ${twitchValidator.expires_in}`);
+		} else {
+			console.log('Token Expired, Retrieving New Token');
+			getTwitchToken();
+		}
+
+	} catch(error) {
+		console.log('Call to Twitch Validator: Failure', error);
+	}
+}
+
+async function getTwitchToken() {
+	try {
+		const twitchInfo = (await axios({
+			url: `${process.env.TWITCH_TOKEN_API}`,
+			method: 'POST',
+			params: {
+				'client_id': `${process.env.TWITCH_CLIENT_ID}`,
+				'client_secret': `${process.env.TWITCH_CLIENT_SECRET}`,
+				'grant_type': 'client_credentials',
+			},
+		})).data;
+
+		console.log(twitchInfo);
+
+		console.log(`Old Twitch Token: ${process.env.TWITCH_TOKEN}`);
+		process.env.TWITCH_TOKEN = twitchInfo.access_token;
+
+	} catch(error) {
+		console.log('Call to Twitch Token: Failure', error);
+	}
+}
 
 async function birthdayChecker(genChannel) {
 	// Create a query getting all documents from Birthday collection

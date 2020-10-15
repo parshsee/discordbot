@@ -48,9 +48,9 @@ function createEmbeddedColumns(message, doc, embed) {
 module.exports = {
 	name: 'quotes',
 	aliases: [],
-	description: 'Gets a random quote, specific quote, or lists all quotes',
+	description: 'Gets a list of all quotes, specific quote, or random quote',
 	args: false,
-	usage: ' **OR** \nia!quotes [first name] [last name] **OR** \nia!quotes [ID] **OR** \nia!quotes list',
+	usage: ' **OR** \nia!quotes [first name] [last name] **OR** \nia!quotes [ID] **OR** \nia!quotes random',
 	async execute(message, args) {
 
 		// Create the MessageEmbed
