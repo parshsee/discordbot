@@ -1,7 +1,7 @@
 require('dotenv').config();
 const axios = require('axios');
 const Streamer = require('../database/models/streamers');
-
+const Discord = require('discord.js');
 
 async function addStreamer(message, args) {
 	const twitchStreamer = args[0];
@@ -22,12 +22,11 @@ async function addStreamer(message, args) {
 
 		if(searchResult.length) {
 			const idNumber = await Streamer.countDocuments() + 1;
-			console.log(idNumber);
 
 			// Construct a new streamer document from the model
 			const streamer = new Streamer({
 				id: idNumber,
-				streamerName: twitchStreamer,
+				streamerName: searchResult[0].display_name,
 				gameTitle: '',
 				status: 'Offline',
 			});
@@ -46,14 +45,52 @@ async function addStreamer(message, args) {
 		} else {
 			message.channel.send('Streamer not found');
 		}
-		console.log(searchResult);
 	} catch(err) {
 		console.log(err);
 	}
 }
 
 async function removeStreamer(message, args) {
+	// Check if id is a number
+	if (isNaN(args[0])) return message.channel.send('Please enter a valid ID number');
 
+	// Get the id number from the args
+	const idNumber = args[0];
+
+	// Create a query finding and deleting the doc with the id number
+	// Await the query to get the document that was deleted
+	const query = Streamer.findOneAndDelete({ id: idNumber });
+	const doc = await query;
+
+	// If document is null (search result failed) return error message
+	if (!doc) return message.channel.send('Streamer could not be found. Please make sure the streamer is in \'ia!twitch list\' and that it is typed correctly ');
+
+	// Get Streamer name from Document
+	const streamerName = doc.streamerName;
+
+	// Call to update the ids for the remaining docs
+	await updateCollectionIDs();
+
+	// Return a message saying deletion was successful
+	console.log('Streamer removed from Database');
+	return message.channel.send(`${streamerName} has been removed from database.`);
+}
+
+async function updateCollectionIDs() {
+// Get number of documents in collection
+	const numberOfDocs = await Streamer.countDocuments();
+
+	for(let i = 0; i < numberOfDocs; i++) {
+		// Find all documents matching the condition (id > i)
+		// Update the first documents id to be i + 1
+		// Function takes a filter, an update, and a callback
+		Streamer.updateOne(
+			{ id: { $gt:i } },
+			{ id: i + 1 },
+			(err) => {
+				if (err) console.log(err);
+			});
+	}
 }
 
 async function listStreamer(message, args) {
