@@ -54,7 +54,7 @@ client.once('ready', () => {
 	// 1000 = 1 sec, 10000 = 10 sec, 60000 = 1 minute, 3600000 = 1 hour, 86400000 = 24 hours
 	const genChannel = client.channels.cache.get(`${process.env.GEN_CHANNEL_ID}`);
 	const remindersChannel = client.channels.cache.get(`${process.env.REMINDERS_CHANNEL_ID}`);
-	const livePromotionChannel = client.channels.cache.get('569279064255496227');
+	const livePromotionChannel = client.channels.cache.get(`${process.env.LIVE_PROMOTION_CHANNEL_ID}`);
 
 	// Sets an interval of milliseconds, to run the birthdayChecker code
 	setInterval(async () => await birthdayChecker(genChannel), 86400000);
