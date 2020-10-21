@@ -346,8 +346,6 @@ async function streamChecker(livePromotionChannel) {
 		},
 	})).data.data;
 
-	// If none of the streamers in DB are live, searchResult returns empty array, exit method
-	if(searchResult.length < 1) return;
 	// For every streamer in DB
 	doc.forEach(async streamer => {
 		// Find and return the index of searchResult where the current live streamer equals the streamer in DB
