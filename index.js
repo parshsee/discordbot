@@ -12,6 +12,8 @@ const database = require('./database/database.js');
 const Birthday = require('./database/models/birthdays');
 // Require the event collection from MongoDB
 const Event = require('./database/models/events');
+// Require the streamer collection from MongoDB
+const Streamer = require('./database/models/streamers');
 // Create a new Discord client (bot)
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -52,17 +54,21 @@ client.once('ready', () => {
 	// 1000 = 1 sec, 10000 = 10 sec, 60000 = 1 minute, 3600000 = 1 hour, 86400000 = 24 hours
 	const genChannel = client.channels.cache.get(`${process.env.GEN_CHANNEL_ID}`);
 	const remindersChannel = client.channels.cache.get(`${process.env.REMINDERS_CHANNEL_ID}`);
+	const livePromotionChannel = client.channels.cache.get('569279064255496227');
 
 	// Sets an interval of milliseconds, to run the birthdayChecker code
 	setInterval(async () => await birthdayChecker(genChannel), 86400000);
-	console.log('Birthday Checker: Created');
+	console.log('Birthday Checker	:	Created');
 
 	// Sets an interval of milliseconds, to run the scheduleChecker code
 	setInterval(async () => await scheduleChecker(remindersChannel), 60000);
-	console.log('Schedule Checker: Created');
+	console.log('Schedule Checker	:	Created');
+
+	setInterval(async () => await streamChecker(livePromotionChannel), 60000);
+	console.log('Streamer Checker	:	Created');
 
 	setInterval(() => twitchTokenValidator(), 60000);
-	console.log('Twitch Token Checker: Created');
+	console.log('Twitch Token Checker	:	Created');
 });
 
 
@@ -170,7 +176,7 @@ async function twitchTokenValidator() {
 		})).data;
 
 		if(twitchValidator.expires_in > 0) {
-			console.log(`Time Remaining: ${twitchValidator.expires_in}`);
+			console.log(`Twitch Token Time Remaining: ${twitchValidator.expires_in}`);
 		} else {
 			console.log('Token Expired, Retrieving New Token');
 			await getTwitchToken();
@@ -312,6 +318,95 @@ async function scheduleChecker(remindersChannel) {
 			console.log('Event DB Called');
 			// Send message to channel letting participants of event
 			return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} starts now! :alarm_clock:`);
+		}
+	});
+}
+
+async function streamChecker(livePromotionChannel) {
+	// Create a query getting all documents from Event collection sorting by id
+	// Await query to get array of document objects
+	const query = Streamer.find().sort({ id: 1 });
+	const doc = await query;
+
+	// If no streamers in DB, doc returns empty array, exit method
+	if(doc.length < 1) return;
+
+	let streamUrl = `${process.env.TWITCH_STREAM_API}`;
+	doc.forEach(streamer => {
+		streamUrl = streamUrl + `user_login=${streamer.streamerName}&`;
+	});
+
+	const searchResult = (await axios({
+		url: streamUrl,
+		method: 'GET',
+		headers: {
+			'Accept': 'application/json',
+			'Client-ID': process.env.TWITCH_CLIENT_ID,
+			'Authorization': `Bearer ${process.env.TWITCH_TOKEN}`,
+		},
+	})).data.data;
+
+	// If none of the streamers in DB are live, searchResult returns empty array, exit method
+	if(searchResult.length < 1) return;
+	// For every streamer in DB
+	doc.forEach(async streamer => {
+		// Find and return the index of searchResult where the current live streamer equals the streamer in DB
+		let i;
+		searchResult.find((liveStreamer, index) => {
+			if(streamer.streamerName === liveStreamer.user_name) {
+				i = index;
+				return true;
+			}
+		});
+
+		// i = Undefined if streamer in DB is not found in searchResult
+		// i = n if streamer is in searchResult (ie Is currently live)
+		if(i !== undefined) {
+			// Call API to get the game name they are playing (or just chatting)
+			const gameName = (await axios({
+				url: `${process.env.TWITCH_GAME_API}id=${searchResult[i].game_id}`,
+				method: 'GET',
+				headers: {
+					'Accept': 'application/json',
+					'Client-ID': process.env.TWITCH_CLIENT_ID,
+					'Authorization': `Bearer ${process.env.TWITCH_TOKEN}`,
+				},
+			})).data.data;
+
+			// If the game title in DB is different from the game title API gives (i.e they are playing a different game)
+			if (streamer.gameTitle !== gameName[0].name) {
+				// Create Embed to send to channel
+				// SetURL makes the title a hyperlink
+				const embed = new Discord.MessageEmbed()
+					.setColor('#0099ff')
+					.setTimestamp()
+					.setTitle(`${streamer.streamerName} is live on Twitch!`)
+					.setURL(`https://twitch.tv/${streamer.streamerName}`)
+					.setDescription(gameName[0].name);
+				// Log
+				console.log(`${streamer.streamerName} went live`);
+
+				// Send embed to channel
+				livePromotionChannel.send(embed);
+
+				// Update the streamer (document) to 'Live' status and current Game
+				streamer.status = 'Live';
+				streamer.gameTitle = gameName[0].name;
+				await streamer.save();
+			}
+		// Else the streamer is not live
+		} else {
+			// If the status in DB says they are live
+			// eslint-disable-next-line no-lonely-if
+			if(streamer.status === 'Live') {
+				// Change status and title for that streamer (document) and save to DB
+				streamer.status = 'Offline';
+				streamer.gameTitle = '';
+				await streamer.save();
+
+				// Log
+				console.log(`${streamer.streamerName} went offline`);
+			}
 		}
 	});
 }
