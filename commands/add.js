@@ -5,17 +5,36 @@ require('dotenv').config();
 // Get the Games schema
 const Game = require('../database/models/games');
 
+async function codeTypeChoice(message) {
+	const codeTypes = ['Steam', 'Microsoft', 'GOG', 'Origin', 'Epic', 'Uplay'];
+	const filter = m => m.author.id === message.author.id;
+
+	try {
+		message.channel.send('What is the game code? (Steam, Microsoft, GOG, Origin, Epic, or Uplay)');
+		const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
+		const response = msg.first().content.toLowerCase();
+
+		if(codeTypes.map(type => { return type.toLowerCase();}).includes(response)) {
+			return response;
+		} else if(response === 'c') {
+			message.channel.send('Command Cancelled');
+			return null;
+		} else {
+			message.channel.send('Invalid response, please choose one of the options or cancel');
+			await codeTypeChoice(message);
+		}
+
+	} catch (error) {
+		message.channel.send('No response given. Command timed out.');
+		return null;
+	}
+}
+
 function argsValidation(args) {
 	const errors = {
 		found: false,
 	};
-	// Check if there are at 3 argleast uments
-	// Game Name (Can be multiple arguments), Key, Type
-	if(args.length < 3) {
-		errors.found = true;
-		errors.message = 'Command needs three (3) arguments, run help command for more info';
-		return errors;
-	}
+
 	// Sets the gameType, gameKey (array split by '-'), and gameName
 	// Example Key: LLJNN-IF2XT-6NGVY
 	// Should follow specified format
@@ -82,6 +101,19 @@ module.exports = {
 
 		// If the message was sent in dm channel
 		if(message.channel.type === 'dm') {
+			// Check if there are at 3 argleast uments
+			// Game Name (Can be multiple arguments), Key, Type
+			if (args.length < 3) {
+				return message.channel.send('Command needs three (3) arguments, run help command for more info');
+			}
+
+			const codeType = await codeTypeChoice(message);
+			if(codeType) {
+				return message.channel.send('Valid Code Type');
+			} else {
+				return message.channel.send('Invalid code Type');
+			}
+
 			// Validate the arguments passed to make sure its correct format
 			const errors = argsValidation(args);
 			// If any errors are found, return the error message
@@ -103,7 +135,6 @@ module.exports = {
 			(async () => {
 				try {
 					await games.save();
-					console.log('Game added to Database');
 					return message.channel.send('Game Added Successfully');
 				} catch (err) {
 					console.log('error: ' + err);
