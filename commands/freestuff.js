@@ -105,12 +105,12 @@ module.exports = {
 					// If more than one instance of game name
 					if(docs2 > 1) {
 						// Add to reply the number of copies
-						reply += `:free: **${docs[i].gameName} x${docs2}** \n Type: ${docs[i].gameType} \n\n`;
+						reply += `:free: **${docs[i].gameName} x${docs2}** \n Type: ${docs[i].gameType} \n Redeemable On: ${docs[i].codeType} \n\n`;
 						// Increase the index by that amount - 1 (due to current game)
 						i = i + docs2 - 1;
 					} else {
 						// Reply normally
-						reply += `:free: **${docs[i].gameName}** \n Type: ${docs[i].gameType} \n\n`;
+						reply += `:free: **${docs[i].gameName}** \n Type: ${docs[i].gameType} \n Redeemable On: ${docs[i].codeType} \n\n`;
 					}
 				}
 
