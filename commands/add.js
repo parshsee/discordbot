@@ -1,7 +1,4 @@
 require('dotenv').config();
-// const jsonReader = require('../util/jsonReader');
-// const jsonWriter = require('../util/jsonWriter');
-// const jsonFormatter = require('../util/jsonFormatter');
 // Get the Games schema
 const Game = require('../database/models/games');
 
@@ -10,7 +7,7 @@ async function codeTypeChoice(message) {
 	const filter = m => m.author.id === message.author.id;
 
 	try {
-		message.channel.send('What is the game code? (Steam, Microsoft, GOG, Origin, Epic, or Uplay)');
+		message.channel.send('What is the game code? (Steam, Microsoft, GOG, Origin, Epic, or Uplay) \n Type \'C\' to cancel ');
 		const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 		const response = msg.first().content.toLowerCase();
 
@@ -30,7 +27,7 @@ async function codeTypeChoice(message) {
 	}
 }
 
-function argsValidation(args) {
+function argsValidation(args, codeType) {
 	const errors = {
 		found: false,
 	};
@@ -40,44 +37,32 @@ function argsValidation(args) {
 	// Should follow specified format
 	// Game Name, Key, Type
 	const gameType = args[args.length - 1];
-	const gameKey = args[args.length - 2].split('-');
 	const gameName = args.slice(0, args.length - 2).join(' ');
 
-	// If game type isn't game, dlc, or other
-	// Return error w/ message
-	if(!(gameType.toLowerCase() === 'game' || gameType.toLowerCase() === 'dlc' || gameType.toLowerCase() === 'other')) {
-		errors.found = true;
-		errors.message = 'Type can only be \'Game\', \'DLC\', or \'Other\'';
-		return errors;
+	gameTypeValidation(gameType, errors);
+	switch(codeType) {
+	case 'steam':
+		validateSteamKey(args, errors);
+		break;
+	case 'microsoft':
+		validateMicrosoftKey(args, errors);
+		break;
+	case 'gog':
+		validateGOGKey(args, errors);
+		break;
+	case 'origin':
+		validateOriginKey(args, errors);
+		break;
+	case 'epic':
+		validateEpicKey(args, errors);
+		break;
+	case 'uplay':
+		validateUplayKey(args, errors);
+		break;
 	}
-	// If the Key array is less than 3 or greater than 3 (Steam Key should only have 3 after splitting by '-')
-	// Return error w/ messaage
-	if(gameKey.length < 3 || gameKey.length > 3) {
-		errors.found = true;
-		errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
-		return errors;
-	} else {
-		// For every section of the key
-		// Check that it's 5 letters long
-		// --------Check that ALL the letters aren't numbers------ Small Possibility random steam code has all nunmbers
-		// Check that all the letters are uppercase (numbers automatically come back as true, possible error)
-		for(const keyPart of gameKey) {
-			if(keyPart.length < 5 || keyPart.length > 5) {
-				errors.found = true;
-				errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
-				return errors;
-			}
-			// if(!isNaN(keyPart)) {
-			//     errors.found = true;
-			//     errors.message = 'Steam key not recognized. Make sure it is in the correct format';
-			// }
-			if(!(keyPart === keyPart.toUpperCase())) {
-				errors.found = true;
-				errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
-				return errors;
-			}
-		}
-	}
+
+
+	console.log(errors);
 
 	// If no errors found
 	// Set name = gameName
@@ -87,6 +72,68 @@ function argsValidation(args) {
 	errors.key = args[args.length - 2];
 	errors.type = gameType;
 	return errors;
+}
+
+function gameTypeValidation(gameType, errors) {
+	// If game type isn't game, dlc, or other
+	// Return error w/ message
+	if(!(gameType.toLowerCase() === 'game' || gameType.toLowerCase() === 'dlc' || gameType.toLowerCase() === 'other')) {
+		errors.found = true;
+		errors.message = 'Type can only be \'Game\', \'DLC\', or \'Other\'';
+	}
+
+	return errors;
+}
+
+function validateSteamKey(args, errors) {
+	const gameKey = args[args.length - 2].split('-');
+	// If the Key array is less than 3 or greater than 3 (Steam Key should only have 3 after splitting by '-')
+	// Return error w/ messaage
+	if(gameKey.length < 3 || gameKey.length > 3) {
+		errors.found = true;
+		errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
+	} else {
+		// For every section of the key
+		// Check that it's 5 letters long
+		// --------Check that ALL the letters aren't numbers------ Small Possibility random steam code has all nunmbers
+		// Check that all the letters are uppercase (numbers automatically come back as true, possible error)
+		for(const keyPart of gameKey) {
+			if(keyPart.length < 5 || keyPart.length > 5) {
+				errors.found = true;
+				errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
+			}
+			// if(!isNaN(keyPart)) {
+			//     errors.found = true;
+			//     errors.message = 'Steam key not recognized. Make sure it is in the correct format';
+			// }
+			if(!(keyPart === keyPart.toUpperCase())) {
+				errors.found = true;
+				errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
+			}
+		}
+	}
+
+	return errors;
+}
+
+function validateMicrosoftKey(args, errors) {
+
+}
+
+function validateGOGKey(args, errors) {
+
+}
+
+function validateOriginKey(args, errors) {
+
+}
+
+function validateEpicKey(args, errors) {
+
+}
+
+function validateUplayKey(args, errors) {
+
 }
 
 module.exports = {
@@ -101,21 +148,24 @@ module.exports = {
 
 		// If the message was sent in dm channel
 		if(message.channel.type === 'dm') {
+			const res = await Game.updateMany({ gameType : { $ne: '' } }, { $set: { codeType: 'Steam' } }, { multi: true });
+			console.log(res);
+
 			// Check if there are at 3 argleast uments
 			// Game Name (Can be multiple arguments), Key, Type
 			if (args.length < 3) {
 				return message.channel.send('Command needs three (3) arguments, run help command for more info');
 			}
 
+			// codeType = null/undefined Or Type
 			const codeType = await codeTypeChoice(message);
+			let errors;
 			if(codeType) {
-				return message.channel.send('Valid Code Type');
+				errors = argsValidation(args, codeType);
 			} else {
-				return message.channel.send('Invalid code Type');
+				return;
 			}
 
-			// Validate the arguments passed to make sure its correct format
-			const errors = argsValidation(args);
 			// If any errors are found, return the error message
 			// Else delete the errors found key/pair
 			if(errors.found) {
