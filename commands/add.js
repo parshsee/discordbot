@@ -71,6 +71,7 @@ function argsValidation(args, codeType) {
 	errors.name = gameName;
 	errors.key = args[args.length - 2];
 	errors.type = gameType;
+	errors.codeType = codeType !== 'gog' ? codeType.charAt(0).toUpperCase() + codeType.slice(1) : codeType.toUpperCase();
 	return errors;
 }
 
@@ -87,6 +88,8 @@ function gameTypeValidation(gameType, errors) {
 
 function validateSteamKey(args, errors) {
 	const gameKey = args[args.length - 2].split('-');
+
+	console.log(gameKey);
 	// If the Key array is less than 3 or greater than 3 (Steam Key should only have 3 after splitting by '-')
 	// Return error w/ messaage
 	if(gameKey.length < 3 || gameKey.length > 3) {
@@ -117,7 +120,35 @@ function validateSteamKey(args, errors) {
 }
 
 function validateMicrosoftKey(args, errors) {
+	const gameKey = args[args.length - 2].split('-');
 
+	// If the Key array is doesn't equal 5 (Microsoft Key should only have 5 after splitting by '-')
+	// Return error w/ messaage
+	if(gameKey.length !== 5) {
+		errors.found = true;
+		errors.message = 'Microsoft key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX)';
+	} else {
+		// For every section of the key
+		// Check that it's 5 letters long
+		// --------Check that ALL the letters aren't numbers------ Small Possibility random steam code has all nunmbers
+		// Check that all the letters are uppercase (numbers automatically come back as true, possible error)
+		for(const keyPart of gameKey) {
+			if(keyPart.length !== 5) {
+				errors.found = true;
+				errors.message = 'Microsoft key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX)';
+			}
+			// if(!isNaN(keyPart)) {
+			//     errors.found = true;
+			//     errors.message = 'Microsoft key not recognized. Make sure it is in the correct format';
+			// }
+			if(!(keyPart === keyPart.toUpperCase())) {
+				errors.found = true;
+				errors.message = 'Microsoft key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX)';
+			}
+		}
+	}
+
+	return errors;
 }
 
 function validateGOGKey(args, errors) {
@@ -148,8 +179,12 @@ module.exports = {
 
 		// If the message was sent in dm channel
 		if(message.channel.type === 'dm') {
-			const res = await Game.updateMany({ gameType : { $ne: '' } }, { $set: { codeType: 'Steam' } }, { multi: true });
-			console.log(res);
+
+			// ///////// REMEMBER TO REMOVE THIS ////////////////////
+			// const res = await Game.updateMany({ gameType : { $ne: '' } }, { $set: { codeType: 'Steam' } }, { multi: true });
+			// console.log(res);
+			// /////////////////////////////////////////////////////
+
 
 			// Check if there are at 3 argleast uments
 			// Game Name (Can be multiple arguments), Key, Type
@@ -166,6 +201,7 @@ module.exports = {
 				return;
 			}
 
+			console.log(errors);
 			// If any errors are found, return the error message
 			// Else delete the errors found key/pair
 			if(errors.found) {
@@ -179,18 +215,19 @@ module.exports = {
 				gameName: errors.name,
 				gameKey: errors.key,
 				gameType: errors.type,
+				codeType: errors.codeType,
 			});
 
 			// Save the game to the database
-			(async () => {
-				try {
-					await games.save();
-					return message.channel.send('Game Added Successfully');
-				} catch (err) {
-					console.log('error: ' + err);
-					return message.channel.send('Steam key already in database.');
-				}
-			})();
+			// (async () => {
+			// 	try {
+			// 		await games.save();
+			// 		return message.channel.send('Game Added Successfully');
+			// 	} catch (err) {
+			// 		console.log('error: ' + err);
+			// 		return message.channel.send('Steam key already in database.');
+			// 	}
+			// })();
 
 			console.log('Game added to Database');
 			return;
