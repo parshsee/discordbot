@@ -222,7 +222,35 @@ function validateOriginKey(args, errors) {
 }
 
 function validateEpicKey(args, errors) {
+	const gameKey = args[args.length - 2].split('-');
 
+	// If the Key array is doesn't equal 5 (Epic Key should only have 5 after splitting by '-')
+	// Return error w/ message
+	if(gameKey.length !== 4) {
+		errors.found = true;
+		errors.message = 'Epic key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+	} else {
+		// For every section of the key
+		// Check that it's 5 letters long
+		// --------Check that ALL the letters aren't numbers------ Small Possibility random Epic code has all nunmbers
+		// Check that all the letters are uppercase (numbers automatically come back as true, possible error)
+		for(const keyPart of gameKey) {
+			if(keyPart.length !== 5) {
+				errors.found = true;
+				errors.message = 'Epic key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+			}
+			// if(!isNaN(keyPart)) {
+			//     errors.found = true;
+			//     errors.message = 'Epic key not recognized. Make sure it is in the correct format';
+			// }
+			if(!(keyPart === keyPart.toUpperCase())) {
+				errors.found = true;
+				errors.message = 'Epic key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+			}
+		}
+	}
+
+	return errors;
 }
 
 function validateUplayKey(args, errors) {
