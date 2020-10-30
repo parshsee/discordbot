@@ -68,13 +68,11 @@ function argsValidation(args, codeType) {
 		break;
 	}
 
-
-	console.log(errors);
-
 	// If no errors found
 	// Set name = gameName
 	// Set key = Full Steam Key (not split)
 	// Set type = gameType
+	// Set codeType = Capitalized codetype
 	errors.name = gameName;
 	errors.key = args[args.length - 2];
 	errors.type = gameType;
@@ -96,7 +94,6 @@ function gameTypeValidation(gameType, errors) {
 function validateSteamKey(args, errors) {
 	const gameKey = args[args.length - 2].split('-');
 
-	console.log(gameKey);
 	// If the Key array is less than 3 or greater than 3 (Steam Key should only have 3 after splitting by '-')
 	// Return error w/ message
 	if(gameKey.length < 3 || gameKey.length > 3) {
@@ -353,7 +350,6 @@ module.exports = {
 				return;
 			}
 
-			console.log(errors);
 			// If any errors are found, return the error message
 			// Else delete the errors found key/pair
 			if(errors.found) {
