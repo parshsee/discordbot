@@ -7,7 +7,7 @@ async function codeTypeChoice(message) {
 	const filter = m => m.author.id === message.author.id;
 
 	try {
-		message.channel.send('What is the game code? (Steam, Microsoft, GOG, Origin, Epic, or Uplay) \n Type \'C\' to cancel ');
+		message.channel.send('What is the game code? (Steam, Microsoft, GOG, Origin, Epic, or Uplay) \nType \'C\' to cancel ');
 		const msg = await message.channel.awaitMessages(filter, { max: 1, time: 120000, errors: ['time'] });
 		const response = msg.first().content.toLowerCase();
 
@@ -91,7 +91,7 @@ function validateSteamKey(args, errors) {
 
 	console.log(gameKey);
 	// If the Key array is less than 3 or greater than 3 (Steam Key should only have 3 after splitting by '-')
-	// Return error w/ messaage
+	// Return error w/ message
 	if(gameKey.length < 3 || gameKey.length > 3) {
 		errors.found = true;
 		errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
@@ -123,7 +123,7 @@ function validateMicrosoftKey(args, errors) {
 	const gameKey = args[args.length - 2].split('-');
 
 	// If the Key array is doesn't equal 5 (Microsoft Key should only have 5 after splitting by '-')
-	// Return error w/ messaage
+	// Return error w/ message
 	if(gameKey.length !== 5) {
 		errors.found = true;
 		errors.message = 'Microsoft key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX)';
@@ -152,6 +152,40 @@ function validateMicrosoftKey(args, errors) {
 }
 
 function validateGOGKey(args, errors) {
+	const gameKey = args[args.length - 2].split('-');
+
+	// If the array is only 1 long & the first element isn't 18 characters (Discount Codes have 18 characters all together)
+	// Return error w/ message
+	if(gameKey.length === 1 && gameKey[0].length !== 18) {
+		errors.found = true;
+		errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+	// Else If the Key array is doesn't equal 4 (GOG Key should only have 4 after splitting by '-') & the first isnt 18 long (Discount Codes)
+	// Return error w/ message
+	} else if(gameKey.length !== 4 && gameKey[0].length !== 18) {
+		errors.found = true;
+		errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+	} else if(gameKey.length === 4 && gameKey[0].length !== 18) {
+		// For every section of the key
+		// Check that it's 5 letters long
+		// --------Check that ALL the letters aren't numbers------ Small Possibility random steam code has all nunmbers
+		// Check that all the letters are uppercase (numbers automatically come back as true, possible error)
+		for(const keyPart of gameKey) {
+			if(keyPart.length !== 5) {
+				errors.found = true;
+				errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+			}
+			// if(!isNaN(keyPart)) {
+			//     errors.found = true;
+			//     errors.message = 'GOG key not recognized. Make sure it is in the correct format';
+			// }
+			if(!(keyPart === keyPart.toUpperCase())) {
+				errors.found = true;
+				errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+			}
+		}
+	}
+
+	return errors;
 
 }
 
