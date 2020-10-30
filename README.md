@@ -24,6 +24,7 @@ This is my first Discord bot which serves to help me learn JavaScript and MongoD
 - [meme](#meme)
 - [quote](#quote)
 - [quotes](#quotes)
+- [twitch](#twitch)
 - [stats](#stats)
 
 ## Command Descriptions
@@ -55,6 +56,8 @@ Call API to retrieve a meme from a random subreddit (dankmemes, memes, me_irl) o
 Adds or Removes a quote from the bot
 ### Quotes
 Gets a random quote, specific quote, or lists all quotes
+### Twitch
+Adds or removes a Twitch streamer from the database or shows all streamers
 ### Stats
 Show information on the server or on a specific user from their user id or mention
 
@@ -69,6 +72,8 @@ Info API: https://api-v3.igdb.com/
 Meme API: https://github.com/R3l3ntl3ss/Meme_Api
 
 Meme Creation API: https://github.com/jacebrowning/memegen
+
+Twitch API: https://dev.twitch.tv/docs/api/
 
 [Back To The Top](#Immature-Bot)
 

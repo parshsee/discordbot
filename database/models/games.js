@@ -6,6 +6,7 @@ const gameSchema = mongoose.Schema({
 	gameName: { type: String },
 	gameKey: { type: String, unique: true },
 	gameType: { type: String },
+	codeType: { type: String },
 });
 
 // Export the model as 'Games' to be used when adding
