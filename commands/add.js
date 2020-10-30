@@ -158,12 +158,12 @@ function validateGOGKey(args, errors) {
 	// Return error w/ message
 	if(gameKey.length === 1 && gameKey[0].length !== 18) {
 		errors.found = true;
-		errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+		errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX or XXXXXXXXXXXXXXXXXX)';
 	// Else If the Key array is doesn't equal 4 (GOG Key should only have 4 after splitting by '-') & the first isnt 18 long (Discount Codes)
 	// Return error w/ message
 	} else if(gameKey.length !== 4 && gameKey[0].length !== 18) {
 		errors.found = true;
-		errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+		errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX or XXXXXXXXXXXXXXXXXX)';
 	} else if(gameKey.length === 4 && gameKey[0].length !== 18) {
 		// For every section of the key
 		// Check that it's 5 letters long
@@ -172,7 +172,7 @@ function validateGOGKey(args, errors) {
 		for(const keyPart of gameKey) {
 			if(keyPart.length !== 5) {
 				errors.found = true;
-				errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+				errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX or XXXXXXXXXXXXXXXXXX)';
 			}
 			// if(!isNaN(keyPart)) {
 			//     errors.found = true;
@@ -180,7 +180,7 @@ function validateGOGKey(args, errors) {
 			// }
 			if(!(keyPart === keyPart.toUpperCase())) {
 				errors.found = true;
-				errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+				errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX or XXXXXXXXXXXXXXXXXX)';
 			}
 		}
 	}
@@ -224,7 +224,7 @@ function validateOriginKey(args, errors) {
 function validateEpicKey(args, errors) {
 	const gameKey = args[args.length - 2].split('-');
 
-	// If the Key array is doesn't equal 5 (Epic Key should only have 5 after splitting by '-')
+	// If the Key array is doesn't equal 4 (Epic Key should only have 4 after splitting by '-')
 	// Return error w/ message
 	if(gameKey.length !== 4) {
 		errors.found = true;
@@ -254,6 +254,68 @@ function validateEpicKey(args, errors) {
 }
 
 function validateUplayKey(args, errors) {
+	const gameKey = args[args.length - 2].split('-');
+
+	if (gameKey[0].length === 4) {
+		// If the Key array is doesn't equal 4 (Uplay Key should only have 4 after splitting by '-')
+		// Return error w/ message
+		if (gameKey.length !== 4) {
+			errors.found = true;
+			errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXX-XXXX-XXXX-XXXX or XXX-XXXXX-XXXXX-XXXXX-XXXXX)';
+		} else {
+			// For every section of the key
+			// Check that it's 5 letters long
+			// --------Check that ALL the letters aren't numbers------ Small Possibility random Uplay code has all nunmbers
+			// Check that all the letters are uppercase (numbers automatically come back as true, possible error)
+			for (const keyPart of gameKey) {
+				if (keyPart.length !== 4) {
+					errors.found = true;
+					errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+				}
+				// if(!isNaN(keyPart)) {
+				//     errors.found = true;
+				//     errors.message = 'Epic key not recognized. Make sure it is in the correct format';
+				// }
+				if (!(keyPart === keyPart.toUpperCase())) {
+					errors.found = true;
+					errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+				}
+			}
+		}
+	} else if(gameKey[0].length === 3) {
+		// If the Key array is doesn't equal 5 (Alternate Uplay Key should only have 5 after splitting by '-')
+		// Return error w/ message
+		if (gameKey.length !== 5) {
+			errors.found = true;
+			errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+		} else {
+			// Remove the first element because it has 3 characters
+			gameKey.shift();
+			// For every section of the key
+			// Check that it's 5 letters long
+			// --------Check that ALL the letters aren't numbers------ Small Possibility random Uplay code has all nunmbers
+			// Check that all the letters are uppercase (numbers automatically come back as true, possible error)
+			for (const keyPart of gameKey) {
+				if (keyPart.length !== 4) {
+					errors.found = true;
+					errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+				}
+				// if(!isNaN(keyPart)) {
+				//     errors.found = true;
+				//     errors.message = 'Epic key not recognized. Make sure it is in the correct format';
+				// }
+				if (!(keyPart === keyPart.toUpperCase())) {
+					errors.found = true;
+					errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+				}
+			}
+		}
+	}else {
+		errors.found = true;
+		errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+	}
+
+	return errors;
 
 }
 
@@ -321,25 +383,6 @@ module.exports = {
 
 			console.log('Game added to Database');
 			return;
-
-			// Get the jsonArray of the games file
-			// const jsonArray = await jsonReader(process.env.GAMES_FILE);
-
-			// //	Check if the steam key is already in the file, return error message
-			// if(jsonArray.find(game => game.key.toLowerCase() === errors.key.toLowerCase())) {
-			// 	return message.channel.send('Steam key already in database.');
-			// }
-			// // Add the formatted object from user arguments into the end
-			// // Turn the array into a JSON string
-			// jsonArray.push(errors);
-			// const jsonString = JSON.stringify(jsonArray);
-			// // Write to the games file (overwriting it with added game)
-			// await jsonWriter(process.env.GAMES_FILE, jsonString);
-			// // Format the file so the added game get alphabetized & ids get updated
-			// await jsonFormatter(process.env.GAMES_FILE);
-
-			// // Reply to user the success
-			// return message.channel.send('Game Added Successfully');
 		}
 		// Delete can only work on server, not in dm's
 		// Remember deleting other peopels messages is a permission
