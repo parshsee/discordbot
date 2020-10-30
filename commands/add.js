@@ -2,6 +2,13 @@ require('dotenv').config();
 // Get the Games schema
 const Game = require('../database/models/games');
 
+const steamErrorMessage = 'Steam key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX)';
+const microsoftErrorMessage = 'Microsoft key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX)';
+const gogErrorMessage = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX or XXXXXXXXXXXXXXXXXX)';
+const originErrorMessage = 'Origin key not recognized. Make sure it is in the correct format (ex. XXXX-XXXX-XXXX-XXXX)';
+const epicErrorMessage = 'Epic key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+const uplayErrorMessage = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXX-XXXX-XXXX-XXXX-XXXX or XXXX-XXXX-XXXX-XXXX)';
+
 async function codeTypeChoice(message) {
 	const codeTypes = ['Steam', 'Microsoft', 'GOG', 'Origin', 'Epic', 'Uplay'];
 	const filter = m => m.author.id === message.author.id;
@@ -94,7 +101,7 @@ function validateSteamKey(args, errors) {
 	// Return error w/ message
 	if(gameKey.length < 3 || gameKey.length > 3) {
 		errors.found = true;
-		errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
+		errors.message = steamErrorMessage;
 	} else {
 		// For every section of the key
 		// Check that it's 5 letters long
@@ -103,7 +110,7 @@ function validateSteamKey(args, errors) {
 		for(const keyPart of gameKey) {
 			if(keyPart.length < 5 || keyPart.length > 5) {
 				errors.found = true;
-				errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
+				errors.message = steamErrorMessage;
 			}
 			// if(!isNaN(keyPart)) {
 			//     errors.found = true;
@@ -111,7 +118,7 @@ function validateSteamKey(args, errors) {
 			// }
 			if(!(keyPart === keyPart.toUpperCase())) {
 				errors.found = true;
-				errors.message = 'Steam key not recognized. Make sure it is in the correct format (ex. TEST1-12345-1E3K9)';
+				errors.message = steamErrorMessage;
 			}
 		}
 	}
@@ -126,7 +133,7 @@ function validateMicrosoftKey(args, errors) {
 	// Return error w/ message
 	if(gameKey.length !== 5) {
 		errors.found = true;
-		errors.message = 'Microsoft key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX)';
+		errors.message = microsoftErrorMessage;
 	} else {
 		// For every section of the key
 		// Check that it's 5 letters long
@@ -135,7 +142,7 @@ function validateMicrosoftKey(args, errors) {
 		for(const keyPart of gameKey) {
 			if(keyPart.length !== 5) {
 				errors.found = true;
-				errors.message = 'Microsoft key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX)';
+				errors.message = microsoftErrorMessage;
 			}
 			// if(!isNaN(keyPart)) {
 			//     errors.found = true;
@@ -143,7 +150,7 @@ function validateMicrosoftKey(args, errors) {
 			// }
 			if(!(keyPart === keyPart.toUpperCase())) {
 				errors.found = true;
-				errors.message = 'Microsoft key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX)';
+				errors.message = microsoftErrorMessage;
 			}
 		}
 	}
@@ -158,12 +165,12 @@ function validateGOGKey(args, errors) {
 	// Return error w/ message
 	if(gameKey.length === 1 && gameKey[0].length !== 18) {
 		errors.found = true;
-		errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX or XXXXXXXXXXXXXXXXXX)';
+		errors.message = gogErrorMessage;
 	// Else If the Key array is doesn't equal 4 (GOG Key should only have 4 after splitting by '-') & the first isnt 18 long (Discount Codes)
 	// Return error w/ message
 	} else if(gameKey.length !== 4 && gameKey[0].length !== 18) {
 		errors.found = true;
-		errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX or XXXXXXXXXXXXXXXXXX)';
+		errors.message = gogErrorMessage;
 	} else if(gameKey.length === 4 && gameKey[0].length !== 18) {
 		// For every section of the key
 		// Check that it's 5 letters long
@@ -172,7 +179,7 @@ function validateGOGKey(args, errors) {
 		for(const keyPart of gameKey) {
 			if(keyPart.length !== 5) {
 				errors.found = true;
-				errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX or XXXXXXXXXXXXXXXXXX)';
+				errors.message = gogErrorMessage;
 			}
 			// if(!isNaN(keyPart)) {
 			//     errors.found = true;
@@ -180,7 +187,7 @@ function validateGOGKey(args, errors) {
 			// }
 			if(!(keyPart === keyPart.toUpperCase())) {
 				errors.found = true;
-				errors.message = 'GOG key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX or XXXXXXXXXXXXXXXXXX)';
+				errors.message = gogErrorMessage;
 			}
 		}
 	}
@@ -196,7 +203,7 @@ function validateOriginKey(args, errors) {
 	// Return error w/ message
 	if(gameKey.length !== 4) {
 		errors.found = true;
-		errors.message = 'Origin key not recognized. Make sure it is in the correct format (ex. XXXX-XXXX-XXXX-XXXX)';
+		errors.message = originErrorMessage;
 	} else {
 		// For every section of the key
 		// Check that it's 4 letters long
@@ -205,7 +212,7 @@ function validateOriginKey(args, errors) {
 		for(const keyPart of gameKey) {
 			if(keyPart.length !== 4) {
 				errors.found = true;
-				errors.message = 'Origin key not recognized. Make sure it is in the correct format (ex. XXXX-XXXX-XXXX-XXXX)';
+				errors.message = originErrorMessage;
 			}
 			// if(!isNaN(keyPart)) {
 			//     errors.found = true;
@@ -213,7 +220,7 @@ function validateOriginKey(args, errors) {
 			// }
 			if(!(keyPart === keyPart.toUpperCase())) {
 				errors.found = true;
-				errors.message = 'Origin key not recognized. Make sure it is in the correct format (ex. XXXX-XXXX-XXXX-XXXX-XXXX)';
+				errors.message = originErrorMessage;
 			}
 		}
 	}
@@ -228,7 +235,7 @@ function validateEpicKey(args, errors) {
 	// Return error w/ message
 	if(gameKey.length !== 4) {
 		errors.found = true;
-		errors.message = 'Epic key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+		errors.message = epicErrorMessage;
 	} else {
 		// For every section of the key
 		// Check that it's 5 letters long
@@ -237,7 +244,7 @@ function validateEpicKey(args, errors) {
 		for(const keyPart of gameKey) {
 			if(keyPart.length !== 5) {
 				errors.found = true;
-				errors.message = 'Epic key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+				errors.message = epicErrorMessage;
 			}
 			// if(!isNaN(keyPart)) {
 			//     errors.found = true;
@@ -245,7 +252,7 @@ function validateEpicKey(args, errors) {
 			// }
 			if(!(keyPart === keyPart.toUpperCase())) {
 				errors.found = true;
-				errors.message = 'Epic key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+				errors.message = epicErrorMessage;
 			}
 		}
 	}
@@ -261,7 +268,7 @@ function validateUplayKey(args, errors) {
 		// Return error w/ message
 		if (gameKey.length !== 4) {
 			errors.found = true;
-			errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXX-XXXX-XXXX-XXXX or XXX-XXXXX-XXXXX-XXXXX-XXXXX)';
+			errors.message = uplayErrorMessage;
 		} else {
 			// For every section of the key
 			// Check that it's 5 letters long
@@ -270,7 +277,7 @@ function validateUplayKey(args, errors) {
 			for (const keyPart of gameKey) {
 				if (keyPart.length !== 4) {
 					errors.found = true;
-					errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+					errors.message = uplayErrorMessage;
 				}
 				// if(!isNaN(keyPart)) {
 				//     errors.found = true;
@@ -278,7 +285,7 @@ function validateUplayKey(args, errors) {
 				// }
 				if (!(keyPart === keyPart.toUpperCase())) {
 					errors.found = true;
-					errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+					errors.message = uplayErrorMessage;
 				}
 			}
 		}
@@ -287,7 +294,7 @@ function validateUplayKey(args, errors) {
 		// Return error w/ message
 		if (gameKey.length !== 5) {
 			errors.found = true;
-			errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+			errors.message = uplayErrorMessage;
 		} else {
 			// Remove the first element because it has 3 characters
 			gameKey.shift();
@@ -298,7 +305,7 @@ function validateUplayKey(args, errors) {
 			for (const keyPart of gameKey) {
 				if (keyPart.length !== 4) {
 					errors.found = true;
-					errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+					errors.message = uplayErrorMessage;
 				}
 				// if(!isNaN(keyPart)) {
 				//     errors.found = true;
@@ -306,13 +313,13 @@ function validateUplayKey(args, errors) {
 				// }
 				if (!(keyPart === keyPart.toUpperCase())) {
 					errors.found = true;
-					errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+					errors.message = uplayErrorMessage;
 				}
 			}
 		}
 	}else {
 		errors.found = true;
-		errors.message = 'Uplay key not recognized. Make sure it is in the correct format (ex. XXXXX-XXXXX-XXXXX-XXXXX)';
+		errors.message = uplayErrorMessage;
 	}
 
 	return errors;
@@ -332,10 +339,8 @@ module.exports = {
 		// If the message was sent in dm channel
 		if(message.channel.type === 'dm') {
 
-			// ///////// REMEMBER TO REMOVE THIS ////////////////////
-			// const res = await Game.updateMany({ gameType : { $ne: '' } }, { $set: { codeType: 'Steam' } }, { multi: true });
-			// console.log(res);
-			// /////////////////////////////////////////////////////
+			const res = await Game.updateMany({ gameType : { $ne: '' } }, { $set: { codeType: 'Steam' } }, { multi: true });
+			console.log(res);
 
 
 			// Check if there are at 3 argleast uments
