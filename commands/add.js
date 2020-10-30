@@ -130,7 +130,7 @@ function validateMicrosoftKey(args, errors) {
 	} else {
 		// For every section of the key
 		// Check that it's 5 letters long
-		// --------Check that ALL the letters aren't numbers------ Small Possibility random steam code has all nunmbers
+		// --------Check that ALL the letters aren't numbers------ Small Possibility random Microsoft code has all nunmbers
 		// Check that all the letters are uppercase (numbers automatically come back as true, possible error)
 		for(const keyPart of gameKey) {
 			if(keyPart.length !== 5) {
@@ -167,7 +167,7 @@ function validateGOGKey(args, errors) {
 	} else if(gameKey.length === 4 && gameKey[0].length !== 18) {
 		// For every section of the key
 		// Check that it's 5 letters long
-		// --------Check that ALL the letters aren't numbers------ Small Possibility random steam code has all nunmbers
+		// --------Check that ALL the letters aren't numbers------ Small Possibility random GOG code has all nunmbers
 		// Check that all the letters are uppercase (numbers automatically come back as true, possible error)
 		for(const keyPart of gameKey) {
 			if(keyPart.length !== 5) {
@@ -190,7 +190,35 @@ function validateGOGKey(args, errors) {
 }
 
 function validateOriginKey(args, errors) {
+	const gameKey = args[args.length - 2].split('-');
 
+	// If the Key array is doesn't equal 4 (Origin Key should only have 4 after splitting by '-')
+	// Return error w/ message
+	if(gameKey.length !== 4) {
+		errors.found = true;
+		errors.message = 'Origin key not recognized. Make sure it is in the correct format (ex. XXXX-XXXX-XXXX-XXXX)';
+	} else {
+		// For every section of the key
+		// Check that it's 4 letters long
+		// --------Check that ALL the letters aren't numbers------ Small Possibility random Origin code has all nunmbers
+		// Check that all the letters are uppercase (numbers automatically come back as true, possible error)
+		for(const keyPart of gameKey) {
+			if(keyPart.length !== 4) {
+				errors.found = true;
+				errors.message = 'Origin key not recognized. Make sure it is in the correct format (ex. XXXX-XXXX-XXXX-XXXX)';
+			}
+			// if(!isNaN(keyPart)) {
+			//     errors.found = true;
+			//     errors.message = 'Microsoft key not recognized. Make sure it is in the correct format';
+			// }
+			if(!(keyPart === keyPart.toUpperCase())) {
+				errors.found = true;
+				errors.message = 'Origin key not recognized. Make sure it is in the correct format (ex. XXXX-XXXX-XXXX-XXXX-XXXX)';
+			}
+		}
+	}
+
+	return errors;
 }
 
 function validateEpicKey(args, errors) {
