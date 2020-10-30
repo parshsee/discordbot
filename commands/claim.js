@@ -27,12 +27,12 @@ module.exports = {
 		if(!doc) return message.channel.send('Game could not be found. Please make sure it is in ia!freestuff and is typed correctly');
 
 		// Get gameName and gameKey from object
-		const { gameName, gameKey } = doc;
+		const { gameName, gameKey, codeType } = doc;
 
 		console.log('Game removed from Database');
 		// Reply to the channel that user claimed and DM user the key
 		message.channel.send(`A copy of ${gameName} has been claimed by ${message.author}`);
-		return message.author.send(`Game Claimed: ${gameName}\nKey: ${gameKey}`);
+		return message.author.send(`Game Claimed: ${gameName}\nKey: ${gameKey}\nRedeemable On: ${codeType}`);
 
 		// const index = jsonArray.findIndex(game => game.name.toLowerCase() === gameName.toLowerCase());
 
