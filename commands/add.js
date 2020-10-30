@@ -68,13 +68,11 @@ function argsValidation(args, codeType) {
 		break;
 	}
 
-
-	console.log(errors);
-
 	// If no errors found
 	// Set name = gameName
 	// Set key = Full Steam Key (not split)
 	// Set type = gameType
+	// Set codeType = Capitalized codetype
 	errors.name = gameName;
 	errors.key = args[args.length - 2];
 	errors.type = gameType;
@@ -96,7 +94,6 @@ function gameTypeValidation(gameType, errors) {
 function validateSteamKey(args, errors) {
 	const gameKey = args[args.length - 2].split('-');
 
-	console.log(gameKey);
 	// If the Key array is less than 3 or greater than 3 (Steam Key should only have 3 after splitting by '-')
 	// Return error w/ message
 	if(gameKey.length < 3 || gameKey.length > 3) {
@@ -338,11 +335,6 @@ module.exports = {
 
 		// If the message was sent in dm channel
 		if(message.channel.type === 'dm') {
-
-			const res = await Game.updateMany({ gameType : { $ne: '' } }, { $set: { codeType: 'Steam' } }, { multi: true });
-			console.log(res);
-
-
 			// Check if there are at 3 argleast uments
 			// Game Name (Can be multiple arguments), Key, Type
 			if (args.length < 3) {
@@ -358,7 +350,6 @@ module.exports = {
 				return;
 			}
 
-			console.log(errors);
 			// If any errors are found, return the error message
 			// Else delete the errors found key/pair
 			if(errors.found) {
@@ -376,15 +367,15 @@ module.exports = {
 			});
 
 			// Save the game to the database
-			// (async () => {
-			// 	try {
-			// 		await games.save();
-			// 		return message.channel.send('Game Added Successfully');
-			// 	} catch (err) {
-			// 		console.log('error: ' + err);
-			// 		return message.channel.send('Steam key already in database.');
-			// 	}
-			// })();
+			(async () => {
+				try {
+					await games.save();
+					return message.channel.send('Game Added Successfully');
+				} catch (err) {
+					console.log('error: ' + err);
+					return message.channel.send('Steam key already in database.');
+				}
+			})();
 
 			console.log('Game added to Database');
 			return;
