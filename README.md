@@ -29,7 +29,7 @@ This is my first Discord bot which serves to help me learn JavaScript and MongoD
 
 ## Command Descriptions
 ### Add
-Adds a specified game and key to the database
+Adds a specified game and key to the database. Support for Steam, Microsoft, GOG, Origin, Uplay, and Epic game codes
 ### Bday
 Adds or removes a birthday from the database
 ### Bdays
