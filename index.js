@@ -64,11 +64,12 @@ client.once('ready', () => {
 	setInterval(async () => await scheduleChecker(remindersChannel), 60000);
 	console.log('Schedule Checker	:	Created');
 
+	setInterval(async () => await twitchTokenValidator(), 60000);
+	console.log('Twitch Token Checker	:	Created');
+
 	setInterval(async () => await streamChecker(livePromotionChannel), 60000);
 	console.log('Streamer Checker	:	Created');
 
-	setInterval(() => twitchTokenValidator(), 60000);
-	console.log('Twitch Token Checker	:	Created');
 });
 
 
@@ -166,19 +167,25 @@ process.on('SIGINT', () => {
 async function twitchTokenValidator() {
 	// Given a token in header
 	// Returns the client id, scopes, and expire time in seconds (remaining)
-	const twitchValidator = (await axios({
-		url: `${process.env.TWITCH_VALIDATION_API}`,
-		method: 'GET',
-		headers: {
-			'Authorization': `OAuth ${process.env.TWITCH_TOKEN}`,
-		},
-	})).data;
+	try {
+		const twitchValidator = (await axios({
+			url: `${process.env.TWITCH_VALIDATION_API}`,
+			method: 'GET',
+			headers: {
+				'Authorization': `OAuth ${process.env.TWITCH_TOKEN}`,
+			},
+		})).data;
 
-	if (twitchValidator.expires_in > 0) {
-		console.log(`Twitch Token Time Remaining: ${twitchValidator.expires_in}`);
-	} else {
-		console.log('Token Expired, Retrieving New Token');
-		await getTwitchToken();
+		if(twitchValidator.expires_in > 0) {
+			console.log(`Twitch Token Time Remaining: ${twitchValidator.expires_in}`);
+		}
+
+	} catch(error) {
+		console.log('Call to Twitch Validator: Failure', error.response.data);
+		if(error.response.data.status === 401 && error.response.data.message === 'invalid access token') {
+			console.log('Token Expired, Retrieving New Token');
+			await getTwitchToken();
+		}
 	}
 }
 
