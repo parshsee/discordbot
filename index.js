@@ -166,24 +166,19 @@ process.on('SIGINT', () => {
 async function twitchTokenValidator() {
 	// Given a token in header
 	// Returns the client id, scopes, and expire time in seconds (remaining)
-	try {
-		const twitchValidator = (await axios({
-			url: `${process.env.TWITCH_VALIDATION_API}`,
-			method: 'GET',
-			headers: {
-				'Authorization': `OAuth ${process.env.TWITCH_TOKEN}`,
-			},
-		})).data;
+	const twitchValidator = (await axios({
+		url: `${process.env.TWITCH_VALIDATION_API}`,
+		method: 'GET',
+		headers: {
+			'Authorization': `OAuth ${process.env.TWITCH_TOKEN}`,
+		},
+	})).data;
 
-		if(twitchValidator.expires_in > 0) {
-			console.log(`Twitch Token Time Remaining: ${twitchValidator.expires_in}`);
-		} else {
-			console.log('Token Expired, Retrieving New Token');
-			await getTwitchToken();
-		}
-
-	} catch(error) {
-		console.log('Call to Twitch Validator: Failure', error);
+	if (twitchValidator.expires_in > 0) {
+		console.log(`Twitch Token Time Remaining: ${twitchValidator.expires_in}`);
+	} else {
+		console.log('Token Expired, Retrieving New Token');
+		await getTwitchToken();
 	}
 }
 
