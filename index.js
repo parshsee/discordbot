@@ -201,8 +201,6 @@ async function getTwitchToken() {
 			},
 		})).data;
 
-		console.log(twitchInfo);
-
 		console.log(`Old Twitch Token: ${process.env.TWITCH_TOKEN}`);
 		process.env.TWITCH_TOKEN = twitchInfo.access_token;
 

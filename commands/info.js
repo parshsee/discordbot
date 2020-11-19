@@ -86,9 +86,6 @@ module.exports = {
 	args: true,
 	usage: '[game name] **OR** \nia!info [game name] --- [year]',
 	async execute(message, args) {
-
-		console.log(process.env.TWITCH_TOKEN);
-
 		// If used as a DM
 		// Return error message
 		if(message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
