@@ -64,7 +64,7 @@ client.once('ready', () => {
 	setInterval(async () => await scheduleChecker(remindersChannel), 60000);
 	console.log('Schedule Checker	:	Created');
 
-	setInterval(() => twitchTokenValidator(), 60000);
+	setInterval(async () => await twitchTokenValidator(), 60000);
 	console.log('Twitch Token Checker	:	Created');
 
 	setInterval(async () => await streamChecker(livePromotionChannel), 60000);
