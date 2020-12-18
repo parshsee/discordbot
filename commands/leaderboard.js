@@ -77,6 +77,8 @@ async function endLeaderboard(message, args) {
 async function addPlayer(message, args) {
 	// Get the tournamentId (last element) from args and remove it
 	const tournamentId = args.pop();
+	// Check if tournamentId is an actual number
+	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid tournament ID. \nUse \'ia!leaderboard list\' to see all tournaments');
 	// Get the player name, capitalizing the first letter in each arg (if more than one) and lowercasing the rest
 	const playerName = args.map((s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
 	// Construct the playerObject
@@ -100,7 +102,7 @@ async function addPlayer(message, args) {
 		tournament.markModified('leaderboard');
 		// Save the updated document to the DB
 		await tournament.save();
-		console.log(`${playerName} has been added to ${tournament.leaderboard.name}`);
+		console.log(`${playerName} has been added to ${tournament.leaderboard.name} tournament`);
 		return message.channel.send(`${playerName} has been added to ${tournament.leaderboard.name}`);
 	} catch (error) {
 		console.log(error);
@@ -109,6 +111,37 @@ async function addPlayer(message, args) {
 }
 
 async function removePlayer(message, args) {
+	// Get the tournamentId (last element) from the args and remove it
+	const tournamentId = args.pop();
+	// Check if tournamentId is an actual number
+	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid tournament ID. \nUse \'ia!leaderboard list\' to see all tournaments');
+	// Get the player name, capitalizing the first letter in each arg (if more than one) and lowercasing the rest
+	const playerName = args.map((s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
+
+	// Check to see if tournament exists in DB
+	const query = await Leaderboard.find({ id: tournamentId });
+	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all tournaments');
+	// Get tournament object (should be first and only object in array)
+	const tournament = query[0];
+
+	// Check to see if name exists in tournament
+	const playerIndex = tournament.leaderboard.players.findIndex(player => {
+		return player.name === playerName;
+	});
+	// Remove the player object from the array
+	tournament.leaderboard.players.splice(playerIndex, 1);
+
+	try {
+		// Tell the DB that this part of the document has been modified (MUST DO for updates)
+		tournament.markModified('leaderboard');
+		// Save the updated document to the DB
+		await tournament.save();
+		console.log(`${playerName} has been removed from ${tournament.leaderboard.name} tournament`);
+		return message.channel.send(`${playerName} has been removed from ${tournament.leaderboard.name}`);
+	} catch (error) {
+		console.log(error);
+		return message.channel.send('There was an error removing that player from the tournament');
+	}
 
 }
 
