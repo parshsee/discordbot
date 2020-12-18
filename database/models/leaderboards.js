@@ -13,7 +13,7 @@ module.exports = mongoose.model('Leaderboards', leaderboardsSchema);
 /*
 exampleLeaderboard = {
     name = 'exampleLeaderboardName',
-    players = Object,
+    players = Array of Object,
 }
 
 examplePlayer = {
@@ -21,4 +21,22 @@ examplePlayer = {
     wins = 12,
     loss = 10,
 }
+
+exampleLeaderboard = {
+    name = 'exampleLeaderboardName',
+    players = [
+        {
+            name: 'examplePlayerName',
+            wins: 12,
+            losses: 10,
+        },
+        {
+            name: 'examplePlayerName2',
+            wins: 10,
+            losses: 12,
+        },
+    ],
+}
+
+
 */
