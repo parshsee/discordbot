@@ -241,25 +241,25 @@ module.exports = {
 		} else if(firstArg === 'add') {
 			// Message sends total number of args needed(add + 1 args)
 			if(args.length < 1) {
-				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info')
+				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return addPlayer(message, args);
 		} else if(firstArg === 'remove') {
 			// Message sends total number of args needed(remove + 1 args)
 			if (args.length < 1) {
-				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info')
+				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return removePlayer(message, args);
 		} else if(firstArg === 'win') {
 			// Message sends total number of args needed(win + 3 args)
 			if(args.length < 3) {
-				return message.channel.send('Command needs at least four (4) arguments, run \'ia!help leaderboard\' for more info')
+				return message.channel.send('Command needs at least four (4) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return updateScores(message, args);
 		} else if(firstArg === 'end') {
 			// Message sends total number of args needed(end  + 1 args)
 			if(args.length < 1) {
-				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info')
+				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return endLeaderboard(message, args);
 		} else {
