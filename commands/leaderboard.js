@@ -128,6 +128,8 @@ async function removePlayer(message, args) {
 	const playerIndex = tournament.leaderboard.players.findIndex(player => {
 		return player.name === playerName;
 	});
+	if(playerIndex < 0) return message.channel.send('Player not found in tournament.\nUse \'ia!leaderboard list\' to see all tournaments.\nUse \'ia!leaderboard list [tournamentID]\' to see all players in that tournament');
+
 	// Remove the player object from the array
 	tournament.leaderboard.players.splice(playerIndex, 1);
 
@@ -146,6 +148,55 @@ async function removePlayer(message, args) {
 }
 
 async function updateScores(message, args) {
+	// win [name] lose [name] [tournamentId]
+	// First Args: Winner Name
+	// Second Args; lose/loss
+	// Third Args: Loser Name
+	// Get the tournamentId (last element) from the args and remove it
+	const tournamentId = args.pop();
+	// Check if tournamentId is an actual number
+	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid tournament ID. \nUse \'ia!leaderboard list\' to see all tournaments');
+
+	// Find the index of the word loss (to split the differnece between winner name and loser)
+	const lossIndex = args.findIndex(x => {
+		return (x === 'lose' || x === 'lost' || x === 'loss');
+	});
+
+	// Get the winners name splicing from the args array, then capitalizing the first letter in each arg (if more than one) and lowercasing the rest
+	const winnerName = args.splice(0, lossIndex).map((s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
+	// Get the loser name splicing from the args array, then capitalizing the first letter in each arg (if more than one) and lowercasing the rest
+	const loserName = args.splice(1).map((s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
+
+	// Check to see if tournament exists in DB
+	const query = await Leaderboard.find({ id: tournamentId });
+	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all tournaments');
+	// Get tournament object (should be first and only object in array)
+	const tournament = query[0];
+
+	// Check to see if each player exists in tournament
+	const winnerIndex = tournament.leaderboard.players.findIndex(player => {
+		return player.name === winnerName;
+	});
+	const loserIndex = tournament.leaderboard.players.findIndex(player => {
+		return player.name === loserName;
+	});
+	if(winnerIndex < 0 || loserIndex < 0) return message.channel.send('One or more players not found in tournament.\nUse \'ia!leaderboard list\' to see all tournaments.\nUse \'ia!leaderboard list [tournamentID]\' to see all players in that tournament');
+
+	// Update the scores for the winner and loser
+	tournament.leaderboard.players[winnerIndex].wins += 1;
+	tournament.leaderboard.players[loserIndex].losses += 1;
+
+	try {
+		// Tell the DB that this part of the document has been modified (MUST DO for updates)
+		tournament.markModified('leaderboard');
+		// Save the updated document to the DB
+		await tournament.save();
+		console.log(`${tournament.leaderboard.players[winnerIndex].name} has won against ${tournament.leaderboard.players[loserIndex].name} in ${tournament.leaderboard.name} tournament`);
+		return message.channel.send(`Scores updated. \n${tournament.leaderboard.players[winnerIndex].name} is at: ${tournament.leaderboard.players[winnerIndex].wins} W - ${tournament.leaderboard.players[winnerIndex].losses} L\n${tournament.leaderboard.players[loserIndex].name} is at: ${tournament.leaderboard.players[loserIndex].wins} W - ${tournament.leaderboard.players[loserIndex].losses} L`);
+	} catch (error) {
+		console.log(error);
+		return message.channel.send('There was an error updating the scores');
+	}
 
 }
 
