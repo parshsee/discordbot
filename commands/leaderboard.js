@@ -1,4 +1,5 @@
 const Leaderboard = require('../database/models/leaderboards');
+const Discord = require('discord.js');
 
 async function addLeaderboard(message, args) {
 	// Get the full tournament name
@@ -44,7 +45,6 @@ async function endLeaderboard(message, args) {
 		// If there are no tournaments in database, send error message
 		if(!query) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all tournaments');
 
-		console.log(query);
 		// Destructured tournament name from query
 		const { name } = query.leaderboard;
 
@@ -62,7 +62,6 @@ async function endLeaderboard(message, args) {
 		// If there are no tournaments in database, send error message
 		if(!query) return message.channel.send('Could not find tournament name in database.\nUse \'ia!leaderboard list\' to see all tournaments.\n Make sure it is spelt exactly the same or use the ID instead');
 
-		console.log(query);
 		// Destructured tournament name from query
 		const { name } = query.leaderboard;
 
@@ -200,6 +199,49 @@ async function updateScores(message, args) {
 
 }
 
+async function listLeaderboard(message, args) {
+	// Create the MessageEmbed
+	const embed = new Discord.MessageEmbed()
+		.setColor('#0099ff')
+		.setTimestamp()
+		.setFooter('Parshotan Seenanan');
+	// If the message guild exists (message is in server) set the author and thumbnail
+	// Else set it static values (message would be dm then)
+	if (message.guild) {
+		embed
+			.setAuthor(message.guild.name, message.guild.iconURL())
+			.setThumbnail(message.guild.iconURL());
+	} else {
+		embed
+			.setAuthor('Immature Bot');
+	}
+
+	// If no arguments, then show all current tournaments
+	if(args.length === 0) {
+		// Get all tournaments in DB
+		const query = await Leaderboard.find().sort({ id: 1 });
+		// Check to see if any tournaments exist
+		if(query.length < 1) return message.channel.send('No tournaments are currently active.\nUse \'ia!leaderboard start [tournament name]\' to start one');
+
+		return createEmbeddedColumns(message, query, embed, 'ID', 'Tournament Name', '\u200b');
+	// Else if one arg (tournamentID, show all players and their scores)
+	} else if(args.length === 1) {
+		const tournamentId = args.pop();
+		// Check if tournamentId is an actual number
+		if(isNaN(tournamentId)) return message.channel.send('Please enter a valid tournament ID. \nUse \'ia!leaderboard list\' to see all tournaments');
+
+		// Check to see if tournament exists in DB
+		const query = await Leaderboard.find({ id: tournamentId });
+		if (query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all tournaments');
+		// Get tournament object (should be first and only object in array)
+		const tournament = query[0];
+
+		return createEmbeddedColumns(message, tournament.leaderboard.players, embed, 'Name', 'Wins', 'Losses');
+	} else {
+		return message.channel.send('Command needs at most two (2) arguments, run \'ia!help leaderboard\' for more info');
+	}
+}
+
 // After removing a tournament, go through the collection
 // Update all ids to be in order
 // Solves issue of having ids [1, 2, 3, 4] deleting id 3, and now ids show as [1, 2, 4]
@@ -220,6 +262,52 @@ async function updateCollectionIDs() {
 	}
 
 
+}
+
+// Creates a embedded with 3 columns: ID, Array of Docs, Name
+// Uses information from array of documents
+// Sends embedded back to channel
+function createEmbeddedColumns(message, doc, embed, titleOne, titleTwo, titleThree) {
+	// The limit of how many objects can be in an embed
+	// Only have 25 fields
+	// Need to set the ID, Array of Docs, and Name each column is a different field (so 3)
+	// 8 * 3 = 24, Only 8 objects can be in an embed at a time
+	let limit = 8;
+
+	// Loop through the array of objects getting each object and index
+	doc.forEach((x, index) => {
+		// If the index = the limit
+		if (index === limit) {
+			// Ternary Operator, set initial title for first embed and the titles for the others
+			embed.setTitle(index === 8 ?
+				(titleOne === 'ID' ? 'All Tournaments' : 'All Players') :
+				(titleOne === 'ID' ? 'All Tournaments Cont.' : 'All Players Cont.'));
+			// Increase the limit
+			limit += 8;
+			// Wait for the embed to be send
+			// forEach function doesn't need it to be await for some reason
+			message.channel.send({ embed });
+			// Clear all fields from the embed
+			// Allows me to add another 25 fields
+			embed.fields = [];
+		}
+
+		// If the remainder is 0, indicates that this will be the first row in embed, set titles
+		if (index % 8 === 0) {
+			embed.addField(`${titleOne}`, titleOne === 'ID' ? `${x.id}` : `${x.name}`, true);
+			embed.addField(`${titleTwo}`, titleTwo === 'Tournament Name' ? `${x.leaderboard.name}` : `${x.wins}`, true);
+			embed.addField(`${titleThree}`, titleThree === '\u200b' ? '\u200b' : `${x.losses}`, true);
+			// Else its not the first row, titles can be blank
+		} else {
+			embed.addField('\u200b', titleOne === 'ID' ? `${x.id}` : `${x.name}`, true);
+			embed.addField('\u200b', titleTwo === 'Tournament Name' ? `${x.leaderboard.name}` : `${x.wins}`, true);
+			embed.addField('\u200b', titleThree === '\u200b' ? '\u200b' : `${x.losses}`, true);
+		}
+	});
+	// Return the remaining embed after it exits for loop
+	// Ensures that the last objects are sent
+	// I.e if 28 objects in db, 24 will get sent with code above, last 4 will get sent with this
+	return message.channel.send(embed);
 }
 
 module.exports = {
@@ -262,6 +350,12 @@ module.exports = {
 				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return endLeaderboard(message, args);
+		} else if(firstArg === 'list') {
+			// Special Case: Can be ia!leaderboard list OR list [tournamentID]
+			if(args.length > 1) {
+				return message.channel.send('Command needs at most two (2) arguments, run \'ia!help leaderboard\' for more info');
+			}
+			return listLeaderboard(message, args);
 		} else {
 			return message.channel.send('Incorrect command usage. For proper usage use ia!help leaderboard');
 		}
