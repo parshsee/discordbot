@@ -43,7 +43,7 @@ async function endLeaderboard(message, args) {
 		// Returns an array of docs (even though if found it will only have 1 doc)
 		const query = await Leaderboard.findOneAndDelete({ id: tournamentId });
 		// If there are no tournaments in database, send error message
-		if(!query) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all tournaments');
+		if(!query) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
 
 		// Destructured tournament name from query
 		const { name } = query.leaderboard;
@@ -60,7 +60,7 @@ async function endLeaderboard(message, args) {
 		// Searching through an object is done with quotation marks
 		const query = await Leaderboard.findOneAndDelete({ 'leaderboard.name': tournamentName });
 		// If there are no tournaments in database, send error message
-		if(!query) return message.channel.send('Could not find tournament name in database.\nUse \'ia!leaderboard list\' to see all tournaments.\n Make sure it is spelt exactly the same or use the ID instead');
+		if(!query) return message.channel.send('Could not find leaderboard name in database.\nUse \'ia!leaderboard list\' to see all leaderboards.\n Make sure it is spelt exactly the same or use the ID instead');
 
 		// Destructured tournament name from query
 		const { name } = query.leaderboard;
@@ -77,7 +77,7 @@ async function addPlayer(message, args) {
 	// Get the tournamentId (last element) from args and remove it
 	const tournamentId = args.pop();
 	// Check if tournamentId is an actual number
-	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid tournament ID. \nUse \'ia!leaderboard list\' to see all tournaments');
+	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
 	// Get the player name, capitalizing the first letter in each arg (if more than one) and lowercasing the rest
 	const playerName = args.map((s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
 	// Construct the playerObject
@@ -90,7 +90,7 @@ async function addPlayer(message, args) {
 	// Check to see if tournament exists in DB
 	// Since it's find (generic) it will return an array of docs
 	const query = await Leaderboard.find({ id: tournamentId });
-	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all tournaments');
+	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboard');
 	// Get tournament object (should be first and only object in array)
 	const tournament = query[0];
 	// Add the playerObject to the players array of the leaderboard object
@@ -101,11 +101,11 @@ async function addPlayer(message, args) {
 		tournament.markModified('leaderboard');
 		// Save the updated document to the DB
 		await tournament.save();
-		console.log(`${playerName} has been added to ${tournament.leaderboard.name} tournament`);
+		console.log(`${playerName} has been added to ${tournament.leaderboard.name} leaderboard`);
 		return message.channel.send(`${playerName} has been added to ${tournament.leaderboard.name}`);
 	} catch (error) {
 		console.log(error);
-		return message.channel.send('There was an error adding that player to the tournament');
+		return message.channel.send('There was an error adding that player to the leaderboard');
 	}
 }
 
@@ -113,13 +113,13 @@ async function removePlayer(message, args) {
 	// Get the tournamentId (last element) from the args and remove it
 	const tournamentId = args.pop();
 	// Check if tournamentId is an actual number
-	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid tournament ID. \nUse \'ia!leaderboard list\' to see all tournaments');
+	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
 	// Get the player name, capitalizing the first letter in each arg (if more than one) and lowercasing the rest
 	const playerName = args.map((s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
 
 	// Check to see if tournament exists in DB
 	const query = await Leaderboard.find({ id: tournamentId });
-	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all tournaments');
+	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
 	// Get tournament object (should be first and only object in array)
 	const tournament = query[0];
 
@@ -127,7 +127,7 @@ async function removePlayer(message, args) {
 	const playerIndex = tournament.leaderboard.players.findIndex(player => {
 		return player.name === playerName;
 	});
-	if(playerIndex < 0) return message.channel.send('Player not found in tournament.\nUse \'ia!leaderboard list\' to see all tournaments.\nUse \'ia!leaderboard list [tournamentID]\' to see all players in that tournament');
+	if(playerIndex < 0) return message.channel.send('Player not found in leaderboard.\nUse \'ia!leaderboard list\' to see all leaderboards.\nUse \'ia!leaderboard list [leaderboardID]\' to see all players in that leaderboard');
 
 	// Remove the player object from the array
 	tournament.leaderboard.players.splice(playerIndex, 1);
@@ -137,11 +137,11 @@ async function removePlayer(message, args) {
 		tournament.markModified('leaderboard');
 		// Save the updated document to the DB
 		await tournament.save();
-		console.log(`${playerName} has been removed from ${tournament.leaderboard.name} tournament`);
+		console.log(`${playerName} has been removed from ${tournament.leaderboard.name} leaderboard`);
 		return message.channel.send(`${playerName} has been removed from ${tournament.leaderboard.name}`);
 	} catch (error) {
 		console.log(error);
-		return message.channel.send('There was an error removing that player from the tournament');
+		return message.channel.send('There was an error removing that player from the leaderboard');
 	}
 
 }
@@ -154,7 +154,7 @@ async function updateScores(message, args) {
 	// Get the tournamentId (last element) from the args and remove it
 	const tournamentId = args.pop();
 	// Check if tournamentId is an actual number
-	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid tournament ID. \nUse \'ia!leaderboard list\' to see all tournaments');
+	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
 
 	// Find the index of the word loss (to split the differnece between winner name and loser)
 	const lossIndex = args.findIndex(x => {
@@ -168,7 +168,7 @@ async function updateScores(message, args) {
 
 	// Check to see if tournament exists in DB
 	const query = await Leaderboard.find({ id: tournamentId });
-	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all tournaments');
+	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
 	// Get tournament object (should be first and only object in array)
 	const tournament = query[0];
 
@@ -179,7 +179,7 @@ async function updateScores(message, args) {
 	const loserIndex = tournament.leaderboard.players.findIndex(player => {
 		return player.name === loserName;
 	});
-	if(winnerIndex < 0 || loserIndex < 0) return message.channel.send('One or more players not found in tournament.\nUse \'ia!leaderboard list\' to see all tournaments.\nUse \'ia!leaderboard list [tournamentID]\' to see all players in that tournament');
+	if(winnerIndex < 0 || loserIndex < 0) return message.channel.send('One or more players not found in leaderboard.\nUse \'ia!leaderboard list\' to see all leaderboards.\nUse \'ia!leaderboard list [leaderboardID]\' to see all players in that leaderboard');
 
 	// Update the scores for the winner and loser
 	tournament.leaderboard.players[winnerIndex].wins += 1;
@@ -190,7 +190,7 @@ async function updateScores(message, args) {
 		tournament.markModified('leaderboard');
 		// Save the updated document to the DB
 		await tournament.save();
-		console.log(`${tournament.leaderboard.players[winnerIndex].name} has won against ${tournament.leaderboard.players[loserIndex].name} in ${tournament.leaderboard.name} tournament`);
+		console.log(`${tournament.leaderboard.players[winnerIndex].name} has won against ${tournament.leaderboard.players[loserIndex].name} in ${tournament.leaderboard.name} leaderboard`);
 		return message.channel.send(`Scores updated. \n${tournament.leaderboard.players[winnerIndex].name} is at: ${tournament.leaderboard.players[winnerIndex].wins} W - ${tournament.leaderboard.players[winnerIndex].losses} L\n${tournament.leaderboard.players[loserIndex].name} is at: ${tournament.leaderboard.players[loserIndex].wins} W - ${tournament.leaderboard.players[loserIndex].losses} L`);
 	} catch (error) {
 		console.log(error);
@@ -221,18 +221,18 @@ async function listLeaderboard(message, args) {
 		// Get all tournaments in DB
 		const query = await Leaderboard.find().sort({ id: 1 });
 		// Check to see if any tournaments exist
-		if(query.length < 1) return message.channel.send('No tournaments are currently active.\nUse \'ia!leaderboard start [tournament name]\' to start one');
+		if(query.length < 1) return message.channel.send('No leaderboards are currently active.\nUse \'ia!leaderboard start [leaderboard name]\' to start one');
 
-		return createEmbeddedColumns(message, query, embed, 'ID', 'Tournament Name', '\u200b');
+		return createEmbeddedColumns(message, query, embed, 'ID', 'Leaderboard Name', '\u200b');
 	// Else if one arg (tournamentID, show all players and their scores)
 	} else if(args.length === 1) {
 		const tournamentId = args.pop();
 		// Check if tournamentId is an actual number
-		if(isNaN(tournamentId)) return message.channel.send('Please enter a valid tournament ID. \nUse \'ia!leaderboard list\' to see all tournaments');
+		if(isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
 
 		// Check to see if tournament exists in DB
 		const query = await Leaderboard.find({ id: tournamentId });
-		if (query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all tournaments');
+		if (query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
 		// Get tournament object (should be first and only object in array)
 		const tournament = query[0];
 
@@ -280,8 +280,8 @@ function createEmbeddedColumns(message, doc, embed, titleOne, titleTwo, titleThr
 		if (index === limit) {
 			// Ternary Operator, set initial title for first embed and the titles for the others
 			embed.setTitle(index === 8 ?
-				(titleOne === 'ID' ? 'All Tournaments' : 'All Players') :
-				(titleOne === 'ID' ? 'All Tournaments Cont.' : 'All Players Cont.'));
+				(titleOne === 'ID' ? 'All Leaderboards' : 'All Players') :
+				(titleOne === 'ID' ? 'All Leaderboard Cont.' : 'All Players Cont.'));
 			// Increase the limit
 			limit += 8;
 			// Wait for the embed to be send
@@ -295,12 +295,12 @@ function createEmbeddedColumns(message, doc, embed, titleOne, titleTwo, titleThr
 		// If the remainder is 0, indicates that this will be the first row in embed, set titles
 		if (index % 8 === 0) {
 			embed.addField(`${titleOne}`, titleOne === 'ID' ? `${x.id}` : `${x.name}`, true);
-			embed.addField(`${titleTwo}`, titleTwo === 'Tournament Name' ? `${x.leaderboard.name}` : `${x.wins}`, true);
+			embed.addField(`${titleTwo}`, titleTwo === 'Leaderboard Name' ? `${x.leaderboard.name}` : `${x.wins}`, true);
 			embed.addField(`${titleThree}`, titleThree === '\u200b' ? '\u200b' : `${x.losses}`, true);
 			// Else its not the first row, titles can be blank
 		} else {
 			embed.addField('\u200b', titleOne === 'ID' ? `${x.id}` : `${x.name}`, true);
-			embed.addField('\u200b', titleTwo === 'Tournament Name' ? `${x.leaderboard.name}` : `${x.wins}`, true);
+			embed.addField('\u200b', titleTwo === 'Leaderboard Name' ? `${x.leaderboard.name}` : `${x.wins}`, true);
 			embed.addField('\u200b', titleThree === '\u200b' ? '\u200b' : `${x.losses}`, true);
 		}
 	});
@@ -312,10 +312,16 @@ function createEmbeddedColumns(message, doc, embed, titleOne, titleTwo, titleThr
 
 module.exports = {
 	name: 'leaderboard',
-	alias: [],
-	description: 'Starts or ends a tournament, Adds or removes a person from the tournament, and monitors wins and losses. ',
+	aliases: ['lb'],
+	description: 'Starts or ends a leaderboard, Adds or removes a person from the leaderboard, and monitors wins and losses. ',
 	args: true,
-	usage: '',
+	usage: 'start [leaderboard name] --- Creates a new leaderboard' +
+				'\n**•**ia!leaderboard end [leaderboard ID] --- Ends a leaderboard' +
+				'\n•ia!leaderboard add [name] [leaderboard ID] --- Adds a player to a leaderboard' +
+				'\n•ia!leaderboard remove [name] [leaderboard ID] --- Removes a player from a leaderboard' +
+				'\n•ia!leaderboard win [player name] loss [player name] [leaderboard ID] --- Updates scores for winning/losing players in leaderboard' +
+				'\n•ia!leaderboard list --- Lists all leaderboard' +
+				'\n•ia!leaderboard list [leaderboard ID] --- Lists all players and the scores in the leaderboard',
 	execute(message, args) {
 		// Get the first argument and remove it from the array
 		const firstArg = args.shift().toLowerCase();
