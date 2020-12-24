@@ -21,6 +21,7 @@ This is my first Discord bot which serves to help me learn JavaScript and MongoD
 - [events](#events)
 - [freestuff](#freestuff)
 - [info](#info)
+- [leaderboard](#leaderboard)
 - [meme](#meme)
 - [quote](#quote)
 - [quotes](#quotes)
@@ -50,6 +51,8 @@ Shows all events in database or a specific one
 Shows all available games in database or searches for a specific game. Multiple copies of the same game will appear as [game name] x[# of copies]
 ### Info
 Call API to retrieve information about a specified game with optional searching for specific year
+### Leaderboard
+Starts or ends a leaderboard, adds or removes players from a leaderboard, updates scores for players for a leaderboard
 ### Meme
 Call API to retrieve a meme from a random subreddit (dankmemes, memes, me_irl) or a specified one. You can also now create your memes using ia!meme create
 ### Quote
