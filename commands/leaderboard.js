@@ -36,6 +36,22 @@ async function addLeaderboard(message, args) {
 }
 
 async function endLeaderboard(message, args) {
+	// Create the MessageEmbed
+	const embed = new Discord.MessageEmbed()
+		.setColor('#0099ff')
+		.setTimestamp()
+		.setFooter('Parshotan Seenanan');
+	// If the message guild exists (message is in server) set the author and thumbnail
+	// Else set it static values (message would be dm then)
+	if (message.guild) {
+		embed
+			.setAuthor(message.guild.name, message.guild.iconURL())
+			.setThumbnail(message.guild.iconURL());
+	} else {
+		embed
+			.setAuthor('Immature Bot');
+	}
+
 	// Check if given a tournament ID or name
 	if(args.length === 1 && Number(args[0])) {
 		const tournamentId = args[0];
@@ -52,7 +68,8 @@ async function endLeaderboard(message, args) {
 
 		console.log('Leaderboard removed from Database');
 		// Return a message saying deletion was successful
-		return message.channel.send(`${name} has ended.`);
+		message.channel.send(`${name} has ended. Here are the scores: `);
+		return createEmbeddedColumns(message, query.leaderboard.players, embed, 'Name', 'Wins', 'Losses');
 	} else {
 		const tournamentName = args.join(' ');
 		// Create a query to find and delete the tournament based on tournamentName
@@ -69,7 +86,8 @@ async function endLeaderboard(message, args) {
 
 		console.log('Leaderboard removed from Database');
 		// Return a message saying deletion was successful
-		return message.channel.send(`${name} has ended.`);
+		message.channel.send(`${name} has ended. Here are the scores: `);
+		return createEmbeddedColumns(message, query.leaderboard.players, embed, 'Name', 'Wins', 'Losses');
 	}
 }
 
