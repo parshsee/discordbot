@@ -260,6 +260,38 @@ async function listLeaderboard(message, args) {
 	}
 }
 
+async function resetLeaderboard(message, args) {
+	// Get the tournamentId (last element) from the args and remove it
+	const tournamentId = args.pop();
+	// Check if tournamentId is an actual number
+	if (isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
+
+	// Check to see if tournament exists in DB
+	const query = await Leaderboard.find({ id: tournamentId });
+	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
+	// Get tournament object (should be first and only object in array)
+	const tournament = query[0];
+
+	console.log(tournament.leaderboard.players);
+	// Go through every player in the tournament and reset their scores
+	tournament.leaderboard.players.forEach((player) => {
+		player.wins = 0;
+		player.losses = 0;
+	});
+
+	try {
+		// Tell the DB that this part of the document has been modified (MUST DO for updates)
+		tournament.markModified('leaderboard');
+		// Save the updated document to the DB
+		await tournament.save();
+		console.log(`${tournament.leaderboard.name} has been reset`);
+		return message.channel.send(`${tournament.leaderboard.name} has been reset`);
+	} catch (error) {
+		console.log(error);
+		return message.channel.send('There was an error resetting the scores');
+	}
+}
+
 // After removing a tournament, go through the collection
 // Update all ids to be in order
 // Solves issue of having ids [1, 2, 3, 4] deleting id 3, and now ids show as [1, 2, 4]
@@ -380,6 +412,12 @@ module.exports = {
 				return message.channel.send('Command needs at most two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return listLeaderboard(message, args);
+		} else if(firstArg === 'reset') {
+			// Message sends total number of args needed(reset + 1 args)
+			if(args.lengt > 1) {
+				return message.channel.send('Command needs two (2) arguments, run \'ia!help leaderboard\' for more info');
+			}
+			return resetLeaderboard(message, args);
 		} else {
 			return message.channel.send('Incorrect command usage. For proper usage use ia!help leaderboard');
 		}
