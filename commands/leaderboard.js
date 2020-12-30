@@ -366,12 +366,13 @@ module.exports = {
 	description: 'Starts or ends a leaderboard, Adds or removes a person from the leaderboard, and monitors wins and losses. ',
 	args: true,
 	usage: 'start [leaderboard name] --- Creates a new leaderboard' +
-				'\n**•**ia!leaderboard end [leaderboard ID] --- Ends a leaderboard' +
-				'\n•ia!leaderboard add [name] [leaderboard ID] --- Adds a player to a leaderboard' +
-				'\n•ia!leaderboard remove [name] [leaderboard ID] --- Removes a player from a leaderboard' +
-				'\n•ia!leaderboard win [player name] loss [player name] [leaderboard ID] --- Updates scores for winning/losing players in leaderboard' +
-				'\n•ia!leaderboard list --- Lists all leaderboard' +
-				'\n•ia!leaderboard list [leaderboard ID] --- Lists all players and the scores in the leaderboard',
+				'\n**•**ia!leaderboard end [leaderboard ID] --- Ends a leaderboard and displays scores' +
+				'\n**•**ia!leaderboard add [name] [leaderboard ID] --- Adds a player to a leaderboard' +
+				'\n**•**ia!leaderboard remove [name] [leaderboard ID] --- Removes a player from a leaderboard' +
+				'\n**•**ia!leaderboard win [player name] loss [player name] [leaderboard ID] --- Updates scores for winning/losing players in leaderboard' +
+				'\n**•**ia!leaderboard list --- Lists all leaderboard' +
+				'\n**•**ia!leaderboard list [leaderboard ID] --- Lists all players and the scores in the leaderboard' +
+				'\n**•**ia!leaderboard reset [leaderboard ID] --- Resets a leaderboard, setting all wins/losses to 0 for all players',
 	execute(message, args) {
 		// Get the first argument and remove it from the array
 		const firstArg = args.shift().toLowerCase();
