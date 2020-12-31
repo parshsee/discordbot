@@ -247,9 +247,22 @@ async function scheduleChecker(remindersChannel) {
 	// Get todays date
 	// Set the seconds/milliseconds to 0
 	const today = new Date();
-	// Set hours back 4 -- Server's time 4 hours ahead of local time
-	// Comment this line out if working locally
-	today.setHours(today.getHours() - 4);
+
+	// Get dates for Daylight Saving Times (DST)
+	const daylightSavingTimeStart = '11/01/' + today.getFullYear();
+	const daylightSavingTimeEnd = '03/08/' + (today.getFullYear() + 1);
+
+	// Check if the date is between DST
+	// Comment this out if working locally
+	if(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd)) {
+		// If true, Server time is only 3 hours ahead
+		// Set hours back 3
+		today.setHours(today.getHours() - 3);
+	} else {
+		// Else Set hours back 4 -- Server's time 4 hours ahead of local time
+		today.setHours(today.getHours() - 4);
+	}
+
 	today.setSeconds(0, 0);
 
 	// Get tomorrows date (todays date + 1)
