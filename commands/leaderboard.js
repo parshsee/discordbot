@@ -36,6 +36,22 @@ async function addLeaderboard(message, args) {
 }
 
 async function endLeaderboard(message, args) {
+	// Create the MessageEmbed
+	const embed = new Discord.MessageEmbed()
+		.setColor('#0099ff')
+		.setTimestamp()
+		.setFooter('Parshotan Seenanan');
+	// If the message guild exists (message is in server) set the author and thumbnail
+	// Else set it static values (message would be dm then)
+	if (message.guild) {
+		embed
+			.setAuthor(message.guild.name, message.guild.iconURL())
+			.setThumbnail(message.guild.iconURL());
+	} else {
+		embed
+			.setAuthor('Immature Bot');
+	}
+
 	// Check if given a tournament ID or name
 	if(args.length === 1 && Number(args[0])) {
 		const tournamentId = args[0];
@@ -52,7 +68,8 @@ async function endLeaderboard(message, args) {
 
 		console.log('Leaderboard removed from Database');
 		// Return a message saying deletion was successful
-		return message.channel.send(`${name} has ended.`);
+		message.channel.send(`${name} has ended. Here are the scores: `);
+		return createEmbeddedColumns(message, query.leaderboard.players, embed, 'Name', 'Wins', 'Losses');
 	} else {
 		const tournamentName = args.join(' ');
 		// Create a query to find and delete the tournament based on tournamentName
@@ -69,7 +86,8 @@ async function endLeaderboard(message, args) {
 
 		console.log('Leaderboard removed from Database');
 		// Return a message saying deletion was successful
-		return message.channel.send(`${name} has ended.`);
+		message.channel.send(`${name} has ended. Here are the scores: `);
+		return createEmbeddedColumns(message, query.leaderboard.players, embed, 'Name', 'Wins', 'Losses');
 	}
 }
 
@@ -242,6 +260,38 @@ async function listLeaderboard(message, args) {
 	}
 }
 
+async function resetLeaderboard(message, args) {
+	// Get the tournamentId (last element) from the args and remove it
+	const tournamentId = args.pop();
+	// Check if tournamentId is an actual number
+	if (isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
+
+	// Check to see if tournament exists in DB
+	const query = await Leaderboard.find({ id: tournamentId });
+	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
+	// Get tournament object (should be first and only object in array)
+	const tournament = query[0];
+
+	console.log(tournament.leaderboard.players);
+	// Go through every player in the tournament and reset their scores
+	tournament.leaderboard.players.forEach((player) => {
+		player.wins = 0;
+		player.losses = 0;
+	});
+
+	try {
+		// Tell the DB that this part of the document has been modified (MUST DO for updates)
+		tournament.markModified('leaderboard');
+		// Save the updated document to the DB
+		await tournament.save();
+		console.log(`${tournament.leaderboard.name} has been reset`);
+		return message.channel.send(`${tournament.leaderboard.name} has been reset`);
+	} catch (error) {
+		console.log(error);
+		return message.channel.send('There was an error resetting the scores');
+	}
+}
+
 // After removing a tournament, go through the collection
 // Update all ids to be in order
 // Solves issue of having ids [1, 2, 3, 4] deleting id 3, and now ids show as [1, 2, 4]
@@ -316,12 +366,13 @@ module.exports = {
 	description: 'Starts or ends a leaderboard, Adds or removes a person from the leaderboard, and monitors wins and losses. ',
 	args: true,
 	usage: 'start [leaderboard name] --- Creates a new leaderboard' +
-				'\n**•**ia!leaderboard end [leaderboard ID] --- Ends a leaderboard' +
-				'\n•ia!leaderboard add [name] [leaderboard ID] --- Adds a player to a leaderboard' +
-				'\n•ia!leaderboard remove [name] [leaderboard ID] --- Removes a player from a leaderboard' +
-				'\n•ia!leaderboard win [player name] loss [player name] [leaderboard ID] --- Updates scores for winning/losing players in leaderboard' +
-				'\n•ia!leaderboard list --- Lists all leaderboard' +
-				'\n•ia!leaderboard list [leaderboard ID] --- Lists all players and the scores in the leaderboard',
+				'\n**•**ia!leaderboard end [leaderboard ID] --- Ends a leaderboard and displays scores' +
+				'\n**•**ia!leaderboard add [name] [leaderboard ID] --- Adds a player to a leaderboard' +
+				'\n**•**ia!leaderboard remove [name] [leaderboard ID] --- Removes a player from a leaderboard' +
+				'\n**•**ia!leaderboard win [player name] loss [player name] [leaderboard ID] --- Updates scores for winning/losing players in leaderboard' +
+				'\n**•**ia!leaderboard list --- Lists all leaderboard' +
+				'\n**•**ia!leaderboard list [leaderboard ID] --- Lists all players and the scores in the leaderboard' +
+				'\n**•**ia!leaderboard reset [leaderboard ID] --- Resets a leaderboard, setting all wins/losses to 0 for all players',
 	execute(message, args) {
 		// Get the first argument and remove it from the array
 		const firstArg = args.shift().toLowerCase();
@@ -362,6 +413,12 @@ module.exports = {
 				return message.channel.send('Command needs at most two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return listLeaderboard(message, args);
+		} else if(firstArg === 'reset') {
+			// Message sends total number of args needed(reset + 1 args)
+			if(args.lengt > 1) {
+				return message.channel.send('Command needs two (2) arguments, run \'ia!help leaderboard\' for more info');
+			}
+			return resetLeaderboard(message, args);
 		} else {
 			return message.channel.send('Incorrect command usage. For proper usage use ia!help leaderboard');
 		}
