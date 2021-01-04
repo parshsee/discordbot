@@ -252,18 +252,28 @@ async function scheduleChecker(remindersChannel) {
 	const daylightSavingTimeStart = '11/01/' + today.getFullYear();
 	const daylightSavingTimeEnd = '03/08/' + (today.getFullYear() + 1);
 
-	// Check if the date is between DST
+	// Gets dates for Daylight Saving Times for Last Year
+	const daylightSavingTimeStartLastYear = '11/01/' + (today.getFullYear() - 1);
+	const daylightSavingTimeEndLastYear = '03/08/' + today.getFullYear();
+
+	// Check if the date is between DST of the current year/next year or DST of last year/current year
+	// I.e Checks between November - March of this year/next year || November - March of last year/this year
 	// Comment this out if working locally
-	if(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd)) {
+	if(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd) ||
+			(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStartLastYear) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEndLastYear))) {
+		console.log(true);
 		// If true, Server time is only 3 hours ahead
 		// Set hours back 3
 		today.setHours(today.getHours() - 3);
 	} else {
+		console.log(false);
 		// Else Set hours back 4 -- Server's time 4 hours ahead of local time
 		today.setHours(today.getHours() - 4);
 	}
 
 	today.setSeconds(0, 0);
+
+	console.log(today);
 
 	// Get tomorrows date (todays date + 1)
 	// Set the seconds/milliseconds to 0
@@ -274,11 +284,15 @@ async function scheduleChecker(remindersChannel) {
 	tomorrow.setHours(today.getHours());
 	tomorrow.setSeconds(0, 0);
 
+	console.log(tomorrow);
+
 	// Get date for an hour ahead (todays hour + 1)
 	// Set the seconds/milliseconds to 0
 	const hourAhead = new Date();
 	hourAhead.setHours(today.getHours() + 1);
 	hourAhead.setSeconds(0, 0);
+
+	console.log(hourAhead);
 
 	// Loop through each event
 	doc.forEach(async event => {
