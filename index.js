@@ -249,31 +249,27 @@ async function scheduleChecker(remindersChannel) {
 	const today = new Date();
 
 	// Get dates for Daylight Saving Times (DST)
-	const daylightSavingTimeStart = '11/01/' + today.getFullYear();
-	const daylightSavingTimeEnd = '03/08/' + (today.getFullYear() + 1);
+	const daylightSavingTimeStart = getDaylightSavingStartTime(today.getFullYear());
+	const daylightSavingTimeEnd = getDaylightSavingEndTime(today.getFullYear() + 1);
 
 	// Gets dates for Daylight Saving Times for Last Year
-	const daylightSavingTimeStartLastYear = '11/01/' + (today.getFullYear() - 1);
-	const daylightSavingTimeEndLastYear = '03/08/' + today.getFullYear();
+	const daylightSavingTimeStartLastYear = getDaylightSavingStartTime(today.getFullYear() - 1);
+	const daylightSavingTimeEndLastYear = getDaylightSavingEndTime(today.getFullYear());
 
 	// Check if the date is between DST of the current year/next year or DST of last year/current year
 	// I.e Checks between November - March of this year/next year || November - March of last year/this year
 	// Comment this out if working locally
 	if(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd) ||
 			(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStartLastYear) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEndLastYear))) {
-		console.log(true);
 		// If true, Server time is only 5 hours ahead
 		// Set hours back 5
 		today.setHours(today.getHours() - 5);
 	} else {
-		console.log(false);
 		// Else Set hours back 4 -- Server's time 4 hours ahead of local time
 		today.setHours(today.getHours() - 4);
 	}
 
 	today.setSeconds(0, 0);
-
-	console.log(today);
 
 	// Get tomorrows date (todays date + 1)
 	// Set the seconds/milliseconds to 0
@@ -284,15 +280,11 @@ async function scheduleChecker(remindersChannel) {
 	tomorrow.setHours(today.getHours());
 	tomorrow.setSeconds(0, 0);
 
-	console.log(tomorrow);
-
 	// Get date for an hour ahead (todays hour + 1)
 	// Set the seconds/milliseconds to 0
 	const hourAhead = new Date();
 	hourAhead.setHours(today.getHours() + 1);
 	hourAhead.setSeconds(0, 0);
-
-	console.log(hourAhead);
 
 	// Loop through each event
 	doc.forEach(async event => {
@@ -434,4 +426,22 @@ async function streamChecker(livePromotionChannel) {
 			}
 		}
 	});
+}
+
+// ---------------------------- Helper Functions ------------------------------
+
+// Returns the Start date for DST
+// First Sunday of November
+function getDaylightSavingStartTime(year) {
+	const date = new Date(year, 10, 7);
+	date.setDate(7 - date.getDay());
+	return date;
+}
+
+// Returns the End date for DST
+// Second Sunday of March
+function getDaylightSavingEndTime(year) {
+	const date = new Date(year, 2, 7);
+	date.setDate(7 + (7 - date.getDay()));
+	return date;
 }
