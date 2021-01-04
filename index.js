@@ -262,9 +262,9 @@ async function scheduleChecker(remindersChannel) {
 	if(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd) ||
 			(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStartLastYear) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEndLastYear))) {
 		console.log(true);
-		// If true, Server time is only 3 hours ahead
-		// Set hours back 3
-		today.setHours(today.getHours() - 3);
+		// If true, Server time is only 5 hours ahead
+		// Set hours back 5
+		today.setHours(today.getHours() - 5);
 	} else {
 		console.log(false);
 		// Else Set hours back 4 -- Server's time 4 hours ahead of local time
