@@ -220,6 +220,30 @@ async function birthdayChecker(genChannel) {
 	// Get the current month & day in mm/dd format
 	// Get the current year
 	const currentDate = new Date();
+
+	// Get dates for Daylight Saving Times (DST)
+	const daylightSavingTimeStart = getDaylightSavingStartTime(currentDate.getFullYear());
+	const daylightSavingTimeEnd = getDaylightSavingEndTime(currentDate.getFullYear() + 1);
+
+	// Gets dates for Daylight Saving Times for Last Year
+	const daylightSavingTimeStartLastYear = getDaylightSavingStartTime(currentDate.getFullYear() - 1);
+	const daylightSavingTimeEndLastYear = getDaylightSavingEndTime(currentDate.getFullYear());
+
+	// Check if the date is between DST of the current year/next year or DST of last year/current year
+	// I.e Checks between November - March of this year/next year || November - March of last year/this year
+	// Comment this out if working locally
+	if(Date.parse(currentDate.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(currentDate.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd) ||
+			(Date.parse(currentDate.toLocaleDateString()) >= Date.parse(daylightSavingTimeStartLastYear) && Date.parse(currentDate.toLocaleDateString()) <= Date.parse(daylightSavingTimeEndLastYear))) {
+		// If true, Server time is only 5 hours ahead
+		// Set hours back 5
+		currentDate.setHours(currentDate.getHours() - 5);
+	} else {
+		// Else Set hours back 4 -- Server's time 4 hours ahead of local time
+		currentDate.setHours(currentDate.getHours() - 4);
+	}
+
+	currentDate.setSeconds(0, 0);
+
 	const currentMonthDay = `${currentDate.getMonth() + 1}/${currentDate.getDate()}`;
 	const currentYear = currentDate.getFullYear();
 
