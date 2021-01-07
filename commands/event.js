@@ -361,7 +361,8 @@ module.exports = {
 	aliases: ['schedule', 'remind'],
 	description: 'Adds or Removes an event from the bot\n__*Can not be used as DM*__',
 	args: true,
-	usage: '\n[add] [event name] **OR** \n[remove] [ID]',
+	usage: 'add [event name] --- Adds an event' +
+			'\n**•**ia!event remove [ID] --- Removes an event',
 	execute(message, args) {
 		if(message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
 

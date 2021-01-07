@@ -9,7 +9,7 @@ module.exports = {
 	aliases: ['get'],
 	description: 'Claim a game and recieve the steam key for it!\n__*Key will be sent as a DM to the user*__',
 	args: true,
-	usage: '[game name]',
+	usage: '[game name] --- Claims a game from the bot',
 	async execute(message, args) {
 		// const jsonArray = await jsonReader(process.env.GAMES_FILE);
 		const userGameName = args.join(' ');
@@ -24,7 +24,7 @@ module.exports = {
 		const doc = await query;
 
 		// If query failed, doc is null, return game not found message
-		if(!doc) return message.channel.send('Game could not be found. Please make sure it is in ia!freestuff and is typed correctly');
+		if(!doc) return message.channel.send('Game could not be found. Make sure it is typed exactly as shown on ia!freestuff');
 
 		// Get gameName and gameKey from object
 		const { gameName, gameKey, codeType } = doc;

@@ -328,7 +328,7 @@ module.exports = {
 	aliases: [],
 	description: 'Adds the specified game and key to the database! \n__*This command can only be used as a DM to the bot*__',
 	args: true,
-	usage: '[game name] [key] [type: Game, DLC, Other]',
+	usage: '[gamename] [key] [type: Game, DLC, Other] --- Adds the game key, name, and type to the database',
 	async execute(message, args) {
 		// Create a reply with sentence + their message
 		const reply = `This command can only be used as a DM: \n${message.content}`;

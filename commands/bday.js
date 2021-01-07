@@ -79,7 +79,8 @@ module.exports = {
 	aliases: [],
 	description: 'Adds or removes a birthday to remember',
 	args: true,
-	usage: '\n[add] [first name] [last name] [mm/dd/yyyy] **OR** \n[remove] [first name] [last name]',
+	usage: 'add [first name] [last name] [mm/dd/yyyy] --- Adds the persons name and birthday to the bot' +
+				'\n**•**ia!bday remove [first name] [last name] --- Removes the persons birthday from the bot',
 	execute(message, args) {
 
 		// Get the first argument and remove it from array

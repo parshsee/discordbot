@@ -48,7 +48,7 @@ module.exports = {
 	aliases: ['cute', 'animal'],
 	description: 'Sends a random cute animal image',
 	args: false,
-	usage: '',
+	usage: ' --- Gets a random cute animal image',
 	async execute(message, args) {
 		// Using this API: https://some-random-api.ml/
 

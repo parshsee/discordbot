@@ -5,7 +5,9 @@ module.exports = {
 	aliases: ['server', 'stat'],
 	description: 'Show information on the server or on a specific user from their user id or mention',
 	args: false,
-	usage: ' **OR** \nia!stats [user id] **OR** \nia!stats [@mention]',
+	usage: ' --- Shows information on the server' +
+			'\n**•**ia!stats [user id] --- Shows information on a specific user using their ID' +
+			'\n**•**ia!stats [@mention] --- Shows information on a specific user using their mention',
 	execute(message, args) {
 
 		if(message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
