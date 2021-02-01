@@ -100,7 +100,8 @@ module.exports = {
 	aliases: [],
 	description: 'Adds or Removes a quote from the bot',
 	args: true,
-	usage: '\n[add] [first name] [last name] [quote] **OR** \n[remove] [ID]',
+	usage: 'add [first name] [last name] [quote] --- Adds a quote to the bot' +
+				'\n**•**ia!quote remove [ID] --- Removes a quote from the bot',
 	execute(message, args) {
 		// Get the first argument and remove it from array
 		const firstArg = args.shift().toLowerCase();

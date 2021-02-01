@@ -80,7 +80,8 @@ module.exports = {
 	aliases: ['freegames', 'free'],
 	description: 'Shows all available games or searches for a specific game \n __Multiple copies of the same game will appear as [game name] x[# of copies]__',
 	args: false,
-	usage: ' **OR** \nia!freestuff [game name]',
+	usage: ' --- Shows all available games' +
+			'\n**•**ia!freestuff [game name] --- Searches for specific game',
 	async execute(message, args) {
 		if(message.channel.name === 'freebies') {
 			if (!args.length) {

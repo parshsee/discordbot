@@ -50,7 +50,10 @@ module.exports = {
 	aliases: [],
 	description: 'Gets a list of all quotes, specific quote, or random quote',
 	args: false,
-	usage: ' **OR** \nia!quotes [first name] [last name] **OR** \nia!quotes [ID] **OR** \nia!quotes random',
+	usage: ' --- Shows a list of all quotes in the bot' +
+				'\n**•**ia!quotes [first name] [last name] --- Shows a list of quotes from a specific person' +
+				'\n**•**ia!quotes [ID] --- Shows a specific quote based ID' +
+				'\n**•**ia!quotes random --- Gets a random quote',
 	async execute(message, args) {
 
 		// Create the MessageEmbed

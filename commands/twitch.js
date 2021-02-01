@@ -152,7 +152,9 @@ module.exports = {
 	aliases: [],
 	description: 'Adds or removes a Twitch streamer from the database or shows all streamers',
 	args: true,
-	usage: '\n[add] [Twitch Username] **OR** \n[remove] [ID] **OR** \n[list]',
+	usage: 'add [Twitch Username] --- Adds a streamer to the bot' +
+				'\n**•**ia!twitch remove [ID] --- Removes a streamer from the bot' +
+				'\n**•**ia!twitch list --- Shows all streamers followed by the bot',
 	async execute(message, args) {
 		if(message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
 

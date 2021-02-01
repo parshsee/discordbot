@@ -50,7 +50,8 @@ module.exports = {
 	aliases: ['schedules, reminds'],
 	description: 'Shows a list of all the events or info about a specific one',
 	args: false,
-	usage: ' **OR** \nia!events [ID]',
+	usage: ' --- Shows all scheduled events' +
+			'\n**•**ia!events [ID] --- Shows a specific event and participants',
 	async execute(message, args) {
 		// Create the MessageEmbed
 		const embed = new Discord.MessageEmbed()

@@ -4,8 +4,8 @@ const Discord = require('discord.js');
 module.exports = {
 	name: 'commands',
 	aliases: ['help', 'guide'],
-	description: 'List all my commands or info about a specific command.',
-	usage: '[command name]',
+	description: 'List all bot commands or info about a specific command.',
+	usage: '[command name] --- Lists all bot commands',
 	execute(message, args) {
 		const data = [];
 		// Get all commands (as objects) from message

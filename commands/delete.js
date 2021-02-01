@@ -3,7 +3,8 @@ module.exports = {
 	aliases: ['prune'],
 	description: 'Deletes the last message or a given number of messages (up to 100) in the channel from the last two weeks\n__*Only available to Mods*__',
 	args: false,
-	usage: ' **OR** \nia!delete [# of messages]',
+	usage: ' --- Deletes the last message' +
+			'\n**•**ia!delete [# of messages] --- Deletes the given number of messages',
 	execute(message, args) {
 
 		if(!message.member.roles.cache.some(role => role.name === 'Mods')) return message.channel.send('This command can only be done by Moderators (Mods)');

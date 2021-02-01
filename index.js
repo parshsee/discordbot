@@ -48,14 +48,77 @@ client.once('ready', () => {
 		}
 	})();
 
-	// https://stackoverflow.com/questions/45120618/send-a-message-with-discord-js
-	// Freebies Channel: 	In .env file
-	// Gen Channel: 		In .env file
-	// 1000 = 1 sec, 10000 = 10 sec, 60000 = 1 minute, 3600000 = 1 hour, 86400000 = 24 hours
-	const genChannel = client.channels.cache.get(`${process.env.GEN_CHANNEL_ID}`);
-	const remindersChannel = client.channels.cache.get(`${process.env.REMINDERS_CHANNEL_ID}`);
-	const livePromotionChannel = client.channels.cache.get(`${process.env.LIVE_PROMOTION_CHANNEL_ID}`);
+	// const genChannel = client.channels.cache.get(`${process.env.GEN_CHANNEL_ID}`);
+	// const remindersChannel = client.channels.cache.get(`${process.env.REMINDERS_CHANNEL_ID}`);
+	// const livePromotionChannel = client.channels.cache.get(`${process.env.LIVE_PROMOTION_CHANNEL_ID}`);
+	let genChannel;
+	let remindersChannel;
+	let livePromotionChannel;
 
+	client.guilds.cache.forEach(guild => {
+		const guildChannelErrors = [];
+
+		// Check if the guild has the required channels
+		// Gets the first text channel, which usually is the general channel
+		const hasGeneralChannel = guild.channels.cache.filter(channel => channel.type === 'text').first();
+		// .find returns the value, which in this case is the Channel class, not a boolean
+		const hasFreebiesChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'freebies');
+		const hasRemindersChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'reminders');
+		const hasLivePromotionChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'live-promotions');
+
+		// Check if freebies channel exists
+		// Else add error
+		if(!hasFreebiesChannel) {
+			guildChannelErrors.push('freebies');
+		}
+
+		// Check if freebies channel exists
+		// Else add error
+		if(!hasRemindersChannel) {
+			guildChannelErrors.push('reminders');
+		}
+
+		// Check if freebies channel exists
+		// Else add error
+		if(!hasLivePromotionChannel) {
+			guildChannelErrors.push('live-promotions');
+		}
+
+		// Check if guild is missing any channels
+		if(guildChannelErrors.length > 0) {
+			// Send message to the guilds general channel
+			hasGeneralChannel.send('Creating required channels...');
+			// Check if bot has permission to create channels
+			// If not, send message asking for permission or for channels to be created
+			if(!guild.me.hasPermission('MANAGE_CHANNELS')) {
+				hasGeneralChannel.send('Don\'t have permission to create required channels. Follow these steps to fully use Immature Bot: ' +
+										'\n1. Either create the required text channels manually OR give Immature Bot permission to manage channels when adding to server' +
+										'\n2. Remove and re-add Immature Bot to server' +
+										`\nMissing channels: ${guildChannelErrors.join(', ')}`);
+			}
+
+			// Create requried channels
+			guildChannelErrors.forEach(missingChannel => {
+				guild.channels.create(missingChannel, {
+					type: 'text',
+
+				}).then(channel => {
+					channel.send('Text Channel Created');
+					if(channel.name.toLowerCase() === 'reminders') remindersChannel = channel;
+					if(channel.name.toLowerCase() === 'live-promotions') livePromotionChannel = channel;
+				}).catch(error => {
+					console.log(error);
+				});
+			});
+		} else {
+			remindersChannel = hasRemindersChannel;
+			livePromotionChannel = hasLivePromotionChannel;
+		}
+
+		genChannel = hasGeneralChannel;
+	});
+
+	// 1000 = 1 sec, 10000 = 10 sec, 60000 = 1 minute, 3600000 = 1 hour, 86400000 = 24 hours
 	// Sets an interval of milliseconds, to run the birthdayChecker code
 	setInterval(async () => await birthdayChecker(genChannel), 86400000);
 	console.log('Birthday Checker	:	Created');
@@ -89,7 +152,7 @@ client.on('message', message => {
 	const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
 	// If there isn't a command with that name, exit
-	if(!command) return;
+	if(!command) return message.send('That command doesn\'t exist!');
 
 	// Checks args property of relevant command and to see if any args were passed
 	// If command requires arguments and no arguments provided (just command)
@@ -220,6 +283,30 @@ async function birthdayChecker(genChannel) {
 	// Get the current month & day in mm/dd format
 	// Get the current year
 	const currentDate = new Date();
+
+	// Get dates for Daylight Saving Times (DST)
+	const daylightSavingTimeStart = getDaylightSavingStartTime(currentDate.getFullYear());
+	const daylightSavingTimeEnd = getDaylightSavingEndTime(currentDate.getFullYear() + 1);
+
+	// Gets dates for Daylight Saving Times for Last Year
+	const daylightSavingTimeStartLastYear = getDaylightSavingStartTime(currentDate.getFullYear() - 1);
+	const daylightSavingTimeEndLastYear = getDaylightSavingEndTime(currentDate.getFullYear());
+
+	// Check if the date is between DST of the current year/next year or DST of last year/current year
+	// I.e Checks between November - March of this year/next year || November - March of last year/this year
+	// Comment this out if working locally
+	if(Date.parse(currentDate.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(currentDate.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd) ||
+			(Date.parse(currentDate.toLocaleDateString()) >= Date.parse(daylightSavingTimeStartLastYear) && Date.parse(currentDate.toLocaleDateString()) <= Date.parse(daylightSavingTimeEndLastYear))) {
+		// If true, Server time is only 5 hours ahead
+		// Set hours back 5
+		currentDate.setHours(currentDate.getHours() - 5);
+	} else {
+		// Else Set hours back 4 -- Server's time 4 hours ahead of local time
+		currentDate.setHours(currentDate.getHours() - 4);
+	}
+
+	currentDate.setSeconds(0, 0);
+
 	const currentMonthDay = `${currentDate.getMonth() + 1}/${currentDate.getDate()}`;
 	const currentYear = currentDate.getFullYear();
 
