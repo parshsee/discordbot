@@ -60,10 +60,15 @@ client.once('ready', () => {
 
 		// Get all text channels
 		const textChannels = guild.channels.cache.filter(channel => channel.type === 'text');
-		textChannels.forEach(channel => {
-			console.log(`${channel.name} ---- ${channel.createdTimestamp}`);
+		// Reducer iterates through the array, getting previous and current channels
+		// then comapres the createdTimestamp to see which is lower (so created first)
+		// and returns that channel ---- Reducer can only return 1 value
+		const hasGeneralChannel = textChannels.reduce((prev, curr) => {
+			return prev.createdTimestamp < curr.createdTimestamp ? prev : curr;
 		});
-		const hasGeneralChannel = textChannels.find(channel => channel.rawPosition === 0);
+
+		console.log(hasGeneralChannel.name);
+
 		// .find returns the value, which in this case is the Channel class, not a boolean
 		const hasFreebiesChannel = textChannels.find(channel => channel.name.toLowerCase() === 'freebies');
 		const hasRemindersChannel = textChannels.find(channel => channel.name.toLowerCase() === 'reminders');
