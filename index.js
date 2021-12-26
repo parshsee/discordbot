@@ -67,6 +67,8 @@ client.once('ready', () => {
 			return prev.createdTimestamp < curr.createdTimestamp ? prev : curr;
 		});
 
+		console.log(hasGeneralChannel.name);
+
 		// .find returns the value, which in this case is the Channel class, not a boolean
 		const hasFreebiesChannel = textChannels.find(channel => channel.name.toLowerCase() === 'freebies');
 		const hasRemindersChannel = textChannels.find(channel => channel.name.toLowerCase() === 'reminders');
