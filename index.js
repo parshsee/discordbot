@@ -58,18 +58,16 @@ client.once('ready', () => {
 	client.guilds.cache.forEach(guild => {
 		const guildChannelErrors = [];
 
-		// Check if the guild has the required channels
-		// Gets the first text channel, which usually is the general channel
-		const hasGeneralChannel = guild.channels.cache.filter(channel => channel.type === 'text').first();
-
+		// Get all text channels
 		const textChannels = guild.channels.cache.filter(channel => channel.type === 'text');
 		textChannels.forEach(channel => {
-			console.log(channel.name);
+			console.log(`${channel.name} ---- ${channel.rawPosition}`);
 		});
+		const hasGeneralChannel = textChannels.find(channel => channel.rawPosition === 0);
 		// .find returns the value, which in this case is the Channel class, not a boolean
-		const hasFreebiesChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'freebies');
-		const hasRemindersChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'reminders');
-		const hasLivePromotionChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'live-promotions');
+		const hasFreebiesChannel = textChannels.find(channel => channel.name.toLowerCase() === 'freebies');
+		const hasRemindersChannel = textChannels.find(channel => channel.name.toLowerCase() === 'reminders');
+		const hasLivePromotionChannel = textChannels.find(channel => channel.name.toLowerCase() === 'live-promotions');
 
 		// Check if freebies channel exists
 		// Else add error
