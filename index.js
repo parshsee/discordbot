@@ -61,7 +61,7 @@ client.once('ready', () => {
 		// Get all text channels
 		const textChannels = guild.channels.cache.filter(channel => channel.type === 'text');
 		textChannels.forEach(channel => {
-			console.log(`${channel.name} ---- ${channel.rawPosition}`);
+			console.log(`${channel.name} ---- ${channel.createdTimestamp}`);
 		});
 		const hasGeneralChannel = textChannels.find(channel => channel.rawPosition === 0);
 		// .find returns the value, which in this case is the Channel class, not a boolean
