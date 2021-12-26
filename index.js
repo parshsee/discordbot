@@ -20,7 +20,7 @@ client.commands = new Discord.Collection();
 // Return an array of all filenames in the directory with .js ending
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-for(const file of commandFiles) {
+for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 
 	// set a new item in the Collection
@@ -61,6 +61,11 @@ client.once('ready', () => {
 		// Check if the guild has the required channels
 		// Gets the first text channel, which usually is the general channel
 		const hasGeneralChannel = guild.channels.cache.filter(channel => channel.type === 'text').first();
+
+		const textChannels = guild.channels.cache.filter(channel => channel.type === 'text');
+		textChannels.forEach(channel => {
+			console.log(channel.name);
+		});
 		// .find returns the value, which in this case is the Channel class, not a boolean
 		const hasFreebiesChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'freebies');
 		const hasRemindersChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'reminders');
@@ -68,33 +73,33 @@ client.once('ready', () => {
 
 		// Check if freebies channel exists
 		// Else add error
-		if(!hasFreebiesChannel) {
+		if (!hasFreebiesChannel) {
 			guildChannelErrors.push('freebies');
 		}
 
 		// Check if freebies channel exists
 		// Else add error
-		if(!hasRemindersChannel) {
+		if (!hasRemindersChannel) {
 			guildChannelErrors.push('reminders');
 		}
 
 		// Check if freebies channel exists
 		// Else add error
-		if(!hasLivePromotionChannel) {
+		if (!hasLivePromotionChannel) {
 			guildChannelErrors.push('live-promotions');
 		}
 
 		// Check if guild is missing any channels
-		if(guildChannelErrors.length > 0) {
+		if (guildChannelErrors.length > 0) {
 			// Send message to the guilds general channel
 			hasGeneralChannel.send('Creating required channels...');
 			// Check if bot has permission to create channels
 			// If not, send message asking for permission or for channels to be created
-			if(!guild.me.hasPermission('MANAGE_CHANNELS')) {
+			if (!guild.me.hasPermission('MANAGE_CHANNELS')) {
 				hasGeneralChannel.send('Don\'t have permission to create required channels. Follow these steps to fully use Immature Bot: ' +
-										'\n1. Either create the required text channels manually OR give Immature Bot permission to manage channels when adding to server' +
-										'\n2. Remove and re-add Immature Bot to server' +
-										`\nMissing channels: ${guildChannelErrors.join(', ')}`);
+					'\n1. Either create the required text channels manually OR give Immature Bot permission to manage channels when adding to server' +
+					'\n2. Remove and re-add Immature Bot to server' +
+					`\nMissing channels: ${guildChannelErrors.join(', ')}`);
 			}
 
 			// Create requried channels
@@ -104,8 +109,8 @@ client.once('ready', () => {
 
 				}).then(channel => {
 					channel.send('Text Channel Created');
-					if(channel.name.toLowerCase() === 'reminders') remindersChannel = channel;
-					if(channel.name.toLowerCase() === 'live-promotions') livePromotionChannel = channel;
+					if (channel.name.toLowerCase() === 'reminders') remindersChannel = channel;
+					if (channel.name.toLowerCase() === 'live-promotions') livePromotionChannel = channel;
 				}).catch(error => {
 					console.log(error);
 				});
@@ -139,7 +144,7 @@ client.once('ready', () => {
 client.on('message', message => {
 	// If the message doesn't start with the prefix || This bot sent the message, exit
 	// Updated to check for Ia and IA command
-	if(!message.content.toLowerCase().startsWith(process.env.PREFIX) || message.author.bot) return;
+	if (!message.content.toLowerCase().startsWith(process.env.PREFIX) || message.author.bot) return;
 
 	// Slices off prefix (removes) and splits everything seperated by space into an array (regex accounts for multiple spaces)
 	const args = message.content.slice(process.env.PREFIX.length).split(/ +/);
@@ -152,14 +157,14 @@ client.on('message', message => {
 	const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
 	// If there isn't a command with that name, exit
-	if(!command) return message.send('That command doesn\'t exist!');
+	if (!command) return message.send('That command doesn\'t exist!');
 
 	// Checks args property of relevant command and to see if any args were passed
 	// If command requires arguments and no arguments provided (just command)
-	if(command.args && !args.length) {
+	if (command.args && !args.length) {
 		let reply = 'you didn\'t provide any arguments!';
 
-		if(command.usage) {
+		if (command.usage) {
 			reply += `\nThe proper usage would be: '${process.env.PREFIX}${command.name} ${command.usage}'`;
 		}
 
@@ -239,13 +244,13 @@ async function twitchTokenValidator() {
 			},
 		})).data;
 
-		if(twitchValidator.expires_in > 0) {
+		if (twitchValidator.expires_in > 0) {
 			console.log(`Twitch Token Time Remaining: ${twitchValidator.expires_in}`);
 		}
 
-	} catch(error) {
+	} catch (error) {
 		console.log('Call to Twitch Validator: Failure', error.response.data);
-		if(error.response.data.status === 401 && error.response.data.message === 'invalid access token') {
+		if (error.response.data.status === 401 && error.response.data.message === 'invalid access token') {
 			console.log('Token Expired, Retrieving New Token');
 			await getTwitchToken();
 		}
@@ -267,7 +272,7 @@ async function getTwitchToken() {
 		console.log(`Old Twitch Token: ${process.env.TWITCH_TOKEN}`);
 		process.env.TWITCH_TOKEN = twitchInfo.access_token;
 
-	} catch(error) {
+	} catch (error) {
 		console.log('Call to Twitch Token: Failure', error);
 	}
 }
@@ -295,8 +300,8 @@ async function birthdayChecker(genChannel) {
 	// Check if the date is between DST of the current year/next year or DST of last year/current year
 	// I.e Checks between November - March of this year/next year || November - March of last year/this year
 	// Comment this out if working locally
-	if(Date.parse(currentDate.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(currentDate.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd) ||
-			(Date.parse(currentDate.toLocaleDateString()) >= Date.parse(daylightSavingTimeStartLastYear) && Date.parse(currentDate.toLocaleDateString()) <= Date.parse(daylightSavingTimeEndLastYear))) {
+	if (Date.parse(currentDate.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(currentDate.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd) ||
+		(Date.parse(currentDate.toLocaleDateString()) >= Date.parse(daylightSavingTimeStartLastYear) && Date.parse(currentDate.toLocaleDateString()) <= Date.parse(daylightSavingTimeEndLastYear))) {
 		// If true, Server time is only 5 hours ahead
 		// Set hours back 5
 		currentDate.setHours(currentDate.getHours() - 5);
@@ -346,8 +351,8 @@ async function scheduleChecker(remindersChannel) {
 	// Check if the date is between DST of the current year/next year or DST of last year/current year
 	// I.e Checks between November - March of this year/next year || November - March of last year/this year
 	// Comment this out if working locally
-	if(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd) ||
-			(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStartLastYear) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEndLastYear))) {
+	if (Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStart) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEnd) ||
+		(Date.parse(today.toLocaleDateString()) >= Date.parse(daylightSavingTimeStartLastYear) && Date.parse(today.toLocaleDateString()) <= Date.parse(daylightSavingTimeEndLastYear))) {
 		// If true, Server time is only 5 hours ahead
 		// Set hours back 5
 		today.setHours(today.getHours() - 5);
@@ -380,7 +385,7 @@ async function scheduleChecker(remindersChannel) {
 		let eventPeople = event.eventPeople;
 
 		// If there's only 1 element in the array and it's 'none', remove it
-		if(eventPeople.length === 1 && eventPeople[0] === 'none') eventPeople.pop();
+		if (eventPeople.length === 1 && eventPeople[0] === 'none') eventPeople.pop();
 		// Add the author ID to the beginning of the array
 		eventPeople.unshift(eventAuthor);
 		// Mutate (modify) the array, changing each ID (person) to allow Discord to @ them
@@ -390,35 +395,35 @@ async function scheduleChecker(remindersChannel) {
 		});
 
 		// Check the reminder type
-		if(reminderType === 'day') {
+		if (reminderType === 'day') {
 			// If reminder type is a day and tomorrows time equals the event time
-			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
+			if (tomorrow.toLocaleString() === eventDate.toLocaleString()) {
 				console.log('Event DB Called');
 				// Send message to channel reminding participants of event in 24 hours
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
 			}
-		} else if(reminderType === 'hour') {
+		} else if (reminderType === 'hour') {
 			// If reminder type is an hour and hourAhead time equals the event time
-			if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
+			if (hourAhead.toLocaleString() === eventDate.toLocaleString()) {
 				console.log('Event DB Called');
 				// Send message to channel reminding participants of event in 1 hour
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
 			}
-		} else if(reminderType === 'both') {
+		} else if (reminderType === 'both') {
 			// If reminder type is a day and tomorrows time equals the event time
-			if(tomorrow.toLocaleString() === eventDate.toLocaleString()) {
+			if (tomorrow.toLocaleString() === eventDate.toLocaleString()) {
 				console.log('Event DB Called');
 				// Send message to channel reminding participants of event in 24 hours
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 24 hours! :alarm_clock:`);
-			// Send message to channel reminding participants of event in 24 hours
-			} else if(hourAhead.toLocaleString() === eventDate.toLocaleString()) {
+				// Send message to channel reminding participants of event in 24 hours
+			} else if (hourAhead.toLocaleString() === eventDate.toLocaleString()) {
 				console.log('Event DB Called');
 				// Send message to channel reminding participants of event in 1 hour
 				return remindersChannel.send(`:alarm_clock: ${eventPeople} --- ${eventName} is in 1 hour! :alarm_clock:`);
 			}
 		}
 		// If current time equals event time
-		if(today.toLocaleString() === eventDate.toLocaleString()) {
+		if (today.toLocaleString() === eventDate.toLocaleString()) {
 			// Delete event from database
 			await Event.findOneAndDelete({ eventId: event.eventId });
 			console.log('Event DB Called');
@@ -435,7 +440,7 @@ async function streamChecker(livePromotionChannel) {
 	const doc = await query;
 
 	// If no streamers in DB, doc returns empty array, exit method
-	if(doc.length < 1) return;
+	if (doc.length < 1) return;
 
 	let streamUrl = `${process.env.TWITCH_STREAM_API}`;
 	doc.forEach(streamer => {
@@ -457,7 +462,7 @@ async function streamChecker(livePromotionChannel) {
 		// Find and return the index of searchResult where the current live streamer equals the streamer in DB
 		let i;
 		searchResult.find((liveStreamer, index) => {
-			if(streamer.streamerName === liveStreamer.user_name) {
+			if (streamer.streamerName === liveStreamer.user_name) {
 				i = index;
 				return true;
 			}
@@ -465,7 +470,7 @@ async function streamChecker(livePromotionChannel) {
 
 		// i = Undefined if streamer in DB is not found in searchResult
 		// i = n if streamer is in searchResult (ie Is currently live)
-		if(i !== undefined) {
+		if (i !== undefined) {
 			// Call API to get the game name they are playing (or just chatting)
 			const gameName = (await axios({
 				url: `${process.env.TWITCH_GAME_API}id=${searchResult[i].game_id}`,
@@ -498,11 +503,11 @@ async function streamChecker(livePromotionChannel) {
 				streamer.gameTitle = gameName[0].name;
 				await streamer.save();
 			}
-		// Else the streamer is not live
+			// Else the streamer is not live
 		} else {
 			// If the status in DB says they are live
 			// eslint-disable-next-line no-lonely-if
-			if(streamer.status === 'Live') {
+			if (streamer.status === 'Live') {
 				// Change status and title for that streamer (document) and save to DB
 				streamer.status = 'Offline';
 				streamer.gameTitle = '';
