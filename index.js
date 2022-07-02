@@ -6,6 +6,8 @@ const fs = require('fs');
 const Discord = require('discord.js');
 // Require the Axios module
 const axios = require('axios');
+// Require the node-scheduler module
+const schedule = require('node-schedule');
 // Require the database connection to MongoDB
 const database = require('./database/database.js');
 // Require the birthday collection from MongoDB
@@ -128,7 +130,8 @@ client.once('ready', () => {
 
 	// 1000 = 1 sec, 10000 = 10 sec, 60000 = 1 minute, 3600000 = 1 hour, 86400000 = 24 hours
 	// Sets an interval of milliseconds, to run the birthdayChecker code
-	setInterval(async () => await birthdayChecker(genChannel), 86400000);
+	// ScheduleJob uses cron format to run everyday (0-6), at 12:00:00
+	schedule.scheduleJob('00 00 12 * * 0-6', async () => await birthdayChecker(genChannel));
 	console.log('Birthday Checker	:	Created');
 
 	// Sets an interval of milliseconds, to run the scheduleChecker code
