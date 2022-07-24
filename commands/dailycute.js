@@ -1,5 +1,6 @@
 require('dotenv').config();
 const axios = require('axios');
+const { MessageAttachment } = require('discord.js');
 
 async function apiCalls(animal, aFact) {
 
@@ -58,16 +59,16 @@ module.exports = {
 		const animalsArr = ['dog', 'cat', 'panda', 'red_panda', 'birb', 'fox', 'koala'];
 
 		// If given an argument, return error message
-		if(args.length) return message.channel.send('This command doesn\'t take any arguments!');
+		if (args.length) return message.channel.send('This command doesn\'t take any arguments!');
 
 		// Get random animal and initalize animal fact
 		const animal = animalsArr[randomNum];
 		let aFact = '';
 
 		// Animal fact API has different names for bird and red panda
-		if(animal === 'red_panda') {
+		if (animal === 'red_panda') {
 			aFact = animalsArr[2];
-		} else if(animal === 'birb') {
+		} else if (animal === 'birb') {
 			aFact = 'bird';
 		} else {
 			aFact = animal;
@@ -77,9 +78,11 @@ module.exports = {
 		const response = await apiCalls(animal, aFact);
 
 		// Check if there was an error during API call
-		if(response.error) return message.channel.send(response.errorMessage);
+		if (response.error) return message.channel.send(response.errorMessage);
 
 		// Return fact and animal image
-		return message.channel.send(`${response.fact}`, { files: [`${response.link}`] });
+		// Send image as new message attachment, with link and file name
+		// Before, discord js treated the file as the name, if it didn't have image extension it sent it as a file
+		return message.channel.send(`${response.fact}`, { files: [new MessageAttachment(response.link, 'animal.png')] });
 	},
 };
