@@ -14,10 +14,10 @@ module.exports = {
 		const embed = new Discord.MessageEmbed()
 			.setColor('#0099ff')
 			.setTimestamp()
-			.setFooter('Parshotan Seenanan');
+			.setFooter('Immature Bot');
 		// If the message guild exists (message is in server) set the author and thumbnail
 		// Else set it static values (message would be dm then)
-		if(message.guild) {
+		if (message.guild) {
 			embed
 				.setAuthor(message.guild.name, message.guild.iconURL())
 				.setThumbnail(message.guild.iconURL());
@@ -28,13 +28,13 @@ module.exports = {
 
 
 		// If no arguments given (i.e just !help)
-		if(!args.length) {
+		if (!args.length) {
 			// Add appropriate title and description to embedded message
 			embed
 				.setTitle('Commands')
 				.setDescription('Here\'s a list of all my commands!');
 			// Add a field in the message for every command, and their description
-			for(const command of commands) {
+			for (const command of commands) {
 				embed.addField(`__**${command[1].name}**__`, command[1].description);
 			}
 			// Add a blank field and an 'Additional Help' field
@@ -51,13 +51,13 @@ module.exports = {
 		const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
 		// If command is not one of the ones recognized reply not valid
-		if(!command) {
+		if (!command) {
 			return message.reply('that\'s not a valid command!');
 		}
 
-		if(command.aliases) data.push(`**Aliases:** ${command.aliases.join(', ')}`);
-		if(command.description) data.push(`**Description:** ${command.description}`);
-		if(command.usage) data.push(`**Usage:** ${process.env.PREFIX}${command.name} ${command.usage}`);
+		if (command.aliases) data.push(`**Aliases:** ${command.aliases.join(', ')}`);
+		if (command.description) data.push(`**Description:** ${command.description}`);
+		if (command.usage) data.push(`**Usage:** ${process.env.PREFIX}${command.name} ${command.usage}`);
 
 		// Create embedded message detailing the command
 		embed
