@@ -20,7 +20,7 @@ async function addStreamer(message, args) {
 			},
 		})).data.data;
 
-		if(searchResult.length) {
+		if (searchResult.length) {
 			const idNumber = await Streamer.countDocuments() + 1;
 
 			// Construct a new streamer document from the model
@@ -45,7 +45,7 @@ async function addStreamer(message, args) {
 		} else {
 			message.channel.send('Streamer not found');
 		}
-	} catch(err) {
+	} catch (err) {
 		console.log(err);
 	}
 }
@@ -77,15 +77,15 @@ async function removeStreamer(message, args) {
 }
 
 async function updateCollectionIDs() {
-// Get number of documents in collection
+	// Get number of documents in collection
 	const numberOfDocs = await Streamer.countDocuments();
 
-	for(let i = 0; i < numberOfDocs; i++) {
+	for (let i = 0; i < numberOfDocs; i++) {
 		// Find all documents matching the condition (id > i)
 		// Update the first documents id to be i + 1
 		// Function takes a filter, an update, and a callback
 		Streamer.updateOne(
-			{ id: { $gt:i } },
+			{ id: { $gt: i } },
 			{ id: i + 1 },
 			(err) => {
 				if (err) console.log(err);
@@ -98,14 +98,14 @@ async function listStreamer(message) {
 	const embed = new Discord.MessageEmbed()
 		.setColor('#0099ff')
 		.setTimestamp()
-		.setFooter('Parshotan Seenanan')
+		.setFooter('Immature Bot')
 		.setAuthor(message.guild.name, message.guild.iconURL())
 		.setThumbnail(message.guild.iconURL());
 
 	const doc = await Streamer.find().sort({ id: 1 });
 	console.log('Streamer DB Called');
 
-	if(!doc.length) return message.channel.send('No streamers in database.\nTo add a streamer use \'ia!twitch add [streamer name]\'');
+	if (!doc.length) return message.channel.send('No streamers in database.\nTo add a streamer use \'ia!twitch add [streamer name]\'');
 
 	// The limit of how many stremers can be in an embed
 	// Only have 25 fields
@@ -153,15 +153,15 @@ module.exports = {
 	description: 'Adds or removes a Twitch streamer from the database or shows all streamers',
 	args: true,
 	usage: 'add [Twitch Username] --- Adds a streamer to the bot' +
-				'\n**•**ia!twitch remove [ID] --- Removes a streamer from the bot' +
-				'\n**•**ia!twitch list --- Shows all streamers followed by the bot',
+		'\n**•**ia!twitch remove [ID] --- Removes a streamer from the bot' +
+		'\n**•**ia!twitch list --- Shows all streamers followed by the bot',
 	async execute(message, args) {
-		if(message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
+		if (message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
 
 		// Get the first argument and remove it from array
 		const firstArg = args.shift().toLowerCase();
 
-		if(firstArg === 'add') {
+		if (firstArg === 'add') {
 			// Shift removes the first arg from array
 			// Message sends total number of args needed (add + 1 args)
 			if (args.length !== 1) {
@@ -177,7 +177,7 @@ module.exports = {
 			}
 			// Call removeStreamer function to remove from database
 			await removeStreamer(message, args);
-		} else if(firstArg === 'list') {
+		} else if (firstArg === 'list') {
 			// ID	|	Twitch Streamer Name   |   Twitch URL
 			await listStreamer(message);
 		} else {

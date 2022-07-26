@@ -51,19 +51,19 @@ module.exports = {
 	description: 'Gets a list of all quotes, specific quote, or random quote',
 	args: false,
 	usage: ' --- Shows a list of all quotes in the bot' +
-				'\n**•**ia!quotes [first name] [last name] --- Shows a list of quotes from a specific person' +
-				'\n**•**ia!quotes [ID] --- Shows a specific quote based ID' +
-				'\n**•**ia!quotes random --- Gets a random quote',
+		'\n**•**ia!quotes [first name] [last name] --- Shows a list of quotes from a specific person' +
+		'\n**•**ia!quotes [ID] --- Shows a specific quote based ID' +
+		'\n**•**ia!quotes random --- Gets a random quote',
 	async execute(message, args) {
 
 		// Create the MessageEmbed
 		const embed = new Discord.MessageEmbed()
 			.setColor('#0099ff')
 			.setTimestamp()
-			.setFooter('Parshotan Seenanan');
+			.setFooter('Immature Bot');
 		// If the message guild exists (message is in server) set the author and thumbnail
 		// Else set it static values (message would be dm then)
-		if(message.guild) {
+		if (message.guild) {
 			embed
 				.setAuthor(message.guild.name, message.guild.iconURL())
 				.setThumbnail(message.guild.iconURL());
@@ -73,20 +73,20 @@ module.exports = {
 		}
 
 		// If no args given (i.e just ia!quotes)
-		if(!args.length) {
+		if (!args.length) {
 			// Create a query getting all docs sorting by id
 			// Await the query to get the array of docs
 			const query = Quote.find().sort({ id: 1 });
 			const doc = await query;
 			console.log('Quote DB Called');
 			// If there are no quotes in database, send error message
-			if(!doc) return message.channel.send('No quotes in database.\nTo add a quote use ia!quote [first name] [last name] [quote]');
+			if (!doc) return message.channel.send('No quotes in database.\nTo add a quote use ia!quote [first name] [last name] [quote]');
 
 			// Call function to create and send 3 column embedded
 			createEmbeddedColumns(message, doc, embed);
 
-		// If the first arg is 'list'
-		} else if(args[0].toLowerCase() === 'random') {
+			// If the first arg is 'list'
+		} else if (args[0].toLowerCase() === 'random') {
 			// Get a number of all the documents in the collection
 			const numberOfDocs = await Quote.countDocuments();
 
@@ -101,7 +101,7 @@ module.exports = {
 			console.log('Quote DB Called');
 
 			// If there are no quotes in database, send error message
-			if(!doc) return message.channel.send('No quotes in database.\nTo add a quote use ia!quote [first name] [last name] [quote]');
+			if (!doc) return message.channel.send('No quotes in database.\nTo add a quote use ia!quote [first name] [last name] [quote]');
 
 			// Convert the timestamp to mm/yyyy
 			const date = `${doc.timestamp.getMonth() + 1}/${doc.timestamp.getFullYear()}`;
@@ -111,8 +111,8 @@ module.exports = {
 
 			// Send the embedded
 			return message.channel.send(embed);
-		// If the first arg is a number (integer)
-		} else if(Number(args[0])) {
+			// If the first arg is a number (integer)
+		} else if (Number(args[0])) {
 			// Store the number in a variable
 			const idNumber = Number(args[0]);
 
@@ -123,7 +123,7 @@ module.exports = {
 			console.log('Quote DB Called');
 
 			// If there are no quotes in database, send error message
-			if(!doc) return message.channel.send('Could not find ID in database.\nUse ia!quotes to see all quotes');
+			if (!doc) return message.channel.send('Could not find ID in database.\nUse ia!quotes to see all quotes');
 
 			// Get the fields from the document (first instance since it's an array)
 			const { firstName, lastName, id, quote } = doc[0];
@@ -136,8 +136,8 @@ module.exports = {
 
 			// Send the embedded
 			return message.channel.send(embed);
-		// If there are two args (should only be first name and last name)
-		} else if(args.length === 2) {
+			// If there are two args (should only be first name and last name)
+		} else if (args.length === 2) {
 			// Get the first and last name
 			const userFirstName = args[0];
 			const userLastName = args[1];
@@ -149,7 +149,7 @@ module.exports = {
 			console.log('Quote DB Called');
 
 			// If there are no quotes in database, send error message
-			if(!doc) return message.channel.send('Could not find name in database.\nUse ia!quotes to see all quotes');
+			if (!doc) return message.channel.send('Could not find name in database.\nUse ia!quotes to see all quotes');
 
 			// Call function to create and send 3 column embedded
 			createEmbeddedColumns(message, doc, embed);

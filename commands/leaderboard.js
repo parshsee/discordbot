@@ -40,7 +40,7 @@ async function endLeaderboard(message, args) {
 	const embed = new Discord.MessageEmbed()
 		.setColor('#0099ff')
 		.setTimestamp()
-		.setFooter('Parshotan Seenanan');
+		.setFooter('Immature Bot');
 	// If the message guild exists (message is in server) set the author and thumbnail
 	// Else set it static values (message would be dm then)
 	if (message.guild) {
@@ -53,13 +53,13 @@ async function endLeaderboard(message, args) {
 	}
 
 	// Check if given a tournament ID or name
-	if(args.length === 1 && Number(args[0])) {
+	if (args.length === 1 && Number(args[0])) {
 		const tournamentId = args[0];
 		// Create a query to find and delete the tournament based on tournamentId
 		// Returns an array of docs (even though if found it will only have 1 doc)
 		const query = await Leaderboard.findOneAndDelete({ id: tournamentId });
 		// If there are no tournaments in database, send error message
-		if(!query) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
+		if (!query) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
 
 		// Destructured tournament name from query
 		const { name } = query.leaderboard;
@@ -77,7 +77,7 @@ async function endLeaderboard(message, args) {
 		// Searching through an object is done with quotation marks
 		const query = await Leaderboard.findOneAndDelete({ 'leaderboard.name': tournamentName });
 		// If there are no tournaments in database, send error message
-		if(!query) return message.channel.send('Could not find leaderboard name in database.\nUse \'ia!leaderboard list\' to see all leaderboards.\n Make sure it is spelt exactly the same or use the ID instead');
+		if (!query) return message.channel.send('Could not find leaderboard name in database.\nUse \'ia!leaderboard list\' to see all leaderboards.\n Make sure it is spelt exactly the same or use the ID instead');
 
 		// Destructured tournament name from query
 		const { name } = query.leaderboard;
@@ -95,7 +95,7 @@ async function addPlayer(message, args) {
 	// Get the tournamentId (last element) from args and remove it
 	const tournamentId = args.pop();
 	// Check if tournamentId is an actual number
-	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
+	if (isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
 	// Get the player name, capitalizing the first letter in each arg (if more than one) and lowercasing the rest
 	const playerName = args.map((s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
 	// Construct the playerObject
@@ -108,7 +108,7 @@ async function addPlayer(message, args) {
 	// Check to see if tournament exists in DB
 	// Since it's find (generic) it will return an array of docs
 	const query = await Leaderboard.find({ id: tournamentId });
-	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboard');
+	if (query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboard');
 	// Get tournament object (should be first and only object in array)
 	const tournament = query[0];
 	// Add the playerObject to the players array of the leaderboard object
@@ -131,13 +131,13 @@ async function removePlayer(message, args) {
 	// Get the tournamentId (last element) from the args and remove it
 	const tournamentId = args.pop();
 	// Check if tournamentId is an actual number
-	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
+	if (isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
 	// Get the player name, capitalizing the first letter in each arg (if more than one) and lowercasing the rest
 	const playerName = args.map((s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
 
 	// Check to see if tournament exists in DB
 	const query = await Leaderboard.find({ id: tournamentId });
-	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
+	if (query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
 	// Get tournament object (should be first and only object in array)
 	const tournament = query[0];
 
@@ -145,7 +145,7 @@ async function removePlayer(message, args) {
 	const playerIndex = tournament.leaderboard.players.findIndex(player => {
 		return player.name === playerName;
 	});
-	if(playerIndex < 0) return message.channel.send('Player not found in leaderboard.\nUse \'ia!leaderboard list\' to see all leaderboards.\nUse \'ia!leaderboard list [leaderboardID]\' to see all players in that leaderboard');
+	if (playerIndex < 0) return message.channel.send('Player not found in leaderboard.\nUse \'ia!leaderboard list\' to see all leaderboards.\nUse \'ia!leaderboard list [leaderboardID]\' to see all players in that leaderboard');
 
 	// Remove the player object from the array
 	tournament.leaderboard.players.splice(playerIndex, 1);
@@ -172,7 +172,7 @@ async function updateScores(message, args) {
 	// Get the tournamentId (last element) from the args and remove it
 	const tournamentId = args.pop();
 	// Check if tournamentId is an actual number
-	if(isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
+	if (isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
 
 	// Find the index of the word loss (to split the differnece between winner name and loser)
 	const lossIndex = args.findIndex(x => {
@@ -186,7 +186,7 @@ async function updateScores(message, args) {
 
 	// Check to see if tournament exists in DB
 	const query = await Leaderboard.find({ id: tournamentId });
-	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
+	if (query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
 	// Get tournament object (should be first and only object in array)
 	const tournament = query[0];
 
@@ -197,7 +197,7 @@ async function updateScores(message, args) {
 	const loserIndex = tournament.leaderboard.players.findIndex(player => {
 		return player.name === loserName;
 	});
-	if(winnerIndex < 0 || loserIndex < 0) return message.channel.send('One or more players not found in leaderboard.\nUse \'ia!leaderboard list\' to see all leaderboards.\nUse \'ia!leaderboard list [leaderboardID]\' to see all players in that leaderboard');
+	if (winnerIndex < 0 || loserIndex < 0) return message.channel.send('One or more players not found in leaderboard.\nUse \'ia!leaderboard list\' to see all leaderboards.\nUse \'ia!leaderboard list [leaderboardID]\' to see all players in that leaderboard');
 
 	// Update the scores for the winner and loser
 	tournament.leaderboard.players[winnerIndex].wins += 1;
@@ -222,7 +222,7 @@ async function listLeaderboard(message, args) {
 	const embed = new Discord.MessageEmbed()
 		.setColor('#0099ff')
 		.setTimestamp()
-		.setFooter('Parshotan Seenanan');
+		.setFooter('Immature Bot');
 	// If the message guild exists (message is in server) set the author and thumbnail
 	// Else set it static values (message would be dm then)
 	if (message.guild) {
@@ -235,18 +235,18 @@ async function listLeaderboard(message, args) {
 	}
 
 	// If no arguments, then show all current tournaments
-	if(args.length === 0) {
+	if (args.length === 0) {
 		// Get all tournaments in DB
 		const query = await Leaderboard.find().sort({ id: 1 });
 		// Check to see if any tournaments exist
-		if(query.length < 1) return message.channel.send('No leaderboards are currently active.\nUse \'ia!leaderboard start [leaderboard name]\' to start one');
+		if (query.length < 1) return message.channel.send('No leaderboards are currently active.\nUse \'ia!leaderboard start [leaderboard name]\' to start one');
 
 		return createEmbeddedColumns(message, query, embed, 'ID', 'Leaderboard Name', '\u200b');
-	// Else if one arg (tournamentID, show all players and their scores)
-	} else if(args.length === 1) {
+		// Else if one arg (tournamentID, show all players and their scores)
+	} else if (args.length === 1) {
 		const tournamentId = args.pop();
 		// Check if tournamentId is an actual number
-		if(isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
+		if (isNaN(tournamentId)) return message.channel.send('Please enter a valid leaderboard ID. \nUse \'ia!leaderboard list\' to see all leaderboards');
 
 		// Check to see if tournament exists in DB
 		const query = await Leaderboard.find({ id: tournamentId });
@@ -268,7 +268,7 @@ async function resetLeaderboard(message, args) {
 
 	// Check to see if tournament exists in DB
 	const query = await Leaderboard.find({ id: tournamentId });
-	if(query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
+	if (query.length < 1) return message.channel.send('Could not find ID in database.\nUse \'ia!leaderboard list\' to see all leaderboards');
 	// Get tournament object (should be first and only object in array)
 	const tournament = query[0];
 
@@ -299,12 +299,12 @@ async function updateCollectionIDs() {
 	// Get number of documents in collection
 	const numberOfDocs = await Leaderboard.countDocuments();
 
-	for(let i = 0; i < numberOfDocs; i++) {
+	for (let i = 0; i < numberOfDocs; i++) {
 		// Find all documents matching the condition (id > i)
 		// Update the first documents id to be i + 1
 		// Function takes a filter, an update, and a callback
 		Leaderboard.updateOne(
-			{ id: { $gt:i } },
+			{ id: { $gt: i } },
 			{ id: i + 1 },
 			(err) => {
 				if (err) console.log(err);
@@ -366,56 +366,56 @@ module.exports = {
 	description: 'Starts or ends a leaderboard, Adds or removes a person from the leaderboard, and monitors wins and losses. ',
 	args: true,
 	usage: 'start [leaderboard name] --- Creates a new leaderboard' +
-				'\n**•**ia!leaderboard end [leaderboard ID] --- Ends a leaderboard and displays scores' +
-				'\n**•**ia!leaderboard add [name] [leaderboard ID] --- Adds a player to a leaderboard' +
-				'\n**•**ia!leaderboard remove [name] [leaderboard ID] --- Removes a player from a leaderboard' +
-				'\n**•**ia!leaderboard win [player name] loss [player name] [leaderboard ID] --- Updates scores for winning/losing players in leaderboard' +
-				'\n**•**ia!leaderboard list --- Lists all leaderboard' +
-				'\n**•**ia!leaderboard list [leaderboard ID] --- Lists all players and the scores in the leaderboard' +
-				'\n**•**ia!leaderboard reset [leaderboard ID] --- Resets a leaderboard, setting all wins/losses to 0 for all players',
+		'\n**•**ia!leaderboard end [leaderboard ID] --- Ends a leaderboard and displays scores' +
+		'\n**•**ia!leaderboard add [name] [leaderboard ID] --- Adds a player to a leaderboard' +
+		'\n**•**ia!leaderboard remove [name] [leaderboard ID] --- Removes a player from a leaderboard' +
+		'\n**•**ia!leaderboard win [player name] loss [player name] [leaderboard ID] --- Updates scores for winning/losing players in leaderboard' +
+		'\n**•**ia!leaderboard list --- Lists all leaderboard' +
+		'\n**•**ia!leaderboard list [leaderboard ID] --- Lists all players and the scores in the leaderboard' +
+		'\n**•**ia!leaderboard reset [leaderboard ID] --- Resets a leaderboard, setting all wins/losses to 0 for all players',
 	execute(message, args) {
 		// Get the first argument and remove it from the array
 		const firstArg = args.shift().toLowerCase();
 
-		if(firstArg === 'start') {
+		if (firstArg === 'start') {
 			// Message sends total number of args needed(add + 1 args)
-			if(args.length < 1) {
+			if (args.length < 1) {
 				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return addLeaderboard(message, args);
-		} else if(firstArg === 'add') {
+		} else if (firstArg === 'add') {
 			// Message sends total number of args needed(add + 1 args)
-			if(args.length < 1) {
+			if (args.length < 1) {
 				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return addPlayer(message, args);
-		} else if(firstArg === 'remove') {
+		} else if (firstArg === 'remove') {
 			// Message sends total number of args needed(remove + 1 args)
 			if (args.length < 1) {
 				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return removePlayer(message, args);
-		} else if(firstArg === 'win') {
+		} else if (firstArg === 'win') {
 			// Message sends total number of args needed(win + 3 args)
-			if(args.length < 3) {
+			if (args.length < 3) {
 				return message.channel.send('Command needs at least four (4) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return updateScores(message, args);
-		} else if(firstArg === 'end') {
+		} else if (firstArg === 'end') {
 			// Message sends total number of args needed(end  + 1 args)
-			if(args.length < 1) {
+			if (args.length < 1) {
 				return message.channel.send('Command needs at least two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return endLeaderboard(message, args);
-		} else if(firstArg === 'list') {
+		} else if (firstArg === 'list') {
 			// Special Case: Can be ia!leaderboard list OR list [tournamentID]
-			if(args.length > 1) {
+			if (args.length > 1) {
 				return message.channel.send('Command needs at most two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return listLeaderboard(message, args);
-		} else if(firstArg === 'reset') {
+		} else if (firstArg === 'reset') {
 			// Message sends total number of args needed(reset + 1 args)
-			if(args.lengt > 1) {
+			if (args.lengt > 1) {
 				return message.channel.send('Command needs two (2) arguments, run \'ia!help leaderboard\' for more info');
 			}
 			return resetLeaderboard(message, args);

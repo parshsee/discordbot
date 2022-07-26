@@ -51,13 +51,13 @@ module.exports = {
 	description: 'Shows a list of all the events or info about a specific one',
 	args: false,
 	usage: ' --- Shows all scheduled events' +
-			'\n**•**ia!events [ID] --- Shows a specific event and participants',
+		'\n**•**ia!events [ID] --- Shows a specific event and participants',
 	async execute(message, args) {
 		// Create the MessageEmbed
 		const embed = new Discord.MessageEmbed()
 			.setColor('#0099ff')
 			.setTimestamp()
-			.setFooter('Parshotan Seenanan');
+			.setFooter('Immature Bot');
 		// If the message guild exists (message is in server) set the author and thumbnail
 		// Else set it static values (message would be dm then)
 		if (message.guild) {
@@ -70,20 +70,20 @@ module.exports = {
 		}
 
 		// If no args given (i.e just ia!events)
-		if(!args.length) {
+		if (!args.length) {
 			// Create a query getting all docs sorting by id
 			// Await the query to get the array of docs
 			const query = Event.find().sort({ eventId: 1 });
 			const doc = await query;
 			console.log('Event DB Called');
 			// If there are no events in database, send error message
-			if(!doc.length) return message.channel.send('No events in database.\nTo add an event use ia!event add [event name]');
+			if (!doc.length) return message.channel.send('No events in database.\nTo add an event use ia!event add [event name]');
 
 			// Call function to create and send 3 column embedded
 			createEmbeddedColumns(message, doc, embed);
 
-		// Else if the first arg is a number (integer)
-		} else if(Number(args[0])) {
+			// Else if the first arg is a number (integer)
+		} else if (Number(args[0])) {
 			// Store the number in a variable
 			const idNumber = Number(args[0]);
 
@@ -94,14 +94,14 @@ module.exports = {
 
 			console.log('Event DB Called');
 			// If there are no events in database, send error message
-			if(!doc) return message.channel.send('Could not find ID in database.\nUse ia!events to see all events');
+			if (!doc) return message.channel.send('Could not find ID in database.\nUse ia!events to see all events');
 
 			// Get the fields from the document (first instance since it's an array)
 			const { eventName, eventDate, eventAuthor } = doc[0];
 			let { eventPeople } = doc[0];
 
 			// If there's only 1 element in the array and it's 'none', remove it
-			if(eventPeople.length === 1 && eventPeople[0] === 'none') eventPeople.pop();
+			if (eventPeople.length === 1 && eventPeople[0] === 'none') eventPeople.pop();
 			// Add the author ID to the beginning of the array
 			eventPeople.unshift(eventAuthor);
 			// Mutate (modify) the array, changing each ID (person) to allow Discord to @ them
