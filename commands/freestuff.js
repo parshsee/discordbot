@@ -19,7 +19,7 @@ function chunkSubstr(str, size) {
 		//          Now when o increments by size again it will be where y left off instead of
 		//          going to the next size and skipping all characters inbetween y and size.
 		// console.log("Substring Starting at: " + o + " : " + str.substr(o, size));
-		if(str.substr(o, size).endsWith('\n\n')) {
+		if (str.substr(o, size).endsWith('\n\n')) {
 			chunks[i] = str.substr(o, size);
 		} else {
 			// eslint-disable-next-line no-inline-comments
@@ -49,7 +49,7 @@ async function sendEmbeds(text, message) {
 		.setAuthor(message.guild.name, message.guild.iconURL())
 		.setThumbnail(message.guild.iconURL())
 		.setTimestamp()
-		.setFooter('Parshotan Seenanan')
+		.setFooter('Immature Bot')
 		.setTitle('Available Games');
 	let count = 1;
 
@@ -57,7 +57,7 @@ async function sendEmbeds(text, message) {
 	for (const chunk of testArr) {
 		// First Embedded Title this
 		// Else every other embedded gets 'Games Cont'
-		if(count === 1) {
+		if (count === 1) {
 			embed
 				.setTitle('Available Games');
 			// .setThumbnail(message.guild.iconURL());
@@ -81,9 +81,9 @@ module.exports = {
 	description: 'Shows all available games or searches for a specific game \n __Multiple copies of the same game will appear as [game name] x[# of copies]__',
 	args: false,
 	usage: ' --- Shows all available games' +
-			'\n**•**ia!freestuff [game name] --- Searches for specific game',
+		'\n**•**ia!freestuff [game name] --- Searches for specific game',
 	async execute(message, args) {
-		if(message.channel.name === 'freebies') {
+		if (message.channel.name === 'freebies') {
 			if (!args.length) {
 				let reply = '';
 				// Returns json array, await so the program doesnt execute rest of lines
@@ -98,13 +98,13 @@ module.exports = {
 
 				// Loop through the array of Games
 				// The copies functionality requires the array to be sorted
-				for(let i = 0, n = docs.length; i < n; i++) {
+				for (let i = 0, n = docs.length; i < n; i++) {
 					// Query the database, finding all documents in Games collection where the name is the same as the current one and returning the count
 					// Await the query to get the number
 					const query2 = Games.find({ gameName: docs[i].gameName }).countDocuments();
 					const docs2 = await query2;
 					// If more than one instance of game name
-					if(docs2 > 1) {
+					if (docs2 > 1) {
 						// Add to reply the number of copies
 						reply += `:free: **${docs[i].gameName} x${docs2}** \n Type: ${docs[i].gameType} \n Redeemable On: ${docs[i].codeType} \n\n`;
 						// Increase the index by that amount - 1 (due to current game)
@@ -135,13 +135,13 @@ module.exports = {
 
 				// Loop through the array of Games
 				// The copies functionality requires the array to be sorted
-				for(let i = 0, n = docs.length; i < n; i++) {
+				for (let i = 0, n = docs.length; i < n; i++) {
 					// Query the database, finding all documents in Games collection where the name is the same as the current one and returning the count
 					// Await the query to get the number
 					const query2 = Games.find({ gameName: docs[i].gameName }).countDocuments();
 					const docs2 = await query2;
 					// If more than one instance of game name
-					if(docs2 > 1) {
+					if (docs2 > 1) {
 						// Add to reply the number of copies
 						reply += `:free: **${docs[i].gameName} x${docs2}** \n Type: ${docs[i].gameType} \n\n`;
 						// Increase the index by that amount - 1 (due to current game)

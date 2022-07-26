@@ -17,7 +17,8 @@ async function birthdayDBCall() {
 	const beforeCurrDate = [];
 
 	// For each document check if its before or after current day
-	doc.forEach(function(birthday) {
+	// eslint-disable-next-line space-before-function-paren
+	doc.forEach(function (birthday) {
 		// Check if the month is ahead
 		if (birthday.birthday.getMonth() + 1 > currentDate.getMonth() + 1) {
 			// Add to array of dates AFTER current day
@@ -65,9 +66,9 @@ function sortArr(arr, currentDate) {
 		const bdayDay2 = b.bday.getDate();
 
 		// If the second month is less than the first month swap them
-		if(bdayMonth - currMonth < bdayMonth2 - currMonth) {
+		if (bdayMonth - currMonth < bdayMonth2 - currMonth) {
 			return -1;
-		} else if(bdayMonth - currMonth === bdayMonth2 - currMonth && bdayDay < bdayDay2) {
+		} else if (bdayMonth - currMonth === bdayMonth2 - currMonth && bdayDay < bdayDay2) {
 			return -1;
 		}
 	});
@@ -91,7 +92,7 @@ function chunkSubstr(str, size) {
 		//          Now when o increments by size again it will be where y left off instead of
 		//          going to the next size and skipping all characters inbetween y and size.
 		// console.log("Substring Starting at: " + o + " : " + str.substr(o, size));
-		if(str.substr(o, size).endsWith('\n\n')) {
+		if (str.substr(o, size).endsWith('\n\n')) {
 			chunks[i] = str.substr(o, size);
 		} else {
 			// eslint-disable-next-line no-inline-comments
@@ -118,10 +119,10 @@ async function sendEmbeds(text, message) {
 	const embed = new Discord.MessageEmbed()
 		.setColor('#0099ff')
 		.setTimestamp()
-		.setFooter('Parshotan Seenanan');
+		.setFooter('Immature Bot');
 	// If the message guild exists (message is in server) set the author and thumbnail
 	// Else set it static values (message would be dm then)
-	if(message.guild) {
+	if (message.guild) {
 		embed
 			.setAuthor(message.guild.name, message.guild.iconURL())
 			.setThumbnail(message.guild.iconURL());
@@ -136,7 +137,7 @@ async function sendEmbeds(text, message) {
 	for (const chunk of testArr) {
 		// First Embedded Title this
 		// Else every other embedded gets 'Games Cont'
-		if(count === 1) {
+		if (count === 1) {
 			embed
 				.setTitle('Birthdays');
 			// .setThumbnail(message.guild.iconURL());
@@ -160,19 +161,19 @@ module.exports = {
 	description: 'Shows all birthdays or a specific one',
 	args: false,
 	usage: ' --- Lists all birthdays' +
-			'\n**•**ia!bdays [first name] [last name] --- Shows a specific birthday based on name',
+		'\n**•**ia!bdays [first name] [last name] --- Shows a specific birthday based on name',
 	async execute(message, args) {
 
 		let reply = '';
 		// If no arguments are given (i.e just ia!bdays)
-		if(!args.length) {
+		if (!args.length) {
 			// Get current date
 			const currentDate = new Date();
 			currentDate.setTime(0, 0, 0, 0);
 			// Get two arrays,
 			// One containing dates after current day
 			// One containing dates before current day
-			const [ afterCurrDate, beforeCurrDate ] = await birthdayDBCall();
+			const [afterCurrDate, beforeCurrDate] = await birthdayDBCall();
 
 			// Get the sorted arrays
 			const sortedAfterDates = sortArr(afterCurrDate, currentDate);
@@ -195,7 +196,7 @@ module.exports = {
 			});
 
 			// If the reply is empty, return error message
-			if(reply === '') {
+			if (reply === '') {
 				reply += 'No birthdays in database.\nTo add a birthday use ia!bday add [first name] [last name] [mm/dd/yyyy]\n\n';
 			}
 			// Create and send embed
@@ -203,7 +204,7 @@ module.exports = {
 		}
 
 		// If not given exactly two arguments (first and last name) return error message
-		if(args.length !== 2) return message.channel.send('Command requires two (2) arguments. Use ia!help [command] for proper usage');
+		if (args.length !== 2) return message.channel.send('Command requires two (2) arguments. Use ia!help [command] for proper usage');
 
 		// Get the entered first and last names
 		const userFirstName = args[0];
@@ -216,7 +217,7 @@ module.exports = {
 		const doc = await query;
 		console.log('Birthday DB Called');
 		// If the array is empty (no documents) send error message
-		if(!doc.length) return message.channel.send('Person could not be found. Please use ia!bdays to view the full list of birthdays');
+		if (!doc.length) return message.channel.send('Person could not be found. Please use ia!bdays to view the full list of birthdays');
 
 		// Get the fields from the document (first instance since it's an array)
 		const { firstName, lastName, birthday } = doc[0];

@@ -6,25 +6,25 @@ module.exports = {
 	description: 'Show information on the server or on a specific user from their user id or mention',
 	args: false,
 	usage: ' --- Shows information on the server' +
-			'\n**•**ia!stats [user id] --- Shows information on a specific user using their ID' +
-			'\n**•**ia!stats [@mention] --- Shows information on a specific user using their mention',
+		'\n**•**ia!stats [user id] --- Shows information on a specific user using their ID' +
+		'\n**•**ia!stats [@mention] --- Shows information on a specific user using their mention',
 	execute(message, args) {
 
-		if(message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
+		if (message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
 
-		if(args.length > 1) {
+		if (args.length > 1) {
 			return message.channel.send('Incorrect usage, use \'ia!help stats\' for more information on how to use this command');
 		} else if (args.length === 1) {
 			// If command is !stats [@mention] or [user id]
 			// Ternary Operator, check to see if there was a mention, if true get first mention else get user gave an id, get member from id
 			const member = message.mentions.members.size === 1 ? message.mentions.members.first() : message.guild.members.cache.get(args[0]);
 
-			if(member) {
+			if (member) {
 				// Create and send embed with info on user
 				const embed = new Discord.MessageEmbed()
 					.setColor('#0099ff')
 					.setTimestamp()
-					.setFooter('Parshotan Seenanan')
+					.setFooter('Immature Bot')
 					.setAuthor(`${member.user.username}`, member.user.displayAvatarURL())
 					.setThumbnail(member.user.displayAvatarURL())
 					.addField('Created On', member.user.createdAt.toLocaleString(), true)
@@ -51,7 +51,7 @@ module.exports = {
 			const embed = new Discord.MessageEmbed()
 				.setColor('#0099ff')
 				.setTimestamp()
-				.setFooter('Parshotan Seenanan')
+				.setFooter('Immature Bot')
 				.setAuthor(`${guild.name}`, guild.iconURL())
 				.setThumbnail(guild.iconURL())
 				.addField('Created On', guild.createdAt.toLocaleString())

@@ -13,7 +13,7 @@ async function apiCalls(gameName, gameYear) {
 	let searchQuery = `search "${gameName}"; fields cover.url, game_modes.name, name, summary; where cover != null`;
 	// If given a game year add that to the search query
 	// Else close the query
-	if(gameYear) {
+	if (gameYear) {
 		searchQuery = searchQuery + ` & release_dates.y = ${gameYear};`;
 	} else {
 		searchQuery = searchQuery + ';';
@@ -57,7 +57,7 @@ async function apiCalls(gameName, gameYear) {
 		// Go through each object (mode) in array with the index
 		// Add that mode to the array of game_modes in gameInfomration
 		// Essentially updates the arrays from the IDs to the actual modes
-		if(gameInformation.game_modes) {
+		if (gameInformation.game_modes) {
 			gameInformation.game_modes.forEach((mode, index) => {
 				gameInformation.game_modes[index] = mode.name;
 			});
@@ -88,7 +88,7 @@ module.exports = {
 	async execute(message, args) {
 		// If used as a DM
 		// Return error message
-		if(message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
+		if (message.channel.type === 'dm') return message.channel.send('This command can\'t be used as a DM');
 
 		// Get the game name from the args
 		// Make all relevant api calls from game name
@@ -100,13 +100,13 @@ module.exports = {
 		// Check if there is a second element in array (which should be the year)
 		// And check if the second element is a number
 		// Return error message if not
-		if(gameArr[1] && isNaN(gameArr[1])) return message.channel.send('Optional second parameter isn\'t a valid year');
+		if (gameArr[1] && isNaN(gameArr[1])) return message.channel.send('Optional second parameter isn\'t a valid year');
 
 		const gameInformation = await apiCalls(gameArr[0], gameArr[1]);
 
 		// If error during API call
 		// Return the error message
-		if(gameInformation.error) {
+		if (gameInformation.error) {
 			return message.channel.send(gameInformation.errorMessage);
 		}
 
@@ -115,7 +115,7 @@ module.exports = {
 		// If the summary is longer than 1024 characters
 		// Get a new length within 1024 characters that ends in a newline
 		// Set the summary to the shorten version
-		if(gameSummary.length > 1024) {
+		if (gameSummary.length > 1024) {
 			const newLength = gameSummary.substr(0, 1024).lastIndexOf('\n');
 			gameSummary = gameSummary.substr(0, newLength);
 		}
@@ -124,7 +124,7 @@ module.exports = {
 		const embed = new discord.MessageEmbed()
 			.setColor('#0099ff')
 			.setTimestamp()
-			.setFooter('Parshotan Seenanan')
+			.setFooter('Immature Bot')
 			.setAuthor(message.guild.name, message.guild.iconURL())
 			.setThumbnail(gameInformation.cover)
 			.setTitle(gameInformation.name)
