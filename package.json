@@ -14,7 +14,7 @@
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "eslint": "^7.15.0",
-    "mongoose": "^6.4.2",
+    "mongoose": "^6.4.6",
     "node-schedule": "^2.1.0"
   }
 }
