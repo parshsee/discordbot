@@ -1,5 +1,8 @@
 # Immature Bot
 
+## ** This bot is no longer being supported or updated. The repository has been archived **
+## ** An updated version of the bot using Discord.js V14 can found here: [Immature Bot V2](https://github.com/parshsee/discordbot-V2) **
+
 ## Description
 This is my first Discord bot which serves to help me learn JavaScript and MongoDB as well as providing useful functions for my peers on their Discord server. 
 
